@@ -1,0 +1,9 @@
+%% -*- erlang -*-
+{application, greeting,
+ [{description, "greeting"},
+  {vsn, "0.1"},
+  {modules, []},
+  {registered, []},
+  {mod, {'greeting_app', []}},
+  {env, []},
+  {applications, [kernel, stdlib, crypto]}]}.

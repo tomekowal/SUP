@@ -1,0 +1,11 @@
+{% extends "devices/devices.dtl" %}
+
+{% block yield %}
+    <form action="/devices/{{ device.id }}/update" method="post">
+      <p>Id: {{ device.id }} <input type="hidden" name="id" value="{{ device.id }}"></p>
+      <p>Name: <input type="text" name="name" value="{{ device.name }}"></p>
+      <p>Kernel: <input type="text" name="kernel" value="{{ device.kernel }}"></p>
+      <p>OS: <input type="text" name="os" value="{{ device.os }}"></p>
+      <input type="submit">
+    </form>
+{% endblock %}

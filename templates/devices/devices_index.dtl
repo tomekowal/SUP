@@ -1,0 +1,31 @@
+{% extends "devices/devices.dtl" %}
+
+{% block yield %}
+  <table border="1">
+    <tr>
+      <th>Id</th>
+      <th>Name</th>
+      <th>Kernel</th>
+      <th>OS</th>
+      <th></th>
+    </tr>
+    {% for device in devices %}
+    <tr>
+      <td>{{ device.id }}</td>
+      <td>{{ device.name }}</td>
+      <td>{{ device.kernel }}</td>
+      <td>{{ device.os }}</td>
+      <td>
+        <a href="/devices/{{ device.id }}/edit">edit</a>
+          |
+            <form action="/devices/{{ device.id }}/destroy" method="post">
+              <input type="hidden" name="id" value="{{ device.id }}"></p>
+              <input type="submit" value="delete">
+            </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <a href="/devices/new">New device</a>
+{% endblock %}

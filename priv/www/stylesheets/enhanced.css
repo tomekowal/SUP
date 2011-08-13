@@ -16,7 +16,7 @@
 }
 
 .action-button.delete {
-  border: 1px solid #0492BE;
+  border: 1px solid #e50000;
   background: #fe1900;
   background: -moz-linear-gradient(top, #fe1900 0%, #bc0404 100%);
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fe1900), color-stop(100%,#bc0404));
@@ -31,7 +31,6 @@
 }
 
 .action-button.delete:hover {
-  border: 1px solid #0492BE;
   background: #bc0404;
   background: -moz-linear-gradient(top, #bc0404 0%, #fe1900 100%);
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#bc0404), color-stop(100%,#fe1900));
@@ -98,7 +97,7 @@ form.delete {
 }
 
 /* Style dla tabel */
-.devices {
+.devices, .programs {
   border: 1px solid #98BF21;
   border-collapse: collapse;
 }

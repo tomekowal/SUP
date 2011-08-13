@@ -1,0 +1,4 @@
+{% extends "main/main.dtl" %}
+{% block content %}
+  <p>Welcome to Software Update Platform - project which simplifies updating applications on remote devices. It tracks software versions, sends software to devices and performs updates.</p>
+{% endblock %}

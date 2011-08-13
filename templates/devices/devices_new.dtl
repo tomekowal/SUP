@@ -1,5 +1,4 @@
 {% extends "devices/devices.dtl" %}
-
 {% block yield %}
     <form action="/devices" method="post">
       <p>Name: <input type="text" name="name"></p>

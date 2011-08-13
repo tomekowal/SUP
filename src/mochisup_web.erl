@@ -27,6 +27,8 @@ loop(Req, DocRoot) ->
       case Controller of
         "devices" ->
           devices_controller:dispatch(Req, Args);
+        "" ->
+          main_controller:index(Req);
         _ ->
           Req:serve_file(Path, DocRoot)
       end

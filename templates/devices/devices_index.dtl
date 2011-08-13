@@ -1,7 +1,7 @@
 {% extends "devices/devices.dtl" %}
 
 {% block yield %}
-  <table border="1">
+  <table class="devices">
     <tr>
       <th>Id</th>
       <th>Name</th>
@@ -16,16 +16,15 @@
       <td>{{ device.kernel }}</td>
       <td>{{ device.os }}</td>
       <td>
-        <a href="/devices/{{ device.id }}/edit">edit</a>
-          |
-            <form action="/devices/{{ device.id }}/destroy" method="post">
-              <input type="hidden" name="id" value="{{ device.id }}"></p>
-              <input type="submit" value="delete">
-            </form>
+        <a href="/devices/{{ device.id }}/edit"><button type="button" class="action-button edit">Edit</button></a>
+        <form action="/devices/{{ device.id }}/destroy" method="post" class="delete">
+          <input type="hidden" name="id" value="{{ device.id }}">
+          <input type="submit" value="Delete" class="action-button delete" onclick="return confirm('Are you sure?');">
+        </form>
       </td>
     </tr>
     {% endfor %}
   </table>
 
-  <a href="/devices/new">New device</a>
+  <a href="/devices/new"><button type="button" class="action-button new">New device</button></a>
 {% endblock %}

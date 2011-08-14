@@ -18,21 +18,22 @@
 #nav li {
   display: block;
   float: left;
-  padding: 10px 20px;
-  margin-right: 1px;
 }
 
 #nav a {
+  border: 1px solid #627d4d;
+  margin: 1px;
+  text-decoration: none;
+  list-style: none;
+  display: inline;
+  padding: 10px 20px;
   color: white;
   text-transform:capitalize;
   font-family: Verdana, Geneva, sans-serif;
   text-transform: capitalize;
-  text-decoration: none;
 }
 
-.menu {
-  list-style: none;
-  display: inline;
+.menu-button {
   background: #627d4d;
   background: -moz-linear-gradient(top, #627d4d 0%, #1f3b08 100%);
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#627d4d), color-stop(100%,#1f3b08));
@@ -42,7 +43,7 @@
   background: linear-gradient(top, #627d4d 0%,#1f3b08 100%);
 }
 
-.menu:hover {
+.menu-button:hover {
   background: #1f3b08;
   background: -moz-linear-gradient(top, #1f3b08 0%, #627d4d 100%);
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#1f3b08), color-stop(100%,#627d4d));
@@ -169,7 +170,7 @@ form.delete {
   border: 1px solid #98BF21;
   border-collapse: collapse;
 }
-td, th {
+th, td{
   border: 1px solid #98BF21;
   padding: 3px 10px 3px 10px;
 }

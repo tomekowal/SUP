@@ -4,7 +4,6 @@
   {% if devices %}
     <table class="devices">
       <tr>
-        <th>Id</th>
         <th>Name</th>
         <th>Kernel</th>
         <th>OS</th>
@@ -12,8 +11,7 @@
       </tr>
       {% for device in devices %}
       <tr>
-        <td>{{ device.id }}</td>
-        <td>{{ device.name }}</td>
+        <td><a href="/devices/{{ device.id }}">{{ device.name }}</a></td>
         <td>{{ device.kernel }}</td>
         <td>{{ device.os }}</td>
         <td>

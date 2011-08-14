@@ -1,10 +1,21 @@
 {% extends "programs/programs.dtl" %}
-
 {% block yield %}
     <form action="/programs/{{ program.id }}/update" method="post">
-      <p>Id: {{ program.id }} <input type="hidden" name="id" value="{{ program.id }}"></p>
-      <p>Name: <input type="text" name="name" value="{{ program.name }}"></p>
-      <p>Version: <input type="text" name="version" value="{{ program.version }}"></p>
+      <input type="hidden" name="id" value="{{ program.id }}">
+      <table class="programs">
+        <tr>
+          <td>Name:</td>
+          <td><input type="text" name="name" value="{{ program.name }}"></td>
+        </tr>
+        <tr>
+          <td>Version:</td>
+          <td><input type="text" name="version" value="{{ program.version }}"></td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td><textarea cols="40" rows="5" name="description">{{ program.description }}</textarea>
+        </td>
+      </table>
       <input type="submit">
     </form>
 {% endblock %}

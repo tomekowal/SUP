@@ -9,12 +9,12 @@
   <div id="container">
     <div id="header">
       <div id="logo">
-        <img src="/images/logo.png" class="logo" />
+        <a href="/"><img src="/images/logo.png" class="logo" /></a>
       </div>
       <div id="nav">
         <ul>
-          <li class="menu"><a href="/devices">Devices</a></li>
-          <li class="menu"><a href="/programs">Programs</a></li>
+          <li class="menu"><a href="/devices" class="menu-button">Devices</a></li>
+          <li class="menu"><a href="/programs" class="menu-button">Programs</a></li>
         </ul>
       </div>
     </div>

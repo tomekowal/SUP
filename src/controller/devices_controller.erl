@@ -1,7 +1,7 @@
 -module(devices_controller).
 -compile(export_all).
 
--record(device, {id, name, kernel, os}).
+-include("../db/db.hrl").
 
 dispatch(Req, Args) ->
   case Req:get(method) of
@@ -49,7 +49,7 @@ create(Req) ->
   Name = proplists:get_value("name", PostData),
   Kernel = proplists:get_value("kernel", PostData),
   Os = proplists:get_value("os", PostData),
-  db:create({device, Id, Name, Kernel, Os}),
+  db:create({device, Id, Name, Kernel, Os, []}),
   Req:respond({302, [{"Location", "/devices"}], ""}).
 
 edit(Req, Id) ->
@@ -61,14 +61,19 @@ edit(Req, Id) ->
   Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
 show(Req, Id) ->
-  Req:respond({200, [{"Content-Type", "text/html"}], "show"}).
+  [Record] = db:find(device, Id),
+  [Atom | Fields] = tuple_to_list(Record),
+  RecordInfo = record_info(fields, device),
+  Device = lists:zip(RecordInfo, Fields),
+  {ok, HTMLOutput} = devices_show_dtl:render([{device, Device}]),
+  Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
 update(Req, Id) ->
   PostData = Req:parse_post(),
   Name = proplists:get_value("name", PostData),
   Kernel = proplists:get_value("kernel", PostData),
   Os = proplists:get_value("os", PostData),
-  db:create({device, Id, Name, Kernel, Os}),
+  db:create({device, Id, Name, Kernel, Os, []}),
   Req:respond({302, [{"Location", "/devices"}], ""}).
 
 destroy(Req, Id) ->

@@ -1,9 +1,20 @@
 {% extends "devices/devices.dtl" %}
 {% block yield %}
     <form action="/devices" method="post">
-      <p>Name: <input type="text" name="name"></p>
-      <p>Kernel: <input type="text" name="kernel"></p>
-      <p>OS: <input type="text" name="os"></p>
+      <table class="devices">
+        <tr>
+          <td>Name:</td>
+          <td><input type="text" name="name"></td>
+        </tr>
+        <tr>
+          <td>Kernel:</td>
+          <td><input type="text" name="kernel"></td>
+        </tr>
+        <tr>
+          <td>OS:</td>
+          <td><input type="text" name="os"></td>
+        </tr>
+      </table>
       <input type="submit">
     </form>
 {% endblock %}

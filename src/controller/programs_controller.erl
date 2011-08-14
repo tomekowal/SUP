@@ -1,7 +1,7 @@
 -module(programs_controller).
 -compile(export_all).
 
--record(program, {id, name, version}).
+-include("../db/db.hrl").
 
 dispatch(Req, Args) ->
   case Req:get(method) of
@@ -48,7 +48,8 @@ create(Req) ->
   Id = helper:timestamp(),
   Name = proplists:get_value("name", PostData),
   Version = proplists:get_value("version", PostData),
-  db:create({program, Id, Name, Version}),
+  Description = proplists:get_value("description", PostData),
+  db:create({program, Id, Name, Version, Description}),
   Req:respond({302, [{"Location", "/programs"}], ""}).
 
 edit(Req, Id) ->
@@ -60,13 +61,19 @@ edit(Req, Id) ->
   Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
 show(Req, Id) ->
-  Req:respond({200, [{"Content-Type", "text/html"}], "show"}).
+  [Record] = db:find(program, Id),
+  [Atom | Fields] = tuple_to_list(Record),
+  RecordInfo = record_info(fields, program),
+  Program = lists:zip(RecordInfo, Fields),
+  {ok, HTMLOutput} = programs_show_dtl:render([{program, Program}]),
+  Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
 update(Req, Id) ->
   PostData = Req:parse_post(),
   Name = proplists:get_value("name", PostData),
   Version = proplists:get_value("version", PostData),
-  db:create({program, Id, Name, Version}),
+  Description = proplists:get_value("description", PostData),
+  db:create({program, Id, Name, Version, Description}),
   Req:respond({302, [{"Location", "/programs"}], ""}).
 
 destroy(Req, Id) ->

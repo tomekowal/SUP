@@ -1,9 +1,7 @@
 -module(db).
 -compile(export_all).
 -include_lib("stdlib/include/qlc.hrl").
-
--record(device, {id, name, kernel, os}).
--record(program, {id, name, version}).
+-include("db.hrl").
 
 init() ->
   mnesia:create_schema([node()]),

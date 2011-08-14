@@ -9,6 +9,8 @@ dispatch(Req, Args) ->
       case Args of
         [] ->
           programs_controller:index(Req);
+        [""] ->
+          programs_controller:index(Req);
         ["new"] ->
           programs_controller:new(Req);
         [Id, "edit"] ->

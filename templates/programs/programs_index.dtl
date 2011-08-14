@@ -1,28 +1,32 @@
 {% extends "programs/programs.dtl" %}
 
 {% block yield %}
-  <table class="programs">
-    <tr>
-      <th>Id</th>
-      <th>Name</th>
-      <th>Version</th>
-      <th></th>
-    </tr>
-    {% for program in programs %}
-    <tr>
-      <td>{{ program.id }}</td>
-      <td>{{ program.name }}</td>
-      <td>{{ program.version }}</td>
-      <td>
-        <a href="/programs/{{ program.id }}/edit"><button type="button" class="action-button edit">Edit</button></a>
-        <form action="/programs/{{ program.id }}/destroy" method="post" class="delete">
-          <input type="hidden" name="id" value="{{ program.id }}">
-          <input type="submit" value="Delete" class="action-button delete" onclick="return confirm('Are you sure?');">
-        </form>
-      </td>
-    </tr>
-    {% endfor %}
-  </table>
+  {% if programs %}
+    <table class="programs">
+      <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Version</th>
+        <th></th>
+      </tr>
+      {% for program in programs %}
+      <tr>
+        <td>{{ program.id }}</td>
+        <td>{{ program.name }}</td>
+        <td>{{ program.version }}</td>
+        <td>
+          <a href="/programs/{{ program.id }}/edit"><button type="button" class="action-button edit">Edit</button></a>
+          <form action="/programs/{{ program.id }}/destroy" method="post" class="delete">
+            <input type="hidden" name="id" value="{{ program.id }}">
+            <input type="submit" value="Delete" class="action-button delete" onclick="return confirm('Are you sure?');">
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <p><strong>No programs found.</strong></p>
+  {% endif %}
 
   <a href="/programs/new"><button type="button" class="action-button new">New program</button></a>
 {% endblock %}

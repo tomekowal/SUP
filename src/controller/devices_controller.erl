@@ -9,6 +9,8 @@ dispatch(Req, Args) ->
       case Args of
         [] ->
           devices_controller:index(Req);
+        [""] ->
+          devices_controller:index(Req);
         ["new"] ->
           devices_controller:new(Req);
         [Id, "edit"] ->

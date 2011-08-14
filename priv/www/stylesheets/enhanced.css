@@ -2,7 +2,75 @@
   height: 128px;
 }
 
-/* style dla przycisków */
+/* menu */
+
+#nav {
+  width: 100%;
+  float: left;
+  margin: 0 0 0 0;
+}
+
+#nav ul {
+  display: block;
+  padding: 0 0 0 0;
+}
+
+#nav li {
+  display: block;
+  float: left;
+  padding: 10px 20px;
+  margin-right: 1px;
+}
+
+#nav a {
+  color: white;
+  text-transform:capitalize;
+  font-family: Verdana, Geneva, sans-serif;
+  text-transform: capitalize;
+  text-decoration: none;
+}
+
+.menu {
+  list-style: none;
+  display: inline;
+  background: #627d4d;
+  background: -moz-linear-gradient(top, #627d4d 0%, #1f3b08 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#627d4d), color-stop(100%,#1f3b08));
+  background: -webkit-linear-gradient(top, #627d4d 0%,#1f3b08 100%);
+  background: -o-linear-gradient(top, #627d4d 0%,#1f3b08 100%);
+  background: -ms-linear-gradient(top, #627d4d 0%,#1f3b08 100%);
+  background: linear-gradient(top, #627d4d 0%,#1f3b08 100%);
+}
+
+.menu:hover {
+  background: #1f3b08;
+  background: -moz-linear-gradient(top, #1f3b08 0%, #627d4d 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#1f3b08), color-stop(100%,#627d4d));
+  background: -webkit-linear-gradient(top, #1f3b08 0%,#627d4d 100%);
+  background: -o-linear-gradient(top, #1f3b08 0%,#627d4d 100%);
+  background: -ms-linear-gradient(top, #1f3b08 0%,#627d4d 100%);
+  background: linear-gradient(top, #1f3b08 0%,#627d4d 100%);
+}
+
+/* div */
+#container {
+  width: 980px;
+  margin: 0 auto;
+  display: block;
+  height: 100%;
+}
+
+
+#content {
+  float: left;
+  margin-top: 20px;
+}
+
+#footer {
+  float: left;
+}
+
+/* przyciski */
 .action-button {
   display: inline-block;
   padding-left: 20px;
@@ -96,7 +164,7 @@ form.delete {
   display: inline-block;
 }
 
-/* Style dla tabel */
+/* tabele */
 .devices, .programs {
   border: 1px solid #98BF21;
   border-collapse: collapse;

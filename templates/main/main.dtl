@@ -7,15 +7,22 @@
 </head>
 <body>
   <div id="container">
-    <div id="wrapper">
-      <div id="header">
+    <div id="header">
+      <div id="logo">
         <img src="/images/logo.png" class="logo" />
       </div>
-      <div id="nav"></div>
-      <div id="content">
-        {% block content %}{% endblock %}
+      <div id="nav">
+        <ul>
+          <li class="menu"><a href="/devices">Devices</a></li>
+          <li class="menu"><a href="/programs">Programs</a></li>
+        </ul>
       </div>
     </div>
+      
+    <div id="content">
+      {% block content %}{% endblock %}
+    </div>
+    
     <div id="footer"></div>
   </div>
 </body>

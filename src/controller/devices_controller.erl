@@ -15,6 +15,8 @@ dispatch(Req, Args) ->
           devices_controller:new(Req);
         [Id, "edit"] ->
           devices_controller:edit(Req, Id);
+        [Id, "programs"] ->
+          devices_controller:programs(Req, Id);
         [Id] ->
           devices_controller:show(Req, Id)
       end;
@@ -79,5 +81,9 @@ update(Req, Id) ->
 destroy(Req, Id) ->
   db:destroy(device, Id),
   Req:respond({302, [{"Location", "/devices"}], ""}).
+
+programs(Req, Id) ->
+  HTMLOutput = "programs",
+  Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
 

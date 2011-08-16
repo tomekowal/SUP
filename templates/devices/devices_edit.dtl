@@ -1,6 +1,6 @@
 {% extends "devices/devices.dtl" %}
 {% block yield %}
-    <form action="/devices" method="post">
+    <form action="/devices/{{ device.id }}/update" method="post">
       <input type="hidden" name="id" value="{{ device.id }}">
       <table class="devices">
         <tr>

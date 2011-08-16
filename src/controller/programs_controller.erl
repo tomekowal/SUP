@@ -70,6 +70,7 @@ show(Req, Id) ->
 
 update(Req, Id) ->
   PostData = Req:parse_post(),
+  Id = proplists:get_value("id", PostData),
   Name = proplists:get_value("name", PostData),
   Version = proplists:get_value("version", PostData),
   Description = proplists:get_value("description", PostData),

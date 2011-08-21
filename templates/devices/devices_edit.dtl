@@ -1,6 +1,11 @@
 {% extends "devices/devices.dtl" %}
+
+{% block head %}
+<script src="/javascripts/devices.js"></script>
+{% endblock %}
+
 {% block yield %}
-    <form action="/devices/{{ device.id }}/update" method="post">
+    <form action="/devices/{{ device.id }}/update" method="post" onsubmit="return validate()">
       <input type="hidden" name="id" value="{{ device.id }}">
       <table class="devices">
         <tr>
@@ -17,5 +22,7 @@
         </tr>
       </table>
       <input type="submit">
+      <a href="/devices/{{ device.id }}">Back to Device</a> |
+      <a href="/devices">Back to Devices</a>
     </form>
 {% endblock %}

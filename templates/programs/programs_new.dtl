@@ -1,6 +1,11 @@
 {% extends "programs/programs.dtl" %}
+
+{% block head %}
+<script src="/javascripts/programs.js"></script>
+{% endblock %}
+
 {% block yield %}
-    <form action="/programs" method="post">
+    <form action="/programs" method="post" onsubmit="return validate()">
       <table class="programs">
         <tr>
           <td>Name:</td>

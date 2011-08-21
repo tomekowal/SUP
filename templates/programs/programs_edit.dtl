@@ -1,6 +1,11 @@
 {% extends "programs/programs.dtl" %}
+
+{% block head %}
+<script src="/javascripts/programs.js"></script>
+{% endblock %}
+
 {% block yield %}
-    <form action="/programs/{{ program.id }}/update" method="post">
+    <form action="/programs/{{ program.id }}/update" method="post" onsubmit="return validate()">
       <input type="hidden" name="id" value="{{ program.id }}">
       <table class="programs">
         <tr>

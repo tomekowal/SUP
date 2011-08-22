@@ -1,0 +1,25 @@
+{% extends "programs/programs.dtl" %}
+
+{% block head %}
+<script src="/javascripts/programs.js"></script>
+{% endblock %}
+
+{% block yield %}
+    <form action="/programs" method="post" onsubmit="return validate()">
+      <table class="programs">
+        <tr>
+          <td>Name:</td>
+          <td><input type="text" name="name"></td>
+        </tr>
+        <tr>
+          <td>Version:</td>
+          <td><input type="text" name="version"></td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td><textarea cols="40" rows="5" name="description"></textarea>
+        </td>
+      </table>
+      <input type="submit">
+    </form>
+{% endblock %}

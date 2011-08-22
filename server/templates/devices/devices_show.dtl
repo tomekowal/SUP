@@ -1,0 +1,21 @@
+{% extends "devices/devices.dtl" %}
+{% block yield %}
+    <table class="devices">
+      <tr>
+        <th>Name</th>
+        <td>{{ device.name }}</td>
+      </tr>
+      <tr>
+        <th>Kernel</th>
+        <td>{{ device.kernel }}</td>
+      </tr>
+      <tr>
+        <th>OS</th>
+        <td>{{ device.os }}</td>
+      </tr>
+      <tr>
+        <th>Programs</th>
+        <td></td>
+      </tr>
+    </table>
+{% endblock %}

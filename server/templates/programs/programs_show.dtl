@@ -1,0 +1,17 @@
+{% extends "programs/programs.dtl" %}
+{% block yield %}
+    <table class="programs">
+      <tr>
+        <th>Name</th>
+        <td>{{ program.name }}</td>
+      </tr>
+      <tr>
+        <th>Version</th>
+        <td>{{ program.version }}</td>
+      </tr>
+      <tr>
+        <th>Description</th>
+        <td>{{ program.description }}</td>
+      </tr>
+    </table>
+{% endblock %}

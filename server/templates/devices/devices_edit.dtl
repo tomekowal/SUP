@@ -1,0 +1,28 @@
+{% extends "devices/devices.dtl" %}
+
+{% block head %}
+<script src="/javascripts/devices.js"></script>
+{% endblock %}
+
+{% block yield %}
+    <form action="/devices/{{ device.id }}/update" method="post" onsubmit="return validate()">
+      <input type="hidden" name="id" value="{{ device.id }}">
+      <table class="devices">
+        <tr>
+          <td>Name:</td>
+          <td><input type="text" name="name" value="{{ device.name }}"></td>
+        </tr>
+        <tr>
+          <td>Kernel:</td>
+          <td><input type="text" name="kernel" value="{{ device.kernel }}"></td>
+        </tr>
+        <tr>
+          <td>OS:</td>
+          <td><input type="text" name="os"  value="{{ device.os }}"></td>
+        </tr>
+      </table>
+      <input type="submit">
+      <a href="/devices/{{ device.id }}">Back to Device</a> |
+      <a href="/devices">Back to Devices</a>
+    </form>
+{% endblock %}

@@ -1,0 +1,6 @@
+/*/ebin
+/*/deps
+/*/doc
+.DS_Store
+*.swp
+/*/Mnesia.mochisup_dev@asus

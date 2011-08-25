@@ -42,7 +42,14 @@ upgrade() ->
 %% @doc supervisor callback.
 init([]) ->
     Web = web_specs(mochisup_web, 8080),
-    Processes = [Web],
+    Connection = {sup_server_connection,
+        {sup_server_connection, start, []},
+        permanent,
+        brutal_kill,
+        worker,
+        [sup_server_connection]
+        },
+    Processes = [Web, Connection],
     Strategy = {one_for_one, 10, 10},
     {ok,
      {Strategy, lists:flatten(Processes)}}.

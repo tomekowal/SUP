@@ -1,7 +1,10 @@
 
 -module(sup_server_connection).
 
--export([start/0, server/1]).
+-export([start/0, server/1, init/0]).
+
+start() ->
+    {ok, spawn(?MODULE, init, [])}.
 
 %%------------------------------------------------------------------------------
 %% @doc Start connection server.
@@ -9,22 +12,26 @@
 %% Creates process which spawns Num workers accepting connections.
 %% @end
 %%------------------------------------------------------------------------------
-start() ->
+init() ->
     %% {active, false} says that packets will NOT be sent to process mailbox,
     %% instead you have to receive them with gen_tcp:recv/2
     %% {packet, 2} creates 2 byte long header with length of data for every
     %% packet
-    ListenPort = 45894,
+    ListenPort = 5678,
     Num = 10,
     case gen_tcp:listen(ListenPort, [{active, false},{packet,2}]) of
         {ok, ListenSocket} ->
             start_servers(Num, ListenSocket),
             {ok, Port} = inet:port(ListenSocket),
-            Port;
+            wait_for_exit();
         {error, Reason} ->
             {error, Reason}
     end.
 
+wait_for_exit() ->
+    receive
+        exit -> ok
+    end.
 %%------------------------------------------------------------------------------
 %% Spawns Num prcesses listening on ListenSocket
 %%------------------------------------------------------------------------------

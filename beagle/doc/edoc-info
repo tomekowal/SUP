@@ -1,3 +1,0 @@
-{application,sup_beagle}.
-{packages,[]}.
-{modules,[mochijson2,sup_beagle_app,sup_beagle_connection,sup_beagle_sup]}.

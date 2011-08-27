@@ -1,7 +1,7 @@
--module(db).
+-module(sup_db).
 -compile(export_all).
 -include_lib("stdlib/include/qlc.hrl").
--include("db.hrl").
+-include("sup_db.hrl").
 
 %%------------------------------------------------------------------------------
 %% @doc Initialize Mnesia database. It has to be called once before first use

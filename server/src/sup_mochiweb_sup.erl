@@ -1,9 +1,9 @@
 %% @author Mochi Media <dev@mochimedia.com>
 %% @copyright 2010 Mochi Media <dev@mochimedia.com>
 
-%% @doc Supervisor for the mochisup application.
+%% @doc Supervisor for the sup_mochiweb application.
 
--module(mochisup_sup).
+-module(sup_mochiweb_sup).
 -author("Mochi Media <dev@mochimedia.com>").
 
 -behaviour(supervisor).
@@ -41,7 +41,7 @@ upgrade() ->
 %% @spec init([]) -> SupervisorTree
 %% @doc supervisor callback.
 init([]) ->
-    Web = web_specs(mochisup_web, 8080),
+    Web = web_specs(sup_mochiweb_web, 8080),
     Connection = {sup_server_connection,
         {sup_server_connection, start, []},
         permanent,
@@ -57,7 +57,7 @@ init([]) ->
 web_specs(Mod, Port) ->
     WebConfig = [{ip, {0,0,0,0}},
                  {port, Port},
-                 {docroot, mochisup_deps:local_path(["priv", "www"])}],
+                 {docroot, sup_mochiweb_deps:local_path(["priv", "www"])}],
     {Mod,
      {Mod, start, [WebConfig]},
      permanent, 5000, worker, dynamic}.

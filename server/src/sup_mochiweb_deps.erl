@@ -5,7 +5,7 @@
 %%      loading path, and locate resources relative
 %%      to this application's path.
 
--module(mochisup_deps).
+-module(sup_mochiweb_deps).
 -author("Mochi Media <dev@mochimedia.com>").
 
 -export([ensure/0, ensure/1]).

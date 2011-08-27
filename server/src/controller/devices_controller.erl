@@ -1,7 +1,7 @@
 -module(devices_controller).
 -compile(export_all).
 
--include("../db/db.hrl").
+-include("../db/sup_db.hrl").
 
 dispatch(Req, Args) ->
   case Req:get(method) of
@@ -37,7 +37,7 @@ index(Req) ->
       [Atom | Fields] = tuple_to_list(Record),
       RecordInfo = record_info(fields, device),
       lists:zip(RecordInfo, Fields) end,
-    db:all(device)),
+    sup_db:all(device)),
   {ok, HTMLOutput} = devices_index_dtl:render([{devices, Devices}]),
   Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
@@ -51,11 +51,11 @@ create(Req) ->
   Name = proplists:get_value("name", PostData),
   Kernel = proplists:get_value("kernel", PostData),
   Os = proplists:get_value("os", PostData),
-  db:create({device, Id, Name, Kernel, Os, []}),
+  sup_db:create({device, Id, Name, Kernel, Os, []}),
   Req:respond({302, [{"Location", "/devices"}], ""}).
 
 edit(Req, Id) ->
-  [Record] = db:find(device, Id),
+  [Record] = sup_db:find(device, Id),
   [Atom | Fields] = tuple_to_list(Record),
   RecordInfo = record_info(fields, device),
   Device = lists:zip(RecordInfo, Fields),
@@ -63,7 +63,7 @@ edit(Req, Id) ->
   Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
 show(Req, Id) ->
-  [Record] = db:find(device, Id),
+  [Record] = sup_db:find(device, Id),
   [Atom | Fields] = tuple_to_list(Record),
   RecordInfo = record_info(fields, device),
   Device = lists:zip(RecordInfo, Fields),
@@ -76,11 +76,11 @@ update(Req, Id) ->
   Name = proplists:get_value("name", PostData),
   Kernel = proplists:get_value("kernel", PostData),
   Os = proplists:get_value("os", PostData),
-  db:create({device, Id, Name, Kernel, Os, []}),
+  sup_db:create({device, Id, Name, Kernel, Os, []}),
   Req:respond({302, [{"Location", "/devices"}], ""}).
 
 destroy(Req, Id) ->
-  db:destroy(device, Id),
+  sup_db:destroy(device, Id),
   Req:respond({302, [{"Location", "/devices"}], ""}).
 
 programs(Req, Id) ->

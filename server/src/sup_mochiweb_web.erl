@@ -1,9 +1,9 @@
 %% @author Mochi Media <dev@mochimedia.com>
 %% @copyright 2010 Mochi Media <dev@mochimedia.com>
 
-%% @doc Web server for mochisup.
+%% @doc Web server for sup_mochiweb.
 
--module(mochisup_web).
+-module(sup_mochiweb_web).
 -author("Mochi Media <dev@mochimedia.com>").
 
 -export([start/1, stop/0, loop/2]).

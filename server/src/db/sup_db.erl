@@ -12,8 +12,7 @@ init() ->
   mnesia:create_schema([node()]),
   mnesia:start(),
   mnesia:create_table(device, [{type, set}, {attributes, record_info(fields, device)}, {disc_copies, [node()]}]),
-  mnesia:create_table(program, [{type, set}, {attributes, record_info(fields, program)}, {disc_copies, [node()]}]),
-  mnesia:stop().
+  mnesia:create_table(program, [{type, set}, {attributes, record_info(fields, program)}, {disc_copies, [node()]}]).
 
 %%------------------------------------------------------------------------------
 %% @doc Starts Mnesia database

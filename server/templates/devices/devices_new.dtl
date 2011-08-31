@@ -19,6 +19,18 @@
           <td>OS:</td>
           <td><input type="text" name="os"></td>
         </tr>
+        <tr>
+          <td>IP:</td>
+          <td><input type="text" name="ip"></td>
+        </tr>
+        <tr>
+          <td>Port:</td>
+          <td><input type="text" name="port"></td>
+        </tr>
+        <tr>
+          <td>Message:</td>
+          <td><input type="text" name="message"></td>
+        </tr>
       </table>
       <input type="submit">
     </form>

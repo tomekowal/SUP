@@ -51,7 +51,10 @@ create(Req) ->
   Name = proplists:get_value("name", PostData),
   Kernel = proplists:get_value("kernel", PostData),
   Os = proplists:get_value("os", PostData),
-  sup_db:create({device, Id, Name, Kernel, Os, []}),
+  Ip = proplists:get_value("ip", PostData),
+  Port = proplists:get_value("port", PostData),
+  Message = proplists:get_value("message", PostData),
+  sup_db:create({device, Id, Name, Kernel, Os, Ip, Port, Message, []}),
   Req:respond({302, [{"Location", "/devices"}], ""}).
 
 edit(Req, Id) ->
@@ -76,7 +79,10 @@ update(Req, Id) ->
   Name = proplists:get_value("name", PostData),
   Kernel = proplists:get_value("kernel", PostData),
   Os = proplists:get_value("os", PostData),
-  sup_db:create({device, Id, Name, Kernel, Os, []}),
+  Ip = proplists:get_value("ip", PostData),
+  Port = proplists:get_value("port", PostData),
+  Message = proplists:get_value("message", PostData),
+  sup_db:create({device, Id, Name, Kernel, Os, Ip, Port, Message, []}),
   Req:respond({302, [{"Location", "/devices"}], ""}).
 
 destroy(Req, Id) ->

@@ -20,6 +20,16 @@
           <td>OS:</td>
           <td><input type="text" name="os"  value="{{ device.os }}"></td>
         </tr>
+          <td>IP:</td>
+          <td><input type="text" name="ip"  value="{{ device.ip }}"></td>
+        </tr>
+          <td>PORT:</td>
+          <td><input type="text" name="port"  value="{{ device.port }}"></td>
+        </tr>
+        </tr>
+          <td>MESSAGE:</td>
+          <td><input type="text" name="message"  value="{{ device.message }}"></td>
+        </tr>
       </table>
       <input type="submit">
       <a href="/devices/{{ device.id }}">Back to Device</a> |

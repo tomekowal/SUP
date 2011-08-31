@@ -14,6 +14,18 @@
         <td>{{ device.os }}</td>
       </tr>
       <tr>
+        <th>IP</th>
+        <td>{{ device.ip }}</td>
+      </tr>
+      <tr>
+        <th>Port</th>
+        <td>{{ device.port }}</td>
+      </tr>
+      <tr>
+        <th>Message</th>
+        <td>{{ device.message }}</td>
+      </tr>
+      <tr>
         <th>Programs</th>
         <td></td>
       </tr>

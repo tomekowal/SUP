@@ -7,6 +7,9 @@
         <th>Name</th>
         <th>Kernel</th>
         <th>OS</th>
+        <th>IP</th>
+        <th>Port</th>
+        <th>Message</th>
         <th></th>
       </tr>
       {% for device in devices %}
@@ -14,6 +17,9 @@
         <td><a href="/devices/{{ device.id }}">{{ device.name }}</a></td>
         <td>{{ device.kernel }}</td>
         <td>{{ device.os }}</td>
+        <td>{{ device.ip }}</td>
+        <td>{{ device.port }}</td>
+        <td>{{ device.message }}</td>
         <td>
           <a href="/devices/{{ device.id }}/edit"><button type="button" class="action-button edit">Edit</button></a>
           <form action="/devices/{{ device.id }}/destroy" method="post" class="delete">

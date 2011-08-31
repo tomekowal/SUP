@@ -63,7 +63,8 @@ loop(Socket) ->
     inet:setopts(Socket, [{active, once}]),
     receive
         {tcp, Socket, Data} ->
-            Answer = process(Data),
+			{ok, {Address, _Port}} = inet:peername(Socket),
+            Answer = process(Data, Address),
             gen_tcp:send(Socket, Answer),
             loop(Socket);
         {tcp_closed, Socket} ->
@@ -74,10 +75,16 @@ loop(Socket) ->
 %%------------------------------------------------------------------------------
 %% Business logic
 %%------------------------------------------------------------------------------
-process(Data) ->
-    io:format("~p ~n", [Data]),
+process(Data, Address) ->
+	Ip = inet_parse:ntoa(Address),
+    io:format("~p from ~p ~n", [Data, Ip]),
     %% here should go functions which output
     %% {Request, Body} for client
     Request = get_data,
-    Body = [body, with, list, inside],
+	case sup_db:get_message_by_device_ip(Ip) of
+		[] ->
+			Body = [body, with, list, inside];
+		[H | _T] ->
+			Body = [the, message, is, H]
+	end,
     mochijson2:encode({struct, [{Request, Body}]}).

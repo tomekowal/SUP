@@ -26,6 +26,10 @@
             <input type="hidden" name="id" value="{{ device.id }}">
             <input type="submit" value="Delete" class="action-button delete" onclick="return confirm('Are you sure?');">
           </form>
+          <form action="/devices/{{ device.id }}/ping" method="post" class="ping">
+            <input type="hidden" name="id" value="{{ device.id }}">
+            <input type="submit" value="Ping" class="action-button ping">
+          </form>
         </td>
       </tr>
       {% endfor %}

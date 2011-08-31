@@ -1,7 +1,7 @@
 
 -module(sup_beagle_connection).
 
--export([start/0, init/0]).
+-export([start/0, init/1]).
 
 -define(CONNECTION_REQUEST_INTERVAL, 5000).
 -define(CONNECTION_TIMEOUT, 5000).
@@ -11,16 +11,28 @@
 %% @end
 %%------------------------------------------------------------------------------
 start() ->
-    Pid = spawn_link(?MODULE, init, []),
-    {ok, Pid}.
+    Pid = spawn_link(?MODULE, init, [loud]),
+    Pid_q = spawn_link(?MODULE, init, [quiet]),
+    {ok, Pid, Pid_q}.
 %%------------------------------------------------------------------------------
 %% @doc Initialize loop for receiving requests
 %% @end
 %%------------------------------------------------------------------------------
-init() ->
-    Port = 5678,                            % can be in macro definition
-    ServerHost = "localhost",               % can be in macro definition
-    loop(ServerHost, Port).
+init(Mode) ->
+	case Mode of 
+		quiet ->
+			Port = 6789,     
+			case gen_tcp:listen(Port, [{active, false},{packet,2}]) of
+        		{ok, Socket} ->
+					quiet_loop(Socket);
+				{error, Reason} ->
+				    {error, Reason}
+			end;
+		loud ->
+			Port = 5678,                            % can be in macro definition
+			ServerHost = "localhost",               % can be in macro definition
+			loop(ServerHost, Port)
+	end.
 
 %%------------------------------------------------------------------------------
 %% Main loop periodically sends connection request.
@@ -39,6 +51,20 @@ loop(ServerHost, Port) ->
         ?CONNECTION_REQUEST_INTERVAL ->
             connection_request(ServerHost, Port),
             loop(ServerHost, Port)
+    end.
+
+%%------------------------------------------------------------------------------
+%% Waits for connections.
+%%------------------------------------------------------------------------------
+quiet_loop(ListenSocket)->
+    case gen_tcp:accept(ListenSocket) of
+        {ok, Socket} ->
+            inet:setopts(Socket, [{active, once}]),
+			receive_reply(),
+            quiet_loop(ListenSocket);
+        Other ->
+            io:format("accept returned ~w - goodbye!~n", [Other]),
+            ok
     end.
 
 %%------------------------------------------------------------------------------

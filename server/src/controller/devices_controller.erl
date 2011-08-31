@@ -27,7 +27,9 @@ dispatch(Req, Args) ->
         [Id, "update"] ->
           devices_controller:update(Req, Id);
         [Id, "destroy"] ->
-          devices_controller:destroy(Req, Id)
+          devices_controller:destroy(Req, Id);
+        [Id, "ping"] ->
+          devices_controller:ping(Req, Id)
       end
   end.
 
@@ -93,4 +95,17 @@ programs(Req, Id) ->
   HTMLOutput = "programs",
   Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
+ping(Req, Id) ->
+	[Record] = sup_db:find(device, Id),
+	{ok, Ip}=inet_parse:address(Record#device.ip),
+    Request = get_data,
+	Body = [server, conects, and_send, Record#device.message],
+    case gen_tcp:connect(Ip, list_to_integer(Record#device.port),[binary, {packet, 2}]) of
+        {ok, Sock} ->
+            ok = gen_tcp:send(Sock, mochijson2:encode({struct, [{Request, Body}]})),
+            ok = gen_tcp:close(Sock);
+        {error, Reason} ->
+            io:format("~w~n", [Reason])	
+    end,
+  	Req:respond({302, [{"Location", "/devices"}], ""}).
 

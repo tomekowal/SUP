@@ -19,7 +19,7 @@ init() ->
     %% packet
     ListenPort = 5678,
     Num = 10,
-    case gen_tcp:listen(ListenPort, [{active, false},{packet,2}]) of
+    case gen_tcp:listen(ListenPort, [{active, false}, {packet, 2}, binary]) of
         {ok, ListenSocket} ->
             start_servers(Num, ListenSocket),
             {ok, Port} = inet:port(ListenSocket),
@@ -64,8 +64,8 @@ loop(Socket) ->
     receive
         {tcp, Socket, Data} ->
 			{ok, {Address, _Port}} = inet:peername(Socket),
-            Answer = process(Data, Address),
-            gen_tcp:send(Socket, Answer),
+            Answer = process(binary_to_term(Data), Address),
+            gen_tcp:send(Socket, term_to_binary(Answer)),
             loop(Socket);
         {tcp_closed, Socket} ->
             io:format("Socket ~w closed [~w]~n", [Socket, self()]),
@@ -87,4 +87,4 @@ process(Data, Address) ->
 		[H | _T] ->
 			Body = [the, message, is, H]
 	end,
-    mochijson2:encode({struct, [{Request, Body}]}).
+    {Request, Body}.

@@ -74,7 +74,7 @@ connection_request(ServerHost, Port) ->
     case gen_tcp:connect(ServerHost, Port,
                                  [binary, {packet, 2}]) of
         {ok, Sock} ->
-            ok = gen_tcp:send(Sock, "Connection Request"),
+            ok = gen_tcp:send(Sock, term_to_binary(device_status)),
             receive_reply(),
             ok = gen_tcp:close(Sock);
         {error, Reason} ->
@@ -89,8 +89,8 @@ receive_reply() ->
         stop ->
             ok;
         {tcp, _S, Binary} ->
-            case mochijson2:decode(Binary) of
-                {struct, [{Request, Body}]} ->
+            case binary_to_term(Binary) of
+                {Request, Body} ->
                     handle(Request, Body);
                 Other ->
                     io:format("Something is wrong: ~p ~n", [Other])
@@ -105,7 +105,7 @@ receive_reply() ->
 %%------------------------------------------------------------------------------
 %% Communication Protocol.
 %%------------------------------------------------------------------------------
-handle(<<"get_data">>, Body) ->
+handle(get_data, Body) ->
     io:format("get data ~p ~n", [Body]);
 handle(_AnythingElse, _Body) ->
     io:format("what a terrible failure").

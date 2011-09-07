@@ -1,0 +1,42 @@
+{% extends "devices/devices.dtl" %}
+
+{% block yield %}
+  {% if devices %}
+    <table class="devices">
+      <tr>
+        <th>Name</th>
+        <th>Kernel</th>
+        <th>OS</th>
+        <th>IP</th>
+        <th>Port</th>
+        <th>Message</th>
+        <th></th>
+      </tr>
+      {% for device in devices %}
+      <tr>
+        <td><a href="/devices/show/{{ device.id }}">{{ device.name }}</a></td>
+        <td>{{ device.kernel }}</td>
+        <td>{{ device.os }}</td>
+        <td>{{ device.ip }}</td>
+        <td>{{ device.port }}</td>
+        <td>{{ device.message }}</td>
+        <td>
+          <a href="/devices/edit/{{ device.id }}"><button type="button" class="action-button edit">Edit</button></a>
+          <form action="/devices/destroy/{{ device.id }}" method="post" class="delete">
+            <input type="hidden" name="id" value="{{ device.id }}">
+            <input type="submit" value="Delete" class="action-button delete" onclick="return confirm('Are you sure?');">
+          </form>
+          <form action="/devices/ping/{{ device.id }}" method="post" class="ping">
+            <input type="hidden" name="id" value="{{ device.id }}">
+            <input type="submit" value="Ping" class="action-button ping">
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <p><strong>No devices found.</strong></p>
+  {% endif %}
+
+  <a href="/devices/new"><button type="button" class="action-button new">New device</button></a>
+{% endblock %}

@@ -1,0 +1,8 @@
+/*/ebin
+/*/deps
+/*/doc
+.DS_Store
+*.swp
+/*/log
+/*/Mnesia.*
+*.dump

@@ -1,4 +1,0 @@
-{% extends "main/main.dtl" %}
-{% block content %}
-  {% block yield %}{% endblock %}
-{% endblock %}

@@ -76,15 +76,26 @@ loop(Socket) ->
 %% Business logic
 %%------------------------------------------------------------------------------
 process(Data, Address) ->
-	Ip = inet_parse:ntoa(Address),
+    Ip = inet_parse:ntoa(Address),
     io:format("~p from ~p ~n", [Data, Ip]),
+
+    {Request, Body} = handle(Data),
     %% here should go functions which output
     %% {Request, Body} for client
-    Request = get_data,
-	case sup_db:get_message_by_device_ip(Ip) of
-		[] ->
-			Body = [body, with, list, inside];
-		[H | _T] ->
-			Body = [the, message, is, H]
-	end,
+    %% Request = get_data,
+	%% case sup_db:get_message_by_device_ip(Ip) of
+	%% 	[] ->
+	%% 		Body = [body, with, list, inside];
+	%% 	[H | _T] ->
+	%% 		Body = [the, message, is, H]
+	%% end,
     {Request, Body}.
+
+%%------------------------------------------------------------------------------
+%% handle gets map of options (list of tuples {key, value})
+%% it returns {Request, Body} to beagle
+%%------------------------------------------------------------------------------
+handle([{releases, Releases}]) ->
+    io:format("~p~n", [Releases]),
+    {download_tar, "beagle_3"}.
+

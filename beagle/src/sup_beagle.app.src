@@ -1,12 +1,18 @@
 {application, sup_beagle,
  [
   {description, ""},
-  {vsn, "1"},
+  {vsn, "2"},
   {registered, []},
   {applications, [
                   kernel,
-                  stdlib
+                  stdlib,
+                  inets
                  ]},
   {mod, { sup_beagle_app, []}},
-  {env, []}
+  {env, [
+         {ftp_host, "192.168.56.1"},
+         {ftp_port, 21},
+         {ftp_user, "anonymous"},
+         {ftp_pass, ""}
+        ]}
  ]}.

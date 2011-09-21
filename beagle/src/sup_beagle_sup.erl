@@ -1,4 +1,3 @@
-
 -module(sup_beagle_sup).
 
 -behaviour(supervisor).

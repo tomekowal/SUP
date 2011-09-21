@@ -28,8 +28,8 @@ init(Mode) ->
 				    {error, Reason}
 			end;
 		loud ->
-			Port = 5678,                            % can be in macro definition
-			ServerHost = "localhost",               % can be in macro definition
+			{ok, ServerHost} = application:get_env(sup_beagle, management_host),
+            {ok, Port} = application:get_env(sup_beagle, management_port),
 			loop(ServerHost, Port)
 	end.
 

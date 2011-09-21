@@ -1,4 +1,3 @@
-
 -module(sup_beagle_connection).
 
 -export([start/0, init/1]).
@@ -19,9 +18,9 @@ start() ->
 %% @end
 %%------------------------------------------------------------------------------
 init(Mode) ->
-	case Mode of 
+	case Mode of
 		quiet ->
-			Port = 6789,     
+			Port = 6789,
 			case gen_tcp:listen(Port, [{active, false},{packet,2}]) of
         		{ok, Socket} ->
 					quiet_loop(Socket);
@@ -74,7 +73,7 @@ connection_request(ServerHost, Port) ->
     case gen_tcp:connect(ServerHost, Port,
                                  [binary, {packet, 2}]) of
         {ok, Sock} ->
-            ok = gen_tcp:send(Sock, term_to_binary(device_status)),
+            ok = gen_tcp:send(Sock, term_to_binary([{releases, release_handler:which_releases()}])),
             receive_reply(),
             ok = gen_tcp:close(Sock);
         {error, Reason} ->
@@ -107,6 +106,8 @@ receive_reply() ->
 %%------------------------------------------------------------------------------
 handle(get_data, Body) ->
     io:format("get data ~p ~n", [Body]);
+handle(download_tar, Name) ->
+    sup_beagle_download:download_tar(Name);
 handle(_AnythingElse, _Body) ->
     io:format("what a terrible failure").
 

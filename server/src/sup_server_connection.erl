@@ -22,7 +22,7 @@ init() ->
     case gen_tcp:listen(ListenPort, [{active, false}, {packet, 2}, binary]) of
         {ok, ListenSocket} ->
             start_servers(Num, ListenSocket),
-            {ok, Port} = inet:port(ListenSocket),
+            {ok, _Port} = inet:port(ListenSocket),
             wait_for_exit();
         {error, Reason} ->
             {error, Reason}

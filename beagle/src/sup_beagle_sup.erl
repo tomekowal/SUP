@@ -24,6 +24,4 @@ start_link() ->
 
 init([]) ->
     {ok, {{one_for_one, 1, 60},
-          [{connection, {sup_beagle_connection, start, []},
-            permanent, brutal_kill, worker, [ch3]}]}}.
-
+          [?CHILD(sup_beagle_management, worker)]}}.

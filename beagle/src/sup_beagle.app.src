@@ -1,7 +1,7 @@
 {application, sup_beagle,
  [
-  {description, ""},
-  {vsn, "2"},
+  {description, "Software Update Platform client"},
+  {vsn, "1.0"},
   {registered, []},
   {applications, [
                   kernel,
@@ -10,7 +10,7 @@
                  ]},
   {mod, { sup_beagle_app, []}},
   {env, [
-         {management_host, "192.168.193.198"},
+         {management_host, "192.168.193.110"},
          {management_port, 5678},
          {ftp_host, "192.168.193.110"},
          {ftp_port, 21},

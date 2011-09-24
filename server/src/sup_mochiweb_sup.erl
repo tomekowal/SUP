@@ -42,12 +42,12 @@ upgrade() ->
 %% @doc supervisor callback.
 init([]) ->
     Web = web_specs(sup_mochiweb_web, 8080),
-    Connection = {sup_server_connection,
-        {sup_server_connection, start, []},
+    Connection = {sup_server_management,
+        {sup_server_management, start_link, []},
         permanent,
         brutal_kill,
         worker,
-        [sup_server_connection]
+        [sup_server_management]
         },
     Processes = [Web, Connection],
     Strategy = {one_for_one, 10, 10},

@@ -1,0 +1,12 @@
+{application, sampleapp,
+ [
+  {description, "Sample application for Software Update Platform"},
+  {vsn, "1.0"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { sampleapp_app, []}},
+  {env, []}
+ ]}.

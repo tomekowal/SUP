@@ -9,3 +9,4 @@
 /beagle/apps/*/ebin
 /beagle/rel/*
 !/beagle/rel/reltool.config
+!/beagle/rel/files

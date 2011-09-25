@@ -5,3 +5,6 @@
 *.swp
 /*/Mnesia.*
 *.dump
+*~
+/beagle/rel/*
+!/beagle/rel/reltool.config

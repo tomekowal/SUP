@@ -6,5 +6,6 @@
 /*/Mnesia.*
 *.dump
 *~
+/beagle/apps/*/ebin
 /beagle/rel/*
 !/beagle/rel/reltool.config

@@ -31,7 +31,7 @@ loop(ServerSocket) ->
 begin_session(Socket) ->
     case gen_tcp:recv(Socket, 0) of
         {ok, Message} ->
-            {SessionData, Handlers} = init_session(Message),
+            {SessionData, Handlers} = init_session(binary_to_term(Message)),
             session_loop(Socket, SessionData, Handlers);
         {error, _Reason} ->
             broken
@@ -96,8 +96,9 @@ session_loop(Socket, SessionData, [Handler | PendingHandlers]) ->
 %%
 %% {@see session_loop}
 %% -----------------------------------------------------------------------------
-init_session(_Message) ->
+init_session(Message) ->
     %% that is just a stub, this must be actually implemented
+    io:format("Message from client: ~n~p~n", [Message]),
     {none,
      [
       {job1, sup_server_handlers, print_result_handler, none},

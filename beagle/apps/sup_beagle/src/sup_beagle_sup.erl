@@ -23,5 +23,12 @@ start_link() ->
 %% ===================================================================
 
 init([]) ->
-    {ok, {{one_for_one, 1, 60},
-          [?CHILD(sup_beagle_management, worker)]}}.
+    {ok,
+     {
+      {one_for_one, 1, 60},
+      [
+       ?CHILD(sup_beagle_config, worker),
+       ?CHILD(sup_beagle_management, worker)
+      ]
+     }
+    }.

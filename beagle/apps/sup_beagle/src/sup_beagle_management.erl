@@ -1,5 +1,5 @@
 -module(sup_beagle_management).
--export([start_link/0, loop/0, connection_request/0]).
+-export([start_link/0, loop/0, trigger_session/1]).
 
 %%------------------------------------------------------------------------------
 %% @doc Starts management client process.
@@ -8,14 +8,15 @@
 start_link() ->
     Pid = spawn_link(?MODULE, loop, []),
     register(management_client, Pid),
+    trigger_session(startup),
     {ok, Pid}.
 
 %%------------------------------------------------------------------------------
 %% @doc Triggers a session with management server due to a connection request.
 %% @end
 %%------------------------------------------------------------------------------
-connection_request() ->
-    management_client ! {perform_session, connection_request}.
+trigger_session(Reason) ->
+    management_client ! {perform_session, Reason}.
 
 %%------------------------------------------------------------------------------
 %% @doc Management client main loop. Message {perform_session, Reason}
@@ -26,8 +27,8 @@ connection_request() ->
 %%------------------------------------------------------------------------------
 loop() ->
     receive
-        {perform_session, _Reason} ->
-            session(),
+        {perform_session, Reason} ->
+            session(Reason),
             ?MODULE:loop();
         stop ->
             ok
@@ -47,13 +48,13 @@ loop() ->
 %% and sent) and the waits for more jobs. After the server sends 'finished'
 %% message, session is finished and connection is closed.
 %% -----------------------------------------------------------------------------
-session() ->
-    {ok, Host} = application:get_env(sup_beagle, management_host),
-    {ok, Port} = application:get_env(sup_beagle, management_port),
+session(Reason) ->
+    {ok, Host} = sup_beagle_config:get(management_host),
+    {ok, Port} = sup_beagle_config:get(management_port),
     Options = [binary, {packet, 4}, {active, false}],
     {ok, Socket} = gen_tcp:connect(Host, Port, Options),
-    Releases = release_handler:which_releases(),
-    gen_tcp:send(Socket, term_to_binary(Releases)),
+    Message = init_session_message(Reason),
+    gen_tcp:send(Socket, term_to_binary(Message)),
     session_loop(Socket).
 
 %%------------------------------------------------------------------------------
@@ -70,6 +71,18 @@ session_loop(Socket) ->
             gen_tcp:send(Socket, term_to_binary(Response)),
             session_loop(Socket)
     end.
+
+%%------------------------------------------------------------------------------
+%% Creates initial session message sent to management server based on reason.
+%%------------------------------------------------------------------------------
+init_session_message(Reason) ->
+    {ok, Identity} = sup_beagle_config:get(identity),
+    Releases = release_handler:which_releases(),
+    [
+     {identity, Identity},
+     {reason, Reason},
+     {releases, Releases}
+    ].
 
 %%------------------------------------------------------------------------------
 %% Job handlers.

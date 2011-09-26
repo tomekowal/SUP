@@ -9,10 +9,10 @@
 %% @end
 %% -----------------------------------------------------------------------------
 download_tar(Name) ->
-    {ok, Host} = application:get_env(sup_beagle, ftp_host),
-    {ok, Port} = application:get_env(sup_beagle, ftp_port),
-    {ok, User} = application:get_env(sup_beagle, ftp_user),
-    {ok, Pass} = application:get_env(sup_beagle, ftp_pass),
+    {ok, Host} = sup_beagle_config:get(ftp_host),
+    {ok, Port} = sup_beagle_config:get(ftp_port),
+    {ok, User} = sup_beagle_config:get(ftp_user),
+    {ok, Pass} = sup_beagle_config:get(ftp_pass),
     {ok, Pid} = inets:start(ftpc, [{host, Host}, {port, Port}]),
     ok = ftp:user(Pid, User, Pass),
     ok = ftp:recv(Pid, Name++".tar.gz", "releases/"++Name++".tar.gz"),

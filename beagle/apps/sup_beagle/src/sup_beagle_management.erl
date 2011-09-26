@@ -9,6 +9,9 @@ start_link() ->
     Pid = spawn_link(?MODULE, loop, []),
     register(management_client, Pid),
     trigger_session(startup),
+    {ok, NotifyInterval} = sup_beagle_config:get(periodic_notify_interval),
+    {ok, _TRef} = timer:apply_interval(NotifyInterval*1000, ?MODULE,
+                                      trigger_session, [periodic_notify]),
     {ok, Pid}.
 
 %%------------------------------------------------------------------------------
@@ -28,7 +31,12 @@ trigger_session(Reason) ->
 loop() ->
     receive
         {perform_session, Reason} ->
-            session(Reason),
+            case (catch session(Reason)) of
+                ok ->
+                    ok;
+                Exception ->
+                    io:format("Session failed: ~p~n", [Exception])
+            end,
             ?MODULE:loop();
         stop ->
             ok

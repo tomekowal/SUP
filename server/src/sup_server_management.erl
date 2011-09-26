@@ -29,13 +29,15 @@ loop(ServerSocket) ->
 %% client, receives their results and passes them to their appropriate handlers.
 %% -----------------------------------------------------------------------------
 begin_session(Socket) ->
-    case gen_tcp:recv(Socket, 0) of
-        {ok, Message} ->
-            {SessionData, Handlers} = init_session(binary_to_term(Message)),
-            session_loop(Socket, SessionData, Handlers);
-        {error, _Reason} ->
-            broken
-    end.
+    try
+        {ok,Packet} = gen_tcp:recv(Socket,0),
+        {SessionData, Handlers} = init_session(binary_to_term(Packet)),
+        session_loop(Socket, SessionData, Handlers)
+    catch
+        Exception ->
+            io:format("Session failed: ~p~n", [Exception])
+    end,
+    ok.
 
 %%------------------------------------------------------------------------------
 %% Main session loop.
@@ -71,22 +73,17 @@ begin_session(Socket) ->
 %%
 %% -----------------------------------------------------------------------------
 session_loop(Socket, _SessionData, []) ->
-    gen_tcp:send(Socket, term_to_binary(finished)),
-    gen_tcp:close(Socket),
-    finished;
+    ok = gen_tcp:send(Socket, term_to_binary(finished)),
+    ok = gen_tcp:close(Socket),
+    ok;
 session_loop(Socket, SessionData, [Handler | PendingHandlers]) ->
     {Job, Module, Function, Extra} = Handler,
-    gen_tcp:send(Socket, term_to_binary(Job)),
-    case gen_tcp:recv(Socket, 0) of
-        {ok, Packet} ->
-            Message = binary_to_term(Packet),
-            HandlerArgs = [Job, Message, SessionData, Extra],
-            MoreHandlers = apply(Module, Function, HandlerArgs),
-            session_loop(Socket, SessionData, MoreHandlers++PendingHandlers);
-        {error, _Reason} ->
-            gen_tcp:close(Socket),
-            broken
-    end.
+    ok = gen_tcp:send(Socket, term_to_binary(Job)),
+    {ok, Packet} = gen_tcp:recv(Socket, 0),
+    Message = binary_to_term(Packet),
+    HandlerArgs = [Job, Message, SessionData, Extra],
+    MoreHandlers = apply(Module, Function, HandlerArgs),
+    session_loop(Socket, SessionData, MoreHandlers++PendingHandlers).
 
 %% -----------------------------------------------------------------------------
 %% Initializes session data and initial handler list to be executed in the newly

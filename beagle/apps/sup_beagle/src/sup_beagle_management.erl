@@ -15,7 +15,7 @@ start_link() ->
     {ok, Pid}.
 
 %%------------------------------------------------------------------------------
-%% @doc Triggers a session with management server due to a connection request.
+%% @doc Triggers a session with management server for a given reason.
 %% @end
 %%------------------------------------------------------------------------------
 trigger_session(Reason) ->
@@ -100,12 +100,12 @@ init_session_message(Reason) ->
 %% -----------------------------------------------------------------------------
 handle_job({get_release, Name}) ->
     ok = sup_beagle_download:download_tar(Name),
-    {ok, _Vsn} = release_handler:unpack_release(Name),
-    ok;
+    {ok, Vsn} = release_handler:unpack_release(Name),
+    {ok, Vsn};
 handle_job({update_to_release, Vsn}) ->
-    {ok, OtherVsn, Descr} = release_handler:install_release(Vsn),
+    {ok, _OtherVsn, _Descr} = release_handler:install_release(Vsn),
     ok = release_handler:make_permanent(Vsn),
-    {ok, OtherVsn, Descr};
+    {ok, release_handler:which_releases()};
 handle_job(Job) ->
     io:format("Unknown job: ~p~n", [Job]),
     ok.

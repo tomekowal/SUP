@@ -1,7 +1,7 @@
 {application, sampleapp,
  [
   {description, "Sample application for Software Update Platform"},
-  {vsn, "1.0"},
+  {vsn, "2.0"},
   {registered, []},
   {applications, [
                   kernel,

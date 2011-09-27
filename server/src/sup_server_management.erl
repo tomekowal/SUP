@@ -95,13 +95,15 @@ session_loop(Socket, SessionData, [Handler | PendingHandlers]) ->
 %% -----------------------------------------------------------------------------
 init_session(Message) ->
     %% that is just a stub, this must be actually implemented
-    io:format("Message from client: ~n~p~n", [Message]),
-    {none,
-     [
-      {job1, sup_server_handlers, print_result_handler, none},
-      {job2, sup_server_handlers, print_result_handler, none},
-      {job3, sup_server_handlers, print_result_handler, none}
-     ]
-    }.
-
-
+    io:format("Releases present on client: ~n~p~n", [Message]),
+    [{identity,Identity} | [{reason,Reason} | _Rest]] = Message,
+    SessionData = [{identity, Identity}],
+    case Reason of
+        upgrade_request ->
+            Handlers = [{{get_release, "beagle_2.0"}, sup_server_handlers, upgrade_handler, ignore}];
+        periodic_notify ->
+            Handlers = [{sample_job, sup_server_handlers, print_result_handler, ignore}];
+        _ ->
+            Handlers = []
+    end,
+    {SessionData, Handlers}.

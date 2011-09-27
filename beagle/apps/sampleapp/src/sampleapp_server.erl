@@ -18,7 +18,7 @@ init(_Args) ->
     {ok, ignore}.
 
 handle_call(get_version, _From, State) ->
-    {reply, "1.0", State}.
+    {reply, "2.0", State}.
 
 handle_cast(_Request, State) ->
     {noreply, State}.

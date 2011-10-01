@@ -1,8 +1,7 @@
 %% Record definitions
 
--include(
 -record(device, {identity :: nonempty_string(),         %% device identity
-                 last_contact :: {term(), term()},          %% last contact
+                 last_contact :: {term(), term()},      %% last contact
                  releases :: [term()],                  %% releases present on device
                  ip :: nonempty_string()                %% device IP
                 }

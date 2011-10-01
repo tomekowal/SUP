@@ -7,30 +7,12 @@
 {% block yield %}
     <form action="/devices" method="post" onsubmit="return validate()">
       <table class="devices">
-        <tr>
-          <td>Name:</td>
-          <td><input type="text" name="name"></td>
-        </tr>
-        <tr>
-          <td>Kernel:</td>
-          <td><input type="text" name="kernel"></td>
-        </tr>
-        <tr>
-          <td>OS:</td>
-          <td><input type="text" name="os"></td>
-        </tr>
-        <tr>
-          <td>IP:</td>
-          <td><input type="text" name="ip"></td>
-        </tr>
-        <tr>
-          <td>Port:</td>
-          <td><input type="text" name="port"></td>
-        </tr>
-        <tr>
-          <td>Message:</td>
-          <td><input type="text" name="message"></td>
-        </tr>
+        {% for field in device_fields %}
+          <tr>
+            <td>{{ field }}</td>
+            <td><input type="text" name="{{ field }}"></td>
+          </tr>
+        {% endfor %}
       </table>
       <input type="submit">
     </form>

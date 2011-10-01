@@ -40,11 +40,11 @@ index(Req) ->
       RecordInfo = record_info(fields, device),
       lists:zip(RecordInfo, Fields) end,
     sup_db:all(device)),
-  {ok, HTMLOutput} = devices_index_dtl:render([{devices, Devices}, {devices_fields, record_info(fields, device)}]),
+  {ok, HTMLOutput} = devices_index_dtl:render([{devices, Devices}, {device_fields, record_info(fields, device)}]),
   Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
 new(Req) ->
-  {ok, HTMLOutput} = devices_new_dtl:render([]),
+  {ok, HTMLOutput} = devices_new_dtl:render([{device_fields, [identity]}]),
   Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
 create(Req) ->
@@ -64,7 +64,7 @@ edit(Req, Id) ->
   [Atom | Fields] = tuple_to_list(Record),
   RecordInfo = record_info(fields, device),
   Device = lists:zip(RecordInfo, Fields),
-  {ok, HTMLOutput} = devices_edit_dtl:render([{device, Device}]),
+  {ok, HTMLOutput} = devices_edit_dtl:render([{device, Device}, {device_fields, record_info(fields, device)}]),
   Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
 show(Req, Id) ->

@@ -5,34 +5,19 @@
 {% endblock %}
 
 {% block yield %}
-    <form action="/devices/{{ device.id }}/update" method="post" onsubmit="return validate()">
-      <input type="hidden" name="id" value="{{ device.id }}">
+    <form action="/devices/{{ device.identity }}/update" method="post" onsubmit="return validate()">
+      <input type="hidden" name="identity" value="{{ device.identity}}">
       <table class="devices">
-        <tr>
-          <td>Name:</td>
-          <td><input type="text" name="name" value="{{ device.name }}"></td>
-        </tr>
-        <tr>
-          <td>Kernel:</td>
-          <td><input type="text" name="kernel" value="{{ device.kernel }}"></td>
-        </tr>
-        <tr>
-          <td>OS:</td>
-          <td><input type="text" name="os"  value="{{ device.os }}"></td>
-        </tr>
-          <td>IP:</td>
-          <td><input type="text" name="ip"  value="{{ device.ip }}"></td>
-        </tr>
-          <td>PORT:</td>
-          <td><input type="text" name="port"  value="{{ device.port }}"></td>
-        </tr>
-        </tr>
-          <td>MESSAGE:</td>
-          <td><input type="text" name="message"  value="{{ device.message }}"></td>
-        </tr>
+        {% for field in device_fields %}
+          <tr>
+            <td>{{ field }}</td>
+            <td><input type="text" name="{{ field }}" value="{{ device.field }}"></td>
+          </tr>
+        {% endfor %}
       </table>
       <input type="submit">
-      <a href="/devices/{{ device.id }}">Back to Device</a> |
+      <a href="/devices/{{ device.identity }}">Back to Device</a> |
       <a href="/devices">Back to Devices</a>
     </form>
 {% endblock %}
+

@@ -11,7 +11,7 @@
       </tr>
       {% for device in devices %}
       <tr>
-        {% for field in devices_fields %}
+        {% for field in device_fields %}
           <td>{{ device.field }}</td>
         {% endfor %}
         <td>

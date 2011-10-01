@@ -40,7 +40,7 @@ index(Req) ->
       RecordInfo = record_info(fields, device),
       lists:zip(RecordInfo, Fields) end,
     sup_db:all(device)),
-  {ok, HTMLOutput} = devices_index_dtl:render([{devices, Devices}]),
+  {ok, HTMLOutput} = devices_index_dtl:render([{devices, Devices}, {devices_fields, record_info(fields, device)}]),
   Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
 new(Req) ->
@@ -95,17 +95,17 @@ programs(Req, Id) ->
   HTMLOutput = "programs",
   Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
-ping(Req, Id) ->
-	[Record] = sup_db:find(device, Id),
-	{ok, Ip}=inet_parse:address(Record#device.ip),
-    Request = get_data,
-	Body = [server, conects, and_send, Record#device.message],
-    case gen_tcp:connect(Ip, list_to_integer(Record#device.port),[binary, {packet, 2}]) of
-        {ok, Sock} ->
-            ok = gen_tcp:send(Sock, mochijson2:encode({struct, [{Request, Body}]})),
-            ok = gen_tcp:close(Sock);
-        {error, Reason} ->
-            io:format("~w~n", [Reason])	
-    end,
-  	Req:respond({302, [{"Location", "/devices"}], ""}).
+%ping(Req, Id) ->
+%	[Record] = sup_db:find(device, Id),
+%	{ok, Ip}=inet_parse:address(Record#device.ip),
+%    Request = get_data,
+%	Body = [server, conects, and_send, Record#device.message],
+%    case gen_tcp:connect(Ip, list_to_integer(Record#device.port),[binary, {packet, 2}]) of
+%        {ok, Sock} ->
+%            ok = gen_tcp:send(Sock, mochijson2:encode({struct, [{Request, Body}]})),
+%            ok = gen_tcp:close(Sock);
+%        {error, Reason} ->
+%            io:format("~w~n", [Reason])	
+%    end,
+%  	Req:respond({302, [{"Location", "/devices"}], ""}).
 

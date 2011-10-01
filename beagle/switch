@@ -1,0 +1,9 @@
+#!/bin/bash
+cd `dirname $0`
+if [ -z $1 -o -z $2 ]; then
+    echo "Usage:" `basename $0` rel-version sampleapp-version
+    exit 1
+fi
+ln -fs ../versioned/reltool.config-$1 rel/reltool.config
+ln -fsT ../versioned/sampleapp-$2 apps/sampleapp
+

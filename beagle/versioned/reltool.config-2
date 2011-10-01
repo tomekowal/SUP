@@ -1,0 +1,36 @@
+{sys, [
+       {lib_dirs, ["../apps"]},
+       {rel, "beagle", "2",
+        [
+         kernel,
+         stdlib,
+         sasl,
+         sup_beagle,
+         sampleapp
+        ]},
+       {rel, "start_clean", "",
+        [
+         kernel,
+         stdlib
+        ]},
+       {boot_rel, "beagle"},
+       {profile, embedded},
+       {excl_sys_filters, ["^bin/.*",
+                           "^erts.*/bin/(dialyzer|typer)"]},
+       {excl_archive_filters, [".*"]},
+       {app, sasl, [{incl_cond, include}]},
+       {app, hipe, [{incl_cond, exclude}]}
+      ]}.
+
+{target_dir, "beagle"}.
+
+{overlay, [
+           {mkdir, "log/sasl"},
+           {copy, "files/erl", "\{\{erts_vsn\}\}/bin/erl"},
+           {copy, "files/nodetool", "\{\{erts_vsn\}\}/bin/nodetool"},
+           {copy, "files/beagle", "bin/beagle"},
+           {copy, "files/beagle.cmd", "bin/beagle.cmd"},
+           {copy, "files/start_erl.cmd", "bin/start_erl.cmd"},
+           {copy, "files/app.config", "etc/app.config"},
+           {copy, "files/vm.args", "etc/vm.args"}
+          ]}.

@@ -6,5 +6,5 @@ generate: compile
 compile:
 	./rebar compile
 
-run: generate
+run:
 	cd rel/beagle && ./bin/beagle console

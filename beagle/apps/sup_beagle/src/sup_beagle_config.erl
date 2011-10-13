@@ -16,11 +16,14 @@ set(Key, Value) ->
 %% gen_server callback interface
 
 init(_Args) ->
-    {ok, appenv_to_dict(application:get_all_env(sup_beagle), dict:new())}.
+    {ok, ConfigFile} = application:get_env(sup_beagle, config_file),
+    FullConfigFile = code:priv_dir(sup_beagle)++"/"+ConfigFile,
+    {ok, Config} = file:consult(FullConfigFile),
+    {ok, config_to_dict(Config, dict:new())}.
 
-appenv_to_dict([{Key,Value}|AppEnvTail], Dict) ->
-    appenv_to_dict(AppEnvTail, dict:store(Key, Value, Dict));
-appenv_to_dict([], Dict) ->
+config_to_dict([{Key,Value}|AppEnvTail], Dict) ->
+    config_to_dict(AppEnvTail, dict:store(Key, Value, Dict));
+config_to_dict([], Dict) ->
     Dict.
 
 find(Key, Dict) ->

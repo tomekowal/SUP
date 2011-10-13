@@ -1,4 +1,5 @@
 -module(sup_beagle_management).
+-include("sup_beagle.hrl").
 -export([start_link/0, loop/0, trigger_session/1]).
 
 %%------------------------------------------------------------------------------
@@ -86,11 +87,7 @@ session_loop(Socket) ->
 init_session_message(Reason) ->
     {ok, Identity} = sup_beagle_config:get(identity),
     Releases = release_handler:which_releases(),
-    [
-     {identity, Identity},
-     {reason, Reason},
-     {releases, Releases}
-    ].
+    #inform{identity = Identity, reason = Reason, releases = Releases}.
 
 %%------------------------------------------------------------------------------
 %% Job handlers.
@@ -106,6 +103,5 @@ handle_job({update_to_release, Vsn}) ->
     {ok, _OtherVsn, _Descr} = release_handler:install_release(Vsn),
     ok = release_handler:make_permanent(Vsn),
     {ok, release_handler:which_releases()};
-handle_job(Job) ->
-    io:format("Unknown job: ~p~n", [Job]),
+handle_job(_Job) ->
     ok.

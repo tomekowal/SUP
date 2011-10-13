@@ -1,5 +1,14 @@
 -module(sup_server_management).
+-include("sup_beagle.hrl").
 -export([start_link/0, loop/1, begin_session/1]).
+-define(TCP_TIMEOUT, 30000).
+
+-record(session_data,
+        {identity :: nonempty_string(),
+         start_time :: {term(), term()},
+         reason :: term(),
+         failed_jobs :: integer()
+        }).
 
 %%------------------------------------------------------------------------------
 %% @doc Starts the management server (network server listening on port).
@@ -30,9 +39,9 @@ loop(ServerSocket) ->
 %% -----------------------------------------------------------------------------
 begin_session(Socket) ->
     try
-        {ok,Packet} = gen_tcp:recv(Socket,0),
-        {SessionData, Handlers} = init_session(binary_to_term(Packet)),
-        session_loop(Socket, SessionData, Handlers)
+        {ok, Packet} = gen_tcp:recv(Socket, 0, ?TCP_TIMEOUT),
+        SessionData = init_session(binary_to_term(Packet)),
+        session_loop(Socket, SessionData)
     catch
         Exception ->
             io:format("Session failed: ~p~n", [Exception])
@@ -72,18 +81,41 @@ begin_session(Socket) ->
 %% changed. Each job in the list is a tuple {Job, Module, Function, Extra}.
 %%
 %% -----------------------------------------------------------------------------
-session_loop(Socket, _SessionData, []) ->
-    ok = gen_tcp:send(Socket, term_to_binary(finished)),
-    ok = gen_tcp:close(Socket),
-    ok;
-session_loop(Socket, SessionData, [Handler | PendingHandlers]) ->
-    {Job, Module, Function, Extra} = Handler,
-    ok = gen_tcp:send(Socket, term_to_binary(Job)),
-    {ok, Packet} = gen_tcp:recv(Socket, 0),
-    Message = binary_to_term(Packet),
-    HandlerArgs = [Job, Message, SessionData, Extra],
-    MoreHandlers = apply(Module, Function, HandlerArgs),
-    session_loop(Socket, SessionData, MoreHandlers++PendingHandlers).
+session_loop(Socket, SessionData) ->
+    Identity = SessionData#session_data.identity,
+    FailedJobs = SessionData#session_data.failed_jobs,
+    case fetch_job(Identity, FailedJobs) of
+        {ok, {job, Message, Function, Module, Extra}} ->
+            try
+                ok = gen_tcp:send(Socket, term_to_binary(Message)),
+                {ok, Packet} = gen_tcp:recv(Socket, 0, ?TCP_TIMEOUT),
+                try
+                    Result = binary_to_term(Packet),
+                    HandlerArgs = [Message, Result, SessionData, Extra],
+                    case apply(Module, Function, HandlerArgs) of
+                        {next_job, NextJob} ->
+                            insert_job(Identity, FailedJobs, NextJob);
+                        none ->
+                            ok
+                    end,
+                    delete_job(Identity, FailedJobs),
+                    session_loop(Socket, SessionData)
+                catch
+                    HandlerException ->
+                        fail_job(Identity, FailedJobs, HandlerException),
+                        NewSessionData = SessionData#session_data{failed_jobs = FailedJobs+1},
+                        session_loop(Socket, NewSessionData)
+                end
+            catch
+                %% connection broken, fail entire session
+                NetException ->
+                    fail_job(Identity, FailedJobs, NetException)
+            end;
+        empty ->
+            ok = gen_tcp:send(Socket, term_to_binary(finished)),
+            ok = gen_tcp:close(Socket),
+            ok
+    end.
 
 %% -----------------------------------------------------------------------------
 %% Initializes session data and initial handler list to be executed in the newly
@@ -95,15 +127,22 @@ session_loop(Socket, SessionData, [Handler | PendingHandlers]) ->
 %% -----------------------------------------------------------------------------
 init_session(Message) ->
     %% that is just a stub, this must be actually implemented
-    io:format("Releases present on client: ~n~p~n", [Message]),
-    [{identity,Identity} | [{reason,Reason} | _Rest]] = Message,
-    SessionData = [{identity, Identity}],
-    case Reason of
-        upgrade_request ->
-            Handlers = [{{get_release, "beagle_2.0"}, sup_server_handlers, upgrade_handler, ignore}];
-        periodic_notify ->
-            Handlers = [{sample_job, sup_server_handlers, print_result_handler, ignore}];
-        _ ->
-            Handlers = []
-    end,
-    {SessionData, Handlers}.
+    io:format("Message from device: ~p~n", [Message]),
+    #session_data{
+      identity = Message#inform.identity,
+      start_time = calendar:universal_time(),
+      reason = Message#inform.reason,
+      failed_jobs = 0
+     }.
+
+fetch_job(_Identity, _Index) ->
+    empty.
+
+insert_job(_Identity, _Index, _Job) ->
+    ok.
+
+delete_job(_Identity, _Index) ->
+    ok.
+
+fail_job(_Identity, _Index, _Exception) ->
+    ok.

@@ -9,14 +9,5 @@
                   inets
                  ]},
   {mod, { sup_beagle_app, []}},
-  {env, [
-         {identity, "beagleboard"},
-         {management_host, "127.0.0.1"},
-         {management_port, 5678},
-         {ftp_host, "127.0.0.1"},
-         {ftp_port, 21},
-         {ftp_user, "anonymous"},
-         {ftp_pass, ""},
-         {periodic_notify_interval, 10}
-        ]}
+  {env, [{config_file, "sup_beagle.config"}] }
  ]}.

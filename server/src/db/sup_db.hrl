@@ -1,5 +1,5 @@
 %% Record definitions
--record(job, {module, function, extra, status}).
+-record(job, {message, module, function, extra, status}).
 -record(release, {name, version}).
 
 -record(device, {identity :: nonempty_string(),         %% device identity
@@ -9,5 +9,3 @@
                  jobs :: [#job{}]
                 }
        ).
-
-

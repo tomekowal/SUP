@@ -1,0 +1,1 @@
+../../beagle/apps/sup_beagle/include/sup_beagle.hrl

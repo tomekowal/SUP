@@ -94,11 +94,10 @@ session_loop(Socket, SessionData) ->
                     HandlerArgs = [Message, Result, SessionData, Extra],
                     case apply(Module, Function, HandlerArgs) of
                         {next_job, NextJob} ->
-                            insert_job(Identity, FailedJobs, NextJob);
+                            replace_job(Identity, FailedJobs, NextJob);
                         none ->
-                            ok
+                            delete_job(Identity, FailedJobs)
                     end,
-                    delete_job(Identity, FailedJobs),
                     session_loop(Socket, SessionData)
                 catch
                     HandlerException ->
@@ -139,6 +138,9 @@ fetch_job(_Identity, _Index) ->
     empty.
 
 insert_job(_Identity, _Index, _Job) ->
+    ok.
+
+replace_job(_Identity, _Index, _Job) ->
     ok.
 
 delete_job(_Identity, _Index) ->

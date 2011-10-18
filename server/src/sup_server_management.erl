@@ -2,7 +2,7 @@
 -include("sup_beagle.hrl").
 -include("db/sup_db.hrl").
 -export([start_link/0, loop/1, begin_session/1]).
--export([fetch_job/2, insert_job/3, delete_job/2, replace_job/3, fail_job/3]).
+-export([fetch_job/2, insert_job/3, append_job/2, delete_job/2, replace_job/3, fail_job/3]).
 -define(TCP_TIMEOUT, 30000).
 
 -record(session_data,
@@ -174,6 +174,13 @@ insert_job(Identity, Index, Job) ->
     [Device] = sup_db:find(device, Identity),
     {FirstList, SecondList} = lists:split(Index-1, Device#device.jobs),
     JobList = FirstList ++ [Job] ++ SecondList,
+    UpdatedDevice = Device#device{jobs=JobList},
+    sup_db:create(UpdatedDevice),
+    ok.
+
+append_job(Identity, Job) ->
+    [Device] = sup_db:find(device, Identity),
+    JobList = Device#device.jobs ++ [Job],
     UpdatedDevice = Device#device{jobs=JobList},
     sup_db:create(UpdatedDevice),
     ok.

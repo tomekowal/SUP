@@ -103,5 +103,8 @@ handle_job({update_to_release, Vsn}) ->
     {ok, _OtherVsn, _Descr} = release_handler:install_release(Vsn),
     ok = release_handler:make_permanent(Vsn),
     {ok, release_handler:which_releases()};
+handle_job({print, Message}) ->
+    io:format("~p~n", [Message]),
+    ok;
 handle_job(_Job) ->
     ok.

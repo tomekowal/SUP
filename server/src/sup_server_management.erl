@@ -2,6 +2,7 @@
 -include("sup_beagle.hrl").
 -include("db/sup_db.hrl").
 -export([start_link/0, loop/1, begin_session/1]).
+-export([fetch_job/2, insert_job/3, delete_job/2, replace_job/3, fail_job/3]).
 -define(TCP_TIMEOUT, 30000).
 
 -record(session_data,
@@ -41,7 +42,7 @@ loop(ServerSocket) ->
 begin_session(Socket) ->
     try
         {ok, Packet} = gen_tcp:recv(Socket, 0, ?TCP_TIMEOUT),
-        SessionData = init_session(binary_to_term(Packet)),
+        SessionData = init_session(Socket, binary_to_term(Packet)),
         session_loop(Socket, SessionData)
     catch
         Exception ->
@@ -85,8 +86,9 @@ begin_session(Socket) ->
 session_loop(Socket, SessionData) ->
     Identity = SessionData#session_data.identity,
     FailedJobs = SessionData#session_data.failed_jobs,
-    case fetch_job(Identity, FailedJobs) of
-        {ok, {job, Message, Function, Module, Extra}} ->
+    case fetch_job(Identity, FailedJobs+1) of
+        {ok, {job, Message, Module, Function, Extra}} ->
+            io:format("JOB to send: ~p~n", [Message]),
             try
                 ok = gen_tcp:send(Socket, term_to_binary(Message)),
                 {ok, Packet} = gen_tcp:recv(Socket, 0, ?TCP_TIMEOUT),
@@ -95,21 +97,21 @@ session_loop(Socket, SessionData) ->
                     HandlerArgs = [Message, Result, SessionData, Extra],
                     case apply(Module, Function, HandlerArgs) of
                         {next_job, NextJob} ->
-                            replace_job(Identity, FailedJobs, NextJob);
+                            replace_job(Identity, FailedJobs+1, NextJob);
                         none ->
-                            delete_job(Identity, FailedJobs)
+                            delete_job(Identity, FailedJobs+1)
                     end,
                     session_loop(Socket, SessionData)
                 catch
                     HandlerException ->
-                        fail_job(Identity, FailedJobs, HandlerException),
+                        fail_job(Identity, FailedJobs+1, HandlerException),
                         NewSessionData = SessionData#session_data{failed_jobs = FailedJobs+1},
                         session_loop(Socket, NewSessionData)
                 end
             catch
                 %% connection broken, fail entire session
                 NetException ->
-                    fail_job(Identity, FailedJobs, NetException)
+                    fail_job(Identity, FailedJobs+1, NetException)
             end;
         empty ->
             ok = gen_tcp:send(Socket, term_to_binary(finished)),
@@ -125,19 +127,48 @@ session_loop(Socket, SessionData) ->
 %%
 %% {@see session_loop}
 %% -----------------------------------------------------------------------------
-init_session(Message) ->
+init_session(Socket, Message) ->
     %% that is just a stub, this must be actually implemented
-    io:format("Message from device: ~p~n", [Message]),
+    %io:format("Message from device: ~p~n", [Message]),
+    Fun = fun() ->
+        case mnesia:read(device, Message#inform.identity, write) of
+            [Device] ->
+                Device;
+            [] ->
+                Device = init_device(Socket, Message),
+                mnesia:write(Device),
+                Device
+        end
+    end,
+    {atomic, _Device} = mnesia:transaction(Fun),
     #session_data{
-      identity = Message#inform.identity,
-      start_time = calendar:universal_time(),
-      reason = Message#inform.reason,
-      failed_jobs = 0
-     }.
+            identity = Message#inform.identity,
+            start_time = calendar:universal_time(),
+            reason = Message#inform.reason,
+            failed_jobs = 0
+           }.
+
+init_device(Socket, Message) ->
+    {ok, {Address, _Port}} = inet:peername(Socket),
+    Releases = lists:map(
+                 fun(Rel) -> sup_server_utils:make_release_record(Rel) end,
+                 Message#inform.releases),
+    #device{
+             identity = Message#inform.identity,
+             last_contact = calendar:universal_time(),
+             releases = Releases,
+             ip = sup_server_utils:ip4addr_to_list(Address),
+             jobs = []
+           }.
 
 fetch_job(Identity, Index) ->
     [Device] = sup_db:find(device, Identity),
-    lists:nth(Index, Device#device.jobs).
+    case Index =< length(Device#device.jobs) of
+        true ->
+            {ok, lists:nth(Index, Device#device.jobs)};
+        false ->
+            empty
+    end.
 
 insert_job(Identity, Index, Job) ->
     [Device] = sup_db:find(device, Identity),
@@ -149,7 +180,7 @@ insert_job(Identity, Index, Job) ->
 
 replace_job(Identity, Index, Job) ->
     [Device] = sup_db:find(device, Identity),
-    {FirstList, SecondList} = lists:split(Index, Device#device.jobs),
+    {FirstList, SecondList} = lists:split(Index-1, Device#device.jobs),
     [_Head | TailList] = SecondList,
     JobList = FirstList ++ [Job] ++ TailList,
     UpdatedDevice = Device#device{jobs=JobList},
@@ -158,14 +189,16 @@ replace_job(Identity, Index, Job) ->
 
 delete_job(Identity, Index) ->
     [Device] = sup_db:find(device, Identity),
-    JobList = lists:delete(Index, Device#device.jobs),
+    {FirstList, SecondList} = lists:split(Index-1, Device#device.jobs),
+    [_Head | TailList] = SecondList,
+    JobList = FirstList ++ TailList,
     UpdatedDevice = Device#device{jobs=JobList},
     sup_db:create(UpdatedDevice),
     ok.
 
 fail_job(Identity, Index, Exception) ->
     [Device] = sup_db:find(device, Identity),
-    {FirstList, SecondList} = lists:split(Index, Device#device.jobs),
+    {FirstList, SecondList} = lists:split(Index-1, Device#device.jobs),
     [HeadJob | TailList] = SecondList,
     FailedJob = HeadJob#job{status=Exception},
     JobList = FirstList ++ [FailedJob] ++ TailList,

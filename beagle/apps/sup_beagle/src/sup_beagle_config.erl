@@ -17,7 +17,7 @@ set(Key, Value) ->
 
 init(_Args) ->
     {ok, ConfigFile} = application:get_env(sup_beagle, config_file),
-    FullConfigFile = code:priv_dir(sup_beagle)++"/"+ConfigFile,
+    FullConfigFile = code:priv_dir(sup_beagle)++"/"++ConfigFile,
     {ok, Config} = file:consult(FullConfigFile),
     {ok, config_to_dict(Config, dict:new())}.
 

@@ -1,5 +1,6 @@
 -module(sup_server_management).
 -include("sup_beagle.hrl").
+-include("db/sup_db.hrl").
 -export([start_link/0, loop/1, begin_session/1]).
 -define(TCP_TIMEOUT, 30000).
 
@@ -134,17 +135,40 @@ init_session(Message) ->
       failed_jobs = 0
      }.
 
-fetch_job(_Identity, _Index) ->
-    empty.
+fetch_job(Identity, Index) ->
+    [Device] = sup_db:find(device, Identity),
+    lists:nth(Index, Device#device.jobs).
 
-insert_job(_Identity, _Index, _Job) ->
+insert_job(Identity, Index, Job) ->
+    [Device] = sup_db:find(device, Identity),
+    {FirstList, SecondList} = lists:split(Index-1, Device#device.jobs),
+    JobList = FirstList ++ [Job] ++ SecondList,
+    UpdatedDevice = Device#device{jobs=JobList},
+    sup_db:create(UpdatedDevice),
     ok.
 
-replace_job(_Identity, _Index, _Job) ->
+replace_job(Identity, Index, Job) ->
+    [Device] = sup_db:find(device, Identity),
+    {FirstList, SecondList} = lists:split(Index, Device#device.jobs),
+    [_Head | TailList] = SecondList,
+    JobList = FirstList ++ [Job] ++ TailList,
+    UpdatedDevice = Device#device{jobs=JobList},
+    sup_db:create(UpdatedDevice),
     ok.
 
-delete_job(_Identity, _Index) ->
+delete_job(Identity, Index) ->
+    [Device] = sup_db:find(device, Identity),
+    JobList = lists:delete(Index, Device#device.jobs),
+    UpdatedDevice = Device#device{jobs=JobList},
+    sup_db:create(UpdatedDevice),
     ok.
 
-fail_job(_Identity, _Index, _Exception) ->
+fail_job(Identity, Index, Exception) ->
+    [Device] = sup_db:find(device, Identity),
+    {FirstList, SecondList} = lists:split(Index, Device#device.jobs),
+    [HeadJob | TailList] = SecondList,
+    FailedJob = HeadJob#job{status=Exception},
+    JobList = FirstList ++ [FailedJob] ++ TailList,
+    UpdatedDevice = Device#device{jobs=JobList},
+    sup_db:create(UpdatedDevice),
     ok.

@@ -15,11 +15,16 @@
         ]},
        {boot_rel, "beagle"},
        {profile, embedded},
+       {incl_cond, exclude},
        {excl_sys_filters, ["^bin/.*",
                            "^erts.*/bin/(dialyzer|typer)"]},
        {excl_archive_filters, [".*"]},
-       {app, sasl, [{incl_cond, include}]},
-       {app, hipe, [{incl_cond, exclude}]}
+       {app, sup_beagle, [{incl_cond, include}]},
+       {app, sampleapp, [{incl_cond, include}]},
+       {app, kernel, [{incl_cond, derived}]},
+       {app, stdlib, [{incl_cond, derived}]},
+       {app, sasl, [{incl_cond, derived}]},
+       {app, inets, [{incl_cond, derived}]}
       ]}.
 
 {target_dir, "beagle"}.

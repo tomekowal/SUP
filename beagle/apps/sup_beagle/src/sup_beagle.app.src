@@ -6,6 +6,7 @@
   {applications, [
                   kernel,
                   stdlib,
+                  sasl,
                   inets
                  ]},
   {mod, { sup_beagle_app, []}},

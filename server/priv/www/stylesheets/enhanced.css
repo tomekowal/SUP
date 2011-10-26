@@ -109,7 +109,7 @@
   background: linear-gradient(top, #bc0404 0%,#fe1900 100%);
 }
 
-.action-button.edit {
+.action-button.view {
   background: #6CC306;
   background: -moz-linear-gradient(top, #6CC306 0%, #559C00 100%);
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #6CC306), color-stop(100%, #559C00));
@@ -125,7 +125,7 @@
   text-shadow: #697B81 0 -1px 0;
 }
 
-.action-button.edit:hover {
+.action-button.view:hover {
   background: #559C00;
   background: -moz-linear-gradient(top, #559C00 6%, #6CC306 33%);
   background: -webkit-gradient(linear, left top, left bottom, color-stop(6%, #559C00), color-stop(33%, #6CC306));

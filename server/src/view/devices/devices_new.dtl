@@ -7,12 +7,10 @@
 {% block yield %}
     <form action="/devices" method="post" onsubmit="return validate()">
       <table class="devices">
-        {% for field in device_fields %}
           <tr>
-            <td>{{ field }}</td>
-            <td><input type="text" name="{{ field }}"></td>
+            <th>Identity</th>
+            <td><input type="text" name="identity"></td>
           </tr>
-        {% endfor %}
       </table>
       <input type="submit">
     </form>

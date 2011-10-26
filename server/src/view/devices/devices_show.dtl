@@ -3,31 +3,39 @@
     <table class="devices">
       <tr>
       	<th>Identity</th>
-	      <td>{{ device.identity }}</td>
-      	<th>Last contact</th>
-	      <td>{{ device.last_contact }}</td>
-      	<th>Ip</th>
-	      <td>{{ device.ip }}</td>
+        <td>{{ device.identity }}</td>
       </tr>
-    </table>
-    <h3>Pending jobs</h3>
-    <table class="devices">
       <tr>
-        <th>Message</th>
-        <th>Module</th>
-        <th>Function</th>
-        <th>Extra</th>
-        <th>Status</th>
+      	<th>Last contact</th>
+        <td>{{ device.last_contact }}</td>
       </tr>
-			{% for job in device.jobs %}
-				<tr>		
-	      	<td> {{ job.message }}</td>
-	      	<td> {{ job.module }}</td>
-	      	<td> {{ job.function }}</td>
-	      	<td> {{ job.extra }}</td>
-	      	<td> {{ job.status }}</td>
-				<tr>      
-			{% endfor %}
-
+      <tr>
+      	<th>Ip</th>
+        <td>{{ device.ip }}</td>
+      </tr>
     </table>
+		{% if device.jobs %}            
+			<h3>Pending jobs</h3>
+		  <table class="devices">
+		    <tr>
+		      <th>Message</th>
+		      <th>Module</th>
+		      <th>Function</th>
+		      <th>Extra</th>
+		      <th>Status</th>
+		    </tr>
+				{% for job in device.jobs %}
+					<tr>		
+			    	<td> {{ job.message }}</td>
+			    	<td> {{ job.module }}</td>
+			    	<td> {{ job.function }}</td>
+			    	<td> {{ job.extra }}</td>
+			    	<td> {{ job.status }}</td>
+					<tr>      
+				{% endfor %}
+		  </table>
+		{% else %}
+			<h3>No pending jobs</h3>
+    {% endif %}
+
 {% endblock %}

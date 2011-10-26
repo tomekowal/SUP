@@ -11,7 +11,9 @@
       </tr>
       <tr>
         <th>Pending jobs</th>
-        <td></td>
+				{% for job in device.jobs %}
+        	<td> {{ job.message }}</td>
+	      {% endfor %}
       </tr>
     </table>
 {% endblock %}

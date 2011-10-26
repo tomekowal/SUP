@@ -82,8 +82,10 @@ destroy(Req, Id) ->
   Req:respond({302, [{"Location", "/devices"}], ""}).
 
 device_to_print(Record) ->
-	{Date, Time} = Record#device.last_contact,
-  NewRecord = Record#device{last_contact=Date ++ " " ++ Time},
+  case Record#device.last_contact of
+    {Date, Time} -> NewRecord = Record#device{last_contact=Date ++ " " ++ Time};
+    never -> NewRecord = Record#device{last_contact="never"}
+  end,
   [_Atom | Fields] = tuple_to_list(NewRecord),
   RecordInfo = record_info(fields, device),
   lists:zip(RecordInfo, Fields).

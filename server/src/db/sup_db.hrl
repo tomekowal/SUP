@@ -1,9 +1,15 @@
 %% Record definitions
--record(job, {message, module, function, extra, status}).
+-record	(job,	{message :: term(),
+							module :: term(), 
+							function :: term(), 
+							extra :: term(), 
+							status :: term()
+							}
+				).
 -record(release, {name, version}).
 
 -record(device, {identity :: nonempty_string(),         %% device identity
-                 last_contact :: {term(), term()},      %% last contact
+                 last_contact :: nonempty_string(),      %% last contact
                  releases :: [#release{}],              %% releases present on device
                  ip :: nonempty_string(),               %% device IP
                  jobs :: [#job{}]

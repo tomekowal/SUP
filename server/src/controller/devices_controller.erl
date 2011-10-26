@@ -82,10 +82,16 @@ destroy(Req, Id) ->
   Req:respond({302, [{"Location", "/devices"}], ""}).
 
 device_to_print(Record) ->
-  case Record#device.last_contact of
-    {Date, Time} -> NewRecord = Record#device{last_contact=Date ++ " " ++ Time};
-    never -> NewRecord = Record#device{last_contact="never"}
-  end,
+  Jobs = lists:map(
+      fun(Job) ->
+	      [_Atom | RawFields] = tuple_to_list(Job),
+        RecordInfo = record_info(fields, job),
+        Fields=lists:map(fun(Field) ->io_lib:format("~p",[Field]) end, RawFields),
+        lists:zip(RecordInfo, Fields)
+      end,
+      Record#device.jobs),
+  NewRecord = Record#device{jobs=Jobs}, 
   [_Atom | Fields] = tuple_to_list(NewRecord),
   RecordInfo = record_info(fields, device),
   lists:zip(RecordInfo, Fields).
+

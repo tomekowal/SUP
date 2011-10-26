@@ -9,11 +9,25 @@
       	<th>Ip</th>
 	      <td>{{ device.ip }}</td>
       </tr>
+    </table>
+    <h3>Pending jobs</h3>
+    <table class="devices">
       <tr>
-        <th>Pending jobs</th>
-				{% for job in device.jobs %}
-        	<td> {{ job.message }}</td>
-	      {% endfor %}
+        <th>Message</th>
+        <th>Module</th>
+        <th>Function</th>
+        <th>Extra</th>
+        <th>Status</th>
       </tr>
+			{% for job in device.jobs %}
+				<tr>		
+	      	<td> {{ job.message }}</td>
+	      	<td> {{ job.module }}</td>
+	      	<td> {{ job.function }}</td>
+	      	<td> {{ job.extra }}</td>
+	      	<td> {{ job.status }}</td>
+				<tr>      
+			{% endfor %}
+
     </table>
 {% endblock %}

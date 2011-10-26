@@ -44,7 +44,7 @@ new(Req) ->
 create(Req) ->
   PostData = Req:parse_post(),
   Identity = proplists:get_value("identity", PostData),
-  sup_db:create(#device{identity=Identity, last_contact={"never",""}}),
+  sup_db:create(#device{identity=Identity, last_contact="never"}),
   Req:respond({302, [{"Location", "/devices"}], ""}).
 
 edit(Req, Id) ->
@@ -76,10 +76,6 @@ destroy(Req, Id) ->
   Req:respond({302, [{"Location", "/devices"}], ""}).
 
 device_to_print(Record) ->
-  case Record#device.last_contact of
-    {Date, Time} -> NewRecord = Record#device{last_contact=Date ++ " " ++ Time};
-    never -> NewRecord = Record#device{last_contact="never"}
-  end,
-  [_Atom | Fields] = tuple_to_list(NewRecord),
+  [_Atom | Fields] = tuple_to_list(Record),
   RecordInfo = record_info(fields, device),
   lists:zip(RecordInfo, Fields).

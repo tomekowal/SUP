@@ -3,17 +3,21 @@
     <table class="devices">
       <tr>
       	<th>Identity</th>
-	      <td>{{ device.identity }}</td>
       	<th>Last contact</th>
-	      <td>{{ device.last_contact }}</td>
       	<th>Ip</th>
-	      <td>{{ device.ip }}</td>
+      	<th>Pending jobs</th>
       </tr>
       <tr>
-        <th>Pending jobs</th>
-				{% for job in device.jobs %}
-        	<td> {{ job.message }}</td>
-	      {% endfor %}
+        <td>{{ device.identity }}</td>
+        <td>{{ device.last_contact }}</td>
+        <td>{{ device.ip }}</td>
+        {% if device.jobs %}
+          {% for job in device.jobs %}
+            <td> {{ job.message }}</td>
+          {% endfor %}
+        {% else %}
+          <td>0</td>
+        {% endif %}
       </tr>
     </table>
 {% endblock %}

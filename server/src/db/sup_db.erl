@@ -79,3 +79,13 @@ destroy(TableName, Key) ->
 destroy_all(TableName) ->
   mnesia:clear_table(TableName).
 
+append_job(Id,Job) ->
+  mnesia:transaction(
+    fun() -> 
+      [Record] = sup_db:find(device, Id),
+      Jobs = Record#device.jobs,      
+      NewRecord = Record#device{jobs=Jobs++[Job#job{status=pending}]},
+      mnesia:write(NewRecord)
+    end
+  ).
+

@@ -13,29 +13,33 @@
       	<th>Ip</th>
         <td>{{ device.ip }}</td>
       </tr>
-    </table>
-		{% if device.jobs %}            
-			<h3>Pending jobs</h3>
-		  <table class="devices">
-		    <tr>
-		      <th>Message</th>
-		      <th>Module</th>
-		      <th>Function</th>
-		      <th>Extra</th>
-		      <th>Status</th>
-		    </tr>
-				{% for job in device.jobs %}
-					<tr>		
-			    	<td> {{ job.message }}</td>
-			    	<td> {{ job.module }}</td>
-			    	<td> {{ job.function }}</td>
-			    	<td> {{ job.extra }}</td>
-			    	<td> {{ job.status }}</td>
-					<tr>      
-				{% endfor %}
-		  </table>
-		{% else %}
-			<h3>No pending jobs</h3>
-    {% endif %}
-
+    </table>           
+		<h3>Pending jobs</h3>
+	  <table class="devices">
+	    <tr>
+	      <th>Message</th>
+	      <th>Module</th>
+	      <th>Function</th>
+	      <th>Extra</th>
+	      <th>Status</th>
+	    </tr>
+			{% for job in device.jobs %}
+				<tr>		
+		    	<td> {{ job.message }}</td>
+		    	<td> {{ job.module }}</td>
+		    	<td> {{ job.function }}</td>
+		    	<td> {{ job.extra }}</td>
+		    	<td> {{ job.status }}</td>
+				<tr>      
+			{% endfor %}
+			<tr>	
+        <form action="/devices/{{ device.identity }}/jobs/new" method="post" onsubmit="return validate()">
+	      	<td><input type="text" name="message"></td>
+	      	<td><input type="text" name="module"></td>
+	      	<td><input type="text" name="function"></td>
+	      	<td><input type="text" name="extra"></td>
+          <td><input type="submit"></td>
+        </form>
+			<tr>      
+	  </table>
 {% endblock %}

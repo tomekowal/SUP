@@ -3,7 +3,7 @@
 							module :: term(), 
 							function :: term(), 
 							extra :: term(), 
-							status :: term()
+							status :: failed | in_progress | pending
 							}
 				).
 -record(release, {name, version}).

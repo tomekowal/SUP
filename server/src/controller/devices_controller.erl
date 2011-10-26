@@ -21,7 +21,9 @@ dispatch(Req, Args) ->
         [] ->
           devices_controller:create(Req);
         [Id, "destroy"] ->
-          devices_controller:destroy(Req, Id)
+          devices_controller:destroy(Req, Id);
+        [Id, "jobs", "new"] ->
+					devices_controller:append_job(Req, Id)
       end
   end.
 
@@ -41,7 +43,7 @@ create(Req) ->
   PostData = Req:parse_post(),
   Identity = proplists:get_value("identity", PostData),
   sup_db:create(#device{identity=Identity, last_contact="never", jobs=[], releases=[], ip="unknown"}),
-  Req:respond({302, [{"Location", "/devices"}], ""}).
+  Req:respond({302, [{"Location", "/devices/" ++ Identity}], ""}).
 
 show(Req, Id) ->
   [Record] = sup_db:find(device, Id),
@@ -52,6 +54,16 @@ show(Req, Id) ->
 destroy(Req, Id) ->
   sup_db:destroy(device, Id),
   Req:respond({302, [{"Location", "/devices"}], ""}).
+
+append_job(Req, Id) ->
+	PostData = Req:parse_post(),
+  Message = proplists:get_value("message", PostData),
+  Module = proplists:get_value("module", PostData),
+  Function = proplists:get_value("function", PostData),
+  Extra = proplists:get_value("extra", PostData),
+	Job = #job{message=Message, module=Module, function=Function, extra=Extra},
+	sup_db:append_job(Id,Job),
+  Req:respond({302, [{"Location", "/devices/" ++ Id}], ""}).
 
 device_to_print(Record) ->
   Jobs = lists:map(

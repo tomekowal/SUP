@@ -34,33 +34,27 @@ index(Req) ->
     fun(Record) ->
 	device_to_print(Record) end,
     sup_db:all(device)),
-  {ok, HTMLOutput} = devices_index_dtl:render([{devices, Devices}, {device_fields, record_info(fields, device)}]),
+  {ok, HTMLOutput} = devices_index_dtl:render([{devices, Devices}]),
   Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
 new(Req) ->
-  {ok, HTMLOutput} = devices_new_dtl:render([{device_fields, [identity]}]),
+  {ok, HTMLOutput} = devices_new_dtl:render([]),
   Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
 create(Req) ->
   PostData = Req:parse_post(),
-  Id = helper:timestamp(),
-  Name = proplists:get_value("name", PostData),
-  Kernel = proplists:get_value("kernel", PostData),
-  Os = proplists:get_value("os", PostData),
-  Ip = proplists:get_value("ip", PostData),
-  Port = proplists:get_value("port", PostData),
-  Message = proplists:get_value("message", PostData),
-  sup_db:create({device, Id, Name, Kernel, Os, Ip, Port, Message, []}),
+  Identity = proplists:get_value("identity", PostData),
+  sup_db:create(#device{identity=Identity, last_contact={"never",""}}),
   Req:respond({302, [{"Location", "/devices"}], ""}).
 
 edit(Req, Id) ->
-  [Record] = sup_db:find(device, list_to_integer(Id)),
+  [Record] = sup_db:find(device, Id),
   Device = device_to_print(Record),
   {ok, HTMLOutput} = devices_edit_dtl:render([{device, Device}, {device_fields, record_info(fields, device)}]),
   Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
-show(Req, Id) ->	
-  [Record] = sup_db:find(device, list_to_integer(Id)),
+show(Req, Id) ->
+  [Record] = sup_db:find(device, Id),
   Device = device_to_print(Record),
   {ok, HTMLOutput} = devices_show_dtl:render([{device, Device}]),
   Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).

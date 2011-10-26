@@ -62,14 +62,6 @@ find(TableName, Key) ->
   {atomic, Val} = mnesia:transaction(F),
   Val.
 
-%get_message_by_device_ip(Ip) ->
-%    F = fun() ->
-%                Message = #device{ip = Ip, message = '$1', _ = '_'},
-%                mnesia:select(device, [{Message, [], ['$1']}])
-%        end,
-%    {atomic, Val} = mnesia:transaction(F),
-%	Val.
-
 %%------------------------------------------------------------------------------
 %% @doc Deletes Mnesia record.
 %% @end

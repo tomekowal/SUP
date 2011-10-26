@@ -15,8 +15,6 @@ dispatch(Req, Args) ->
           devices_controller:new(Req);
         [Id, "edit"] ->
           devices_controller:edit(Req, Id);
-        [Id, "programs"] ->
-          devices_controller:programs(Req, Id);
         [Id] ->
           devices_controller:show(Req, Id)
       end;
@@ -27,18 +25,14 @@ dispatch(Req, Args) ->
         [Id, "update"] ->
           devices_controller:update(Req, Id);
         [Id, "destroy"] ->
-          devices_controller:destroy(Req, Id);
-        [Id, "ping"] ->
-          devices_controller:ping(Req, Id)
+          devices_controller:destroy(Req, Id)
       end
   end.
 
 index(Req) ->
   Devices = lists:map(
     fun(Record) ->
-      [Atom | Fields] = tuple_to_list(Record),
-      RecordInfo = record_info(fields, device),
-      lists:zip(RecordInfo, Fields) end,
+	device_to_print(Record) end,
     sup_db:all(device)),
   {ok, HTMLOutput} = devices_index_dtl:render([{devices, Devices}, {device_fields, record_info(fields, device)}]),
   Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
@@ -60,18 +54,14 @@ create(Req) ->
   Req:respond({302, [{"Location", "/devices"}], ""}).
 
 edit(Req, Id) ->
-  [Record] = sup_db:find(device, Id),
-  [Atom | Fields] = tuple_to_list(Record),
-  RecordInfo = record_info(fields, device),
-  Device = lists:zip(RecordInfo, Fields),
+  [Record] = sup_db:find(device, list_to_integer(Id)),
+  Device = device_to_print(Record),
   {ok, HTMLOutput} = devices_edit_dtl:render([{device, Device}, {device_fields, record_info(fields, device)}]),
   Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
-show(Req, Id) ->
-  [Record] = sup_db:find(device, Id),
-  [Atom | Fields] = tuple_to_list(Record),
-  RecordInfo = record_info(fields, device),
-  Device = lists:zip(RecordInfo, Fields),
+show(Req, Id) ->	
+  [Record] = sup_db:find(device, list_to_integer(Id)),
+  Device = device_to_print(Record),
   {ok, HTMLOutput} = devices_show_dtl:render([{device, Device}]),
   Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
@@ -91,21 +81,9 @@ destroy(Req, Id) ->
   sup_db:destroy(device, Id),
   Req:respond({302, [{"Location", "/devices"}], ""}).
 
-programs(Req, Id) ->
-  HTMLOutput = "programs",
-  Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
-
-%ping(Req, Id) ->
-%	[Record] = sup_db:find(device, Id),
-%	{ok, Ip}=inet_parse:address(Record#device.ip),
-%    Request = get_data,
-%	Body = [server, conects, and_send, Record#device.message],
-%    case gen_tcp:connect(Ip, list_to_integer(Record#device.port),[binary, {packet, 2}]) of
-%        {ok, Sock} ->
-%            ok = gen_tcp:send(Sock, mochijson2:encode({struct, [{Request, Body}]})),
-%            ok = gen_tcp:close(Sock);
-%        {error, Reason} ->
-%            io:format("~w~n", [Reason])	
-%    end,
-%  	Req:respond({302, [{"Location", "/devices"}], ""}).
-
+device_to_print(Record) ->
+	{Date, Time} = Record#device.last_contact,
+  NewRecord = Record#device{last_contact=Date ++ " " ++ Time},
+  [_Atom | Fields] = tuple_to_list(NewRecord),
+  RecordInfo = record_info(fields, device),
+  lists:zip(RecordInfo, Fields).

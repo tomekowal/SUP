@@ -23,7 +23,9 @@ dispatch(Req, Args) ->
         [Id, "destroy"] ->
           devices_controller:destroy(Req, Id);
         [Id, "jobs", "new"] ->
-					devices_controller:append_job(Req, Id)
+					devices_controller:append_job(Req, Id);
+				[Id, "jobs", "new", Type] ->
+  				devices_controller:create_job(Req, Id, Type)
       end
   end.
 
@@ -64,6 +66,17 @@ append_job(Req, Id) ->
 	Job = #job{message=Message, module=Module, function=Function, extra=Extra},
 	sup_db:append_job(Id,Job),
   Req:respond({302, [{"Location", "/devices/" ++ Id}], ""}).
+
+create_job(Req, Id, Type) ->
+	PostData = Req:parse_post(),
+  Message = {get_release, proplists:get_value("file", PostData)},
+  Module = sup_server_handlers,
+  Function = upgrade_handler,
+  Extra = ignore,
+	Job = #job{message=Message, module=Module, function=Function, extra=Extra},
+	sup_db:append_job(Id,Job),
+  Req:respond({302, [{"Location", "/devices/" ++ Id}], ""}).
+
 
 device_to_print(Record) ->
   Jobs = lists:map(

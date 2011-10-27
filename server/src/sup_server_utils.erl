@@ -1,5 +1,5 @@
 -module(sup_server_utils).
--export([ip4addr_to_list/1, make_release_record/1]).
+-compile(export_all).
 -include("db/sup_db.hrl").
 
 ip4addr_to_list({Oct1,Oct2,Oct3,Oct4}) ->
@@ -11,3 +11,12 @@ make_release_record(Release) ->
               name = Name,
               version = Version
             }.
+
+list_to_term(String) ->
+    {ok, T, _} = erl_scan:string(String++"."),
+    case erl_parse:parse_term(T) of
+        {ok, Term} ->
+            Term;
+        {error, Error} ->
+            Error
+    end.

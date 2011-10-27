@@ -57,10 +57,10 @@ destroy(Req, Id) ->
 
 append_job(Req, Id) ->
 	PostData = Req:parse_post(),
-  Message = proplists:get_value("message", PostData),
-  Module = proplists:get_value("module", PostData),
-  Function = proplists:get_value("function", PostData),
-  Extra = proplists:get_value("extra", PostData),
+  Message = sup_server_utils:list_to_term(proplists:get_value("message", PostData)),
+  Module = sup_server_utils:list_to_term(proplists:get_value("module", PostData)),
+  Function = sup_server_utils:list_to_term(proplists:get_value("function", PostData)),
+  Extra = sup_server_utils:list_to_term(proplists:get_value("extra", PostData)),
 	Job = #job{message=Message, module=Module, function=Function, extra=Extra},
 	sup_db:append_job(Id,Job),
   Req:respond({302, [{"Location", "/devices/" ++ Id}], ""}).
@@ -74,7 +74,7 @@ device_to_print(Record) ->
         lists:zip(RecordInfo, Fields)
       end,
       Record#device.jobs),
-  NewRecord = Record#device{jobs=Jobs}, 
+  NewRecord = Record#device{jobs=Jobs},
   [_Atom | Fields] = tuple_to_list(NewRecord),
   RecordInfo = record_info(fields, device),
   lists:zip(RecordInfo, Fields).

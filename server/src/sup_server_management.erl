@@ -87,7 +87,7 @@ session_loop(Socket, SessionData) ->
     Identity = SessionData#session_data.identity,
     FailedJobs = SessionData#session_data.failed_jobs,
     case fetch_job(Identity, FailedJobs+1) of
-        {ok, {job, Message, Module, Function, Extra}} ->
+        {ok, {job, Message, Module, Function, Extra, _Status}} ->
             io:format("JOB to send: ~p~n", [Message]),
             try
                 ok = gen_tcp:send(Socket, term_to_binary(Message)),
@@ -116,7 +116,9 @@ session_loop(Socket, SessionData) ->
         empty ->
             ok = gen_tcp:send(Socket, term_to_binary(finished)),
             ok = gen_tcp:close(Socket),
-            ok
+            ok;
+        SthElse ->
+            io:format("We have ~p~n", [SthElse])
     end.
 
 %% -----------------------------------------------------------------------------

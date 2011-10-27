@@ -87,7 +87,6 @@ session_loop(Socket, SessionData) ->
     FailedJobs = SessionData#session_data.failed_jobs,
     case sup_db:fetch_job(Identity, FailedJobs+1) of
         {ok, {job, Message, Module, Function, Extra, _Status}} ->
-            io:format("JOB to send: ~p~n", [Message]),
             try
                 ok = gen_tcp:send(Socket, term_to_binary(Message)),
                 {ok, Packet} = gen_tcp:recv(Socket, 0, ?TCP_TIMEOUT),

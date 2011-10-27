@@ -1,6 +1,7 @@
 /server/ebin
 /server/deps
 /server/doc
+/server/log
 /server/Mnesia.*
 /beagle/apps/*/ebin
 /beagle/versioned/*/ebin

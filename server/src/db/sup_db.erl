@@ -79,13 +79,69 @@ destroy(TableName, Key) ->
 destroy_all(TableName) ->
   mnesia:clear_table(TableName).
 
-append_job(Id,Job) ->
+append_job(Identity, Job) ->
   mnesia:transaction(
-    fun() -> 
-      [Record] = sup_db:find(device, Id),
-      Jobs = Record#device.jobs,      
+    fun() ->
+      [Record] = sup_db:find(device, Identity),
+      Jobs = Record#device.jobs,
       NewRecord = Record#device{jobs=Jobs++[Job#job{status=pending}]},
-      mnesia:write(NewRecord)
+      sup_db:create(NewRecord)
     end
   ).
 
+fetch_job(Identity, Index) ->
+  {atomic, Val} = mnesia:transaction(
+    fun() ->
+      [Device] = sup_db:find(device, Identity),
+      case Index =< length(Device#device.jobs) of
+          true ->
+              Job = lists:nth(Index, Device#device.jobs),
+              {FirstList, [_Head | SecondList]} = lists:split(Index-1, Device#device.jobs),
+              UpdatedJob = Job#job{status=pending},
+              JobList = FirstList ++ [UpdatedJob] ++ SecondList,
+              UpdatedDevice = Device#device{jobs=JobList},
+              sup_db:create(UpdatedDevice),
+              {ok, UpdatedJob};
+          false ->
+              empty
+      end
+    end
+  ),
+  Val.
+
+replace_job(Identity, Index, Job) ->
+  mnesia:transaction(
+    fun() ->
+      [Device] = sup_db:find(device, Identity),
+      {FirstList, [_Head | SecondList]} = lists:split(Index-1, Device#device.jobs),
+      UpdatedJob = Job#job{status=pending},
+      JobList = FirstList ++ [UpdatedJob] ++ SecondList,
+      UpdatedDevice = Device#device{jobs=JobList},
+      sup_db:create(UpdatedDevice)
+    end
+  ).
+
+delete_job(Identity, Index) ->
+  mnesia:transaction(
+    fun() ->
+      [Device] = sup_db:find(device, Identity),
+      {FirstList, SecondList} = lists:split(Index-1, Device#device.jobs),
+      [_Head | TailList] = SecondList,
+      JobList = FirstList ++ TailList,
+      UpdatedDevice = Device#device{jobs=JobList},
+      sup_db:create(UpdatedDevice)
+    end
+  ).
+
+fail_job(Identity, Index, Exception) ->
+  mnesia:transaction(
+    fun() ->
+      [Device] = sup_db:find(device, Identity),
+      {FirstList, SecondList} = lists:split(Index-1, Device#device.jobs),
+      [HeadJob | TailList] = SecondList,
+      FailedJob = HeadJob#job{status={failed, Exception}},
+      JobList = FirstList ++ [FailedJob] ++ TailList,
+      UpdatedDevice = Device#device{jobs=JobList},
+      sup_db:create(UpdatedDevice)
+    end
+  ).

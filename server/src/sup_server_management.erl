@@ -2,7 +2,6 @@
 -include("sup_beagle.hrl").
 -include("db/sup_db.hrl").
 -export([start_link/0, loop/1, begin_session/1]).
--export([fetch_job/2, insert_job/3, append_job/2, delete_job/2, replace_job/3, fail_job/3]).
 -define(TCP_TIMEOUT, 30000).
 
 -record(session_data,
@@ -86,7 +85,7 @@ begin_session(Socket) ->
 session_loop(Socket, SessionData) ->
     Identity = SessionData#session_data.identity,
     FailedJobs = SessionData#session_data.failed_jobs,
-    case fetch_job(Identity, FailedJobs+1) of
+    case sup_db:fetch_job(Identity, FailedJobs+1) of
         {ok, {job, Message, Module, Function, Extra, _Status}} ->
             io:format("JOB to send: ~p~n", [Message]),
             try
@@ -97,28 +96,26 @@ session_loop(Socket, SessionData) ->
                     HandlerArgs = [Message, Result, SessionData, Extra],
                     case apply(Module, Function, HandlerArgs) of
                         {next_job, NextJob} ->
-                            replace_job(Identity, FailedJobs+1, NextJob);
+                            sup_db:replace_job(Identity, FailedJobs+1, NextJob);
                         none ->
-                            delete_job(Identity, FailedJobs+1)
+                            sup_db:delete_job(Identity, FailedJobs+1)
                     end,
                     session_loop(Socket, SessionData)
                 catch
-                    HandlerException ->
-                        fail_job(Identity, FailedJobs+1, HandlerException),
+                    _:HandlerException ->
+                        sup_db:fail_job(Identity, FailedJobs+1, HandlerException),
                         NewSessionData = SessionData#session_data{failed_jobs = FailedJobs+1},
                         session_loop(Socket, NewSessionData)
                 end
             catch
                 %% connection broken, fail entire session
-                NetException ->
-                    fail_job(Identity, FailedJobs+1, NetException)
+                _:NetException ->
+                    sup_db:fail_job(Identity, FailedJobs+1, NetException)
             end;
         empty ->
             ok = gen_tcp:send(Socket, term_to_binary(finished)),
             ok = gen_tcp:close(Socket),
-            ok;
-        SthElse ->
-            io:format("We have ~p~n", [SthElse])
+            ok
     end.
 
 %% -----------------------------------------------------------------------------
@@ -163,54 +160,4 @@ init_device(Socket, Message) ->
              jobs = []
            }.
 
-fetch_job(Identity, Index) ->
-    [Device] = sup_db:find(device, Identity),
-    case Index =< length(Device#device.jobs) of
-        true ->
-            {ok, lists:nth(Index, Device#device.jobs)};
-        false ->
-            empty
-    end.
 
-insert_job(Identity, Index, Job) ->
-    [Device] = sup_db:find(device, Identity),
-    {FirstList, SecondList} = lists:split(Index-1, Device#device.jobs),
-    JobList = FirstList ++ [Job] ++ SecondList,
-    UpdatedDevice = Device#device{jobs=JobList},
-    sup_db:create(UpdatedDevice),
-    ok.
-
-append_job(Identity, Job) ->
-    [Device] = sup_db:find(device, Identity),
-    JobList = Device#device.jobs ++ [Job],
-    UpdatedDevice = Device#device{jobs=JobList},
-    sup_db:create(UpdatedDevice),
-    ok.
-
-replace_job(Identity, Index, Job) ->
-    [Device] = sup_db:find(device, Identity),
-    {FirstList, SecondList} = lists:split(Index-1, Device#device.jobs),
-    [_Head | TailList] = SecondList,
-    JobList = FirstList ++ [Job] ++ TailList,
-    UpdatedDevice = Device#device{jobs=JobList},
-    sup_db:create(UpdatedDevice),
-    ok.
-
-delete_job(Identity, Index) ->
-    [Device] = sup_db:find(device, Identity),
-    {FirstList, SecondList} = lists:split(Index-1, Device#device.jobs),
-    [_Head | TailList] = SecondList,
-    JobList = FirstList ++ TailList,
-    UpdatedDevice = Device#device{jobs=JobList},
-    sup_db:create(UpdatedDevice),
-    ok.
-
-fail_job(Identity, Index, Exception) ->
-    [Device] = sup_db:find(device, Identity),
-    {FirstList, SecondList} = lists:split(Index-1, Device#device.jobs),
-    [HeadJob | TailList] = SecondList,
-    FailedJob = HeadJob#job{status=Exception},
-    JobList = FirstList ++ [FailedJob] ++ TailList,
-    UpdatedDevice = Device#device{jobs=JobList},
-    sup_db:create(UpdatedDevice),
-    ok.

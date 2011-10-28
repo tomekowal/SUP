@@ -34,12 +34,22 @@
 			{% endfor %}
 			<tr>	
         <form action="/devices/{{ device.identity }}/jobs/new" method="post" onsubmit="return validate()">
-	      	<td><input type="text" name="message"></td>
-	      	<td><input type="text" name="module"></td>
-	      	<td><input type="text" name="function"></td>
-	      	<td><input type="text" name="extra"></td>
-          <td><input type="submit"></td>
+	      	<td><input type="text" name="message"/></td>
+	      	<td><input type="text" name="module"/></td>
+	      	<td><input type="text" name="function"/></td>
+	      	<td><input type="text" name="extra"/></td>
+          <td><input type="submit"/></td>
         </form>
-			<tr>      
+			<tr>     
+	  </table>
+	  <h3>Updrade to release</h3>
+	  <table class="devices">
+	    <tr><th>Release Name</th><th></th></tr>
+	    <tr>
+	      <form action="/devices/{{ device.identity }}/jobs/new/upgrade" method="post" onsubmit="return validate()">
+      	  <td><input type="text" name="file"/></td>
+          <td><input type="submit" text="Upgrade"/></td>
+        </form>  
+	    </tr>
 	  </table>
 {% endblock %}

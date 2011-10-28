@@ -106,5 +106,8 @@ handle_job({update_to_release, Vsn}) ->
 handle_job({print, Message}) ->
     io:format("~p~n", [Message]),
     ok;
+handle_job(wait) ->
+    timer:sleep(10000),
+    ok;
 handle_job(_Job) ->
     ok.

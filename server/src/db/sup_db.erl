@@ -97,7 +97,7 @@ fetch_job(Identity, Index) ->
           true ->
               Job = lists:nth(Index, Device#device.jobs),
               {FirstList, [_Head | SecondList]} = lists:split(Index-1, Device#device.jobs),
-              UpdatedJob = Job#job{status=pending},
+              UpdatedJob = Job#job{status=in_progress},
               JobList = FirstList ++ [UpdatedJob] ++ SecondList,
               UpdatedDevice = Device#device{jobs=JobList},
               sup_db:create(UpdatedDevice),

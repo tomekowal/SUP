@@ -16,7 +16,6 @@
       <div id="nav">
         <ul>
           <li class="menu"><a href="/devices" class="menu-button">Devices</a></li>
-          <li class="menu"><a href="/programs" class="menu-button">Programs</a></li>
         </ul>
       </div>
     </div>

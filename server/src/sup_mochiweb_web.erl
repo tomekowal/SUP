@@ -37,8 +37,6 @@ loop(Req, DocRoot) ->
           main_controller:index(Req);
         "devices" ->
           devices_controller:dispatch(Req, Args);
-        "programs" ->
-          programs_controller:dispatch(Req, Args);
         _ ->
           Req:serve_file(Path, DocRoot)
       end

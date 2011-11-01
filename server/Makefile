@@ -4,6 +4,9 @@ DEST:=$(PREFIX)$(PROJECT)
 
 REBAR=./rebar
 
+compile:
+	@$(REBAR) compile
+
 all:
 	@$(REBAR) get-deps compile
 
@@ -17,12 +20,6 @@ test:
 
 clean:
 	@$(REBAR) clean
-
-build_plt:
-	@$(REBAR) build-plt
-
-dialyzer:
-	@$(REBAR) dialyze
 
 app:
 	@$(REBAR) create template=mochiwebapp dest=$(DEST) appid=$(PROJECT)

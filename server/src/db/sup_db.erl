@@ -113,10 +113,12 @@ replace_job(Identity, Index, Job) ->
   mnesia:transaction(
     fun() ->
       [Device] = sup_db:find(device, Identity),
-      {FirstList, [_Head | SecondList]} = lists:split(Index-1, Device#device.jobs),
+      {FirstList, [CurrentJob | SecondList]} = lists:split(Index-1, Device#device.jobs),
+      FinishedJob = CurrentJob#job{status=finished},
       UpdatedJob = Job#job{status=pending},
       JobList = FirstList ++ [UpdatedJob] ++ SecondList,
-      UpdatedDevice = Device#device{jobs=JobList},
+      FinishedJobList = [FinishedJob | Device#device.finished_jobs],
+      UpdatedDevice = Device#device{jobs=JobList, finished_jobs=FinishedJobList},
       sup_db:create(UpdatedDevice)
     end
   ).
@@ -126,9 +128,11 @@ delete_job(Identity, Index) ->
     fun() ->
       [Device] = sup_db:find(device, Identity),
       {FirstList, SecondList} = lists:split(Index-1, Device#device.jobs),
-      [_Head | TailList] = SecondList,
+      [CurrentJob | TailList] = SecondList,
+      FinishedJob = CurrentJob#job{status=finished},
       JobList = FirstList ++ TailList,
-      UpdatedDevice = Device#device{jobs=JobList},
+      FinishedJobList = [FinishedJob | Device#device.finished_jobs],
+      UpdatedDevice = Device#device{jobs=JobList, finished_jobs=FinishedJobList},
       sup_db:create(UpdatedDevice)
     end
   ).

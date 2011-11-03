@@ -12,6 +12,7 @@
                  last_contact :: nonempty_string(),      %% last contact
                  releases :: [#release{}],              %% releases present on device
                  ip :: nonempty_string(),               %% device IP
-                 jobs :: [#job{}]
+                 jobs :: [#job{}],
+                 finished_jobs :: [#job{}]
                 }
        ).

@@ -13,7 +13,8 @@
       	<th>Ip</th>
         <td>{{ device.ip }}</td>
       </tr>
-    </table>           
+    </table>
+
 		<h3>Pending jobs</h3>
 	  <table class="devices">
 	    <tr>
@@ -51,5 +52,25 @@
           <td><input type="submit" text="Upgrade"/></td>
         </form>  
 	    </tr>
+	  </table>
+
+		<h3>Finished jobs</h3>
+	  <table class="devices">
+	    <tr>
+	      <th>Message</th>
+	      <th>Module</th>
+	      <th>Function</th>
+	      <th>Extra</th>
+	      <th>Status</th>
+	    </tr>
+			{% for fjob in device.finished_jobs %}
+				<tr>
+		    	<td> {{ fjob.message }}</td>
+		    	<td> {{ fjob.module }}</td>
+		    	<td> {{ fjob.function }}</td>
+		    	<td> {{ fjob.extra }}</td>
+		    	<td> {{ fjob.status }}</td>
+				<tr>
+			{% endfor %}
 	  </table>
 {% endblock %}

@@ -156,7 +156,8 @@ init_device(Socket, Message) ->
              last_contact = calendar:universal_time(),
              releases = Releases,
              ip = sup_server_utils:ip4addr_to_list(Address),
-             jobs = []
+             jobs = [],
+             finished_jobs = []
            }.
 
 

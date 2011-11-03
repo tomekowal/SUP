@@ -87,8 +87,16 @@ device_to_print(Record) ->
         lists:zip(RecordInfo, Fields)
       end,
       Record#device.jobs),
+  FinishedJobs = lists:map(
+      fun(Job) ->
+        [_Atom | RawFields] = tuple_to_list(Job),
+        RecordInfo = record_info(fields, job),
+        Fields=lists:map(fun(Field) ->io_lib:format("~p",[Field]) end, RawFields),
+        lists:zip(RecordInfo, Fields)
+      end,
+      Record#device.finished_jobs),
   LastContact = Record#device.last_contact,
-  NewRecord = Record#device{jobs=Jobs,last_contact=helper:format_date(LastContact)},
+  NewRecord = Record#device{jobs=Jobs,finished_jobs=FinishedJobs,last_contact=helper:format_date(LastContact)},
   [_Atom | Fields] = tuple_to_list(NewRecord),
   RecordInfo = record_info(fields, device),
   lists:zip(RecordInfo, Fields).

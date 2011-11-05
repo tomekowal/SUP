@@ -44,7 +44,7 @@ new(Req) ->
 create(Req) ->
   PostData = Req:parse_post(),
   Identity = proplists:get_value("identity", PostData),
-  sup_db:create(#device{identity=Identity, last_contact="never", jobs=[], releases=[], ip="unknown"}),
+  sup_db:create(#device{identity=Identity, last_contact="never", jobs=[], finished_jobs=[], releases=[], ip="unknown"}),
   Req:respond({302, [{"Location", "/devices/" ++ Identity}], ""}).
 
 show(Req, Id) ->

@@ -5,13 +5,15 @@
 {% endblock %}
 
 {% block yield %}
-    <form action="/devices" method="post" onsubmit="return validate()">
-      <table class="devices">
-          <tr>
-            <th>Identity</th>
-            <td><input type="text" name="identity"></td>
-          </tr>
-      </table>
-      <input type="submit">
-    </form>
+<h2>New device</h2>
+<p>Enter a MAC address in the form below (e.g. <b>01:23:45:ab:cd:ef</b>):</p>
+<form action="/devices" method="post" onsubmit="return validate()">
+  <table class="devices">
+      <tr>
+        <th>Identity</th>
+        <td><input id="mac" type="text" name="identity"></td>
+      </tr>
+  </table>
+  <input type="submit">
+</form>
 {% endblock %}

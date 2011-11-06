@@ -130,12 +130,14 @@ init_session(Socket, Message) ->
     %io:format("Message from device: ~p~n", [Message]),
     Fun = fun() ->
         case mnesia:read(device, Message#inform.identity, write) of
-            [Device] ->
-                Device;
             [] ->
                 Device = init_device(Socket, Message),
                 mnesia:write(Device),
-                Device
+                Device;
+            [Device] ->
+                UpdatedDevice = update_device(Socket, Message, Device),
+                mnesia:write(UpdatedDevice),
+                UpdatedDevice
         end
     end,
     {atomic, _Device} = mnesia:transaction(Fun),
@@ -159,6 +161,18 @@ init_device(Socket, Message) ->
              ip = sup_server_utils:ip4addr_to_list(Address),
              jobs = [],
              finished_jobs = []
+           }.
+
+update_device(Socket, Message, Device) ->
+    {ok, {Address, _Port}} = inet:peername(Socket),
+    Releases = lists:map(
+                 fun(Rel) -> sup_server_utils:make_release_record(Rel) end,
+                 Message#inform.releases),
+    Device#device{
+             last_contact = calendar:universal_time(),
+             releases = Releases,
+             running_applications = Message#inform.running_applications,
+             ip = sup_server_utils:ip4addr_to_list(Address)
            }.
 
 

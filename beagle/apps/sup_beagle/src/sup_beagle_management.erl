@@ -87,7 +87,9 @@ session_loop(Socket) ->
 init_session_message(Reason) ->
     {ok, Identity} = sup_beagle_config:get(identity),
     Releases = release_handler:which_releases(),
-    #inform{identity = Identity, reason = Reason, releases = Releases}.
+    RunningApplications = application:which_applications(),
+    #inform{identity = Identity, reason = Reason, releases = Releases, 
+      running_applications = RunningApplications}.
 
 %%------------------------------------------------------------------------------
 %% Job handlers.

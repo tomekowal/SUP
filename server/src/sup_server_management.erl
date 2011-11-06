@@ -155,6 +155,7 @@ init_device(Socket, Message) ->
              identity = Message#inform.identity,
              last_contact = calendar:universal_time(),
              releases = Releases,
+             running_applications = Message#inform.running_applications,
              ip = sup_server_utils:ip4addr_to_list(Address),
              jobs = [],
              finished_jobs = []

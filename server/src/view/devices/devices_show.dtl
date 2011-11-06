@@ -15,6 +15,22 @@
       </tr>
     </table>
 
+    <h3>Applications</h3>
+    <table class="applications">
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Version</th>
+      </tr>
+      {% for name, description, version in device.running_applications %}
+        <tr>
+          <td> {{ name }} </td>
+          <td> {{ description }} </td>
+          <td> {{ version }} </td>
+        </tr>
+      {% endfor %}
+    </table>
+
 		<h3>Pending jobs</h3>
 	  <table class="devices">
 	    <tr>

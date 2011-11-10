@@ -6,8 +6,8 @@ ERL_ROOT={{ target_root }}
 
 case "$1" in
 	configure)
-	tar xzvf $ERL_ROOT/debian/$APP -C $ERL_ROOT
-	truncate -s 0 $ERL_ROOT/debian/$APP
+	tar xzvf $ERL_ROOT/debian/applications/$APP -C $ERL_ROOT
+	truncate -s 0 $ERL_ROOT/debian/applications/$APP
 	;;
 
 	abort-upgrade|abort-remove|abort-deconfigure)

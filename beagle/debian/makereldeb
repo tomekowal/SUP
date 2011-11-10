@@ -1,30 +1,29 @@
 #!/usr/bin/env escript
 %% -*- erlang -*-
 
--define(REL_DIR, "../rel/beagle").
+-define(REL_DIR, "../rel/beagle-full").
 -define(TARGET_ROOT, "/home/ghik/Inz/SUP/beagle/rel/beagle-raw").
 -define(SCRIPT_RIGHTS, "0775").
 
-main([ApplicationName, Version]) ->
+main([Release, Version]) ->
     file:set_cwd(filename:dirname(escript:script_name())),
-    PackageName = package_name(ApplicationName),
+    PackageName = release_package_name(Release),
 
-    Variables = get_variables(ApplicationName, Version),
-
+    Variables = get_variables(Release, Version),
     execute_command("rm -rf "++PackageName),
-    initialize_pkg_dirs(ApplicationName),
+    initialize_pkg_dirs(Release),
     file:set_cwd(PackageName),
 
-    save("DEBIAN/control", fill_template("../templates/control", Variables)),
-    save("DEBIAN/prerm", fill_template("../templates/prerm", Variables), ?SCRIPT_RIGHTS),
-    save("DEBIAN/postrm", fill_template("../templates/postrm", Variables), ?SCRIPT_RIGHTS),
-    save("DEBIAN/preinst", fill_template("../templates/preinst", Variables), ?SCRIPT_RIGHTS),
-    save("DEBIAN/postinst", fill_template("../templates/postinst", Variables), ?SCRIPT_RIGHTS),
+    save("DEBIAN/control", fill_template("../templates/control-rel", Variables)),
+    save("DEBIAN/prerm", fill_template("../templates/prerm-rel", Variables), ?SCRIPT_RIGHTS),
+    save("DEBIAN/postrm", fill_template("../templates/postrm-rel", Variables), ?SCRIPT_RIGHTS),
+    save("DEBIAN/preinst", fill_template("../templates/preinst-rel", Variables), ?SCRIPT_RIGHTS),
+    save("DEBIAN/postinst", fill_template("../templates/postinst-rel", Variables), ?SCRIPT_RIGHTS),
 
-    ArchiveFile = string:sub_string(?TARGET_ROOT, 2)++"/debian/"++ApplicationName,
+    ArchiveFile = "."++filename:join([?TARGET_ROOT, "debian/releases", Release]),
     Result = execute_commands(
                [
-                "tar czf "++ArchiveFile++".tar.gz -C ../"++?REL_DIR++" lib/"++ApplicationName++"-"++Version,
+                "tar czf "++ArchiveFile++".tar.gz -C ../"++?REL_DIR++" releases/"++Version,
                 "mv "++ArchiveFile++".tar.gz "++ArchiveFile,
                 "md5sum `find . -type f | awk '/."++escape_slashes(?TARGET_ROOT)++"/ { print substr($0, 3) }'` > DEBIAN/md5sums",
                 "dpkg -b . ../"++PackageName++".deb"
@@ -40,39 +39,41 @@ main([ApplicationName, Version]) ->
             failed
     end;
 main(_) ->
-    io:format("Usage: ~s application version~n", [filename:basename(escript:script_name())]).
+    io:format("Usage: ~s release version~n", [filename:basename(escript:script_name())]).
 
-get_variables(ApplicationName, Version) ->
-    Application = list_to_atom(ApplicationName),
-    AppDir = ?REL_DIR++"/lib/"++ApplicationName++"-"++Version,
-    {ok, [AppFileContents]} = file:consult(AppDir++"/ebin/"++ApplicationName++".app"),
-    {application, Application, AppConfig} = AppFileContents,
+get_variables(Release, Version) ->
+    RelDir = ?REL_DIR++"/releases/"++Version,
+    {ok, [RelFileContents]} = file:consult(RelDir++"/"++Release++".rel"),
+    {release, {Release, Version}, {erts, ErtsVersion}, Applications} = RelFileContents,
 
-    PackageName = package_name(ApplicationName),
-
-    {vsn, Version} = lists:keyfind(vsn, 1, AppConfig),
-    {description, Description} = lists:keyfind(description, 1, AppConfig),
-    {applications, Applications} = lists:keyfind(applications, 1, AppConfig),
-
-    Dependencies = lists:map(fun(App) -> package_name(atom_to_list(App)) end, Applications),
+    PackageName = release_package_name(Release),
+    Dependencies = lists:map(
+                     fun({App, AppVer}) ->
+                             application_package_name(atom_to_list(App))++" (= "++AppVer++")"
+                     end,
+                     Applications
+                    ),
 
     [
      {target_root, ?TARGET_ROOT},
-     {application, ApplicationName},
+     {erts_vsn, ErtsVersion},
+     {release, Release},
      {package, PackageName},
      {vsn, Version},
-     {description, Description},
+     {description, "SoftwareUpdatePlatform-managed release: "++Release},
      {dependencies, Dependencies}
     ].
 
-initialize_pkg_dirs(ApplicationName) ->
-    PackageName = package_name(ApplicationName),
+initialize_pkg_dirs(Release) ->
+    PackageName = release_package_name(Release),
 
     os:cmd("mkdir -p "++PackageName++"/DEBIAN"),
-    os:cmd("mkdir -p "++PackageName++?TARGET_ROOT++"/debian").
+    os:cmd("mkdir -p "++PackageName++?TARGET_ROOT++"/debian/releases").
 
-%% debian package name cannot contain underscores
-package_name(ApplicationName) ->
+release_package_name(Release) ->
+    "sup-erlang-rel-"++Release.
+
+application_package_name(ApplicationName) ->
     {ok, UnderscoreRegex} = re:compile("_"),
     "sup-erlang-"++re:replace(ApplicationName, UnderscoreRegex, "-", [global, {return, list}]).
 

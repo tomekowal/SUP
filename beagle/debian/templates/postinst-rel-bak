@@ -1,0 +1,84 @@
+#!/bin/bash
+echo "postinst $*"
+
+VSN={{ vsn }}
+REL={{ release }}
+ERTS_VSN={{ erts_vsn }}
+ERL_ROOT={{ target_root }}
+
+NODERUN=$ERL_ROOT/bin/$REL
+ESCRIPT=$ERL_ROOT/erts-$ERTS_VSN/bin/escript
+NODETOOL=$REL_ROOT/erts-$ERTS_VNS/nodetool
+
+NAME_ARG=`egrep '^-s?name' $ERL_ROOT/etc/vm.args`
+COOKIE_ARG=`grep '^-setcookie' $ERL_ROOT/etc/vm.args`
+
+NODETOOL_RPC="$ESCRIPT $NODETOOL $NAME_ARG $COOKIE_ARG rpc"
+
+case "$1" in
+    configure)
+
+    # Unpack release files
+    tar xzvf $ERL_ROOT/debian/releases/$REL -C $ERL_ROOT
+    truncate -s 0 $ERL_ROOT/debian/releases/$REL
+
+    # Check if 'start_erl.data' exists. If not, this is initial release, and
+    # 'start_erl.data' and 'RELEASES' files must be created.
+    if [ ! -f $ERL_ROOT/releases/start_erl.data ]; then
+        echo "No initial release found. Generating start_erl.data and RELEASES..."
+        echo "$ERTS_VSN $VSN" > $ERL_ROOT/releases/start_erl.data && \
+
+        $NODERUN start_clean
+        $NODETOOL_RPC sup_beagle_maintenance create_RELEASES $ERL_ROOT $REL $VSN
+        $NODERUN stop
+
+        if [ $? -eq 0 ]; then
+            echo "Starting node..."
+            $NODERUN start
+            exit 0
+        else
+            echo "Failed to start node. Exiting."
+            exit 1
+        fi
+    fi
+
+    echo "Checking if node is running..."
+    $ERL_ROOT/bin/$REL ping
+    if [ $? -eq 0 ]; then
+        echo "Performing hot-upgrade..."
+        $NODETOOL_RPC sup_beagle_maintenance upgrade_release $ERL_ROOT $REL $VSN
+
+        if [ ! $? -eq 0 ]; then
+            echo "Hot-upgrade failed. Stopping node..."
+            $ERL_ROOT/bin/$REL stop
+        else
+            echo "Cleaning old releases..."
+            $NODETOOL_RPC sup_beagle_maintenance clean_old_releases
+        fi
+    else
+        echo "Node is down. Performing clean upgrade..."
+        $NODERUN start_clean
+        $NODETOOL_RPC sup_beagle_maintenance upgrade_release $ERL_ROOT $REL $VSN && \
+        $NODERUN stop
+
+        echo "Starting node..." && \
+        $ERL_ROOT/bin/$REL start && \
+        echo "Cleaning old releases..." && \
+        $ESCRIPT_REMSH $MAINTENANCE clean_old_releases
+
+        if [ ! $? -eq 0 ]; then
+            echo "Clean upgrade failed."
+        fi
+    fi
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+exit 0

@@ -9,7 +9,10 @@
 !/beagle/rel/reltool.config
 !/beagle/rel/files
 /beagle/debian/sup-erlang-*
+/beagle/NOTES
 .DS_Store
+.\#*
+\#*\#
 *.swp
 *.dump
 *.beam

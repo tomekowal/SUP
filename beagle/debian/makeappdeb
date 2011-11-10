@@ -1,0 +1,132 @@
+#!/usr/bin/env escript
+%% -*- erlang -*-
+
+-define(REL_DIR, "../rel/beagle-full").
+-define(TARGET_ROOT, "/home/ghik/Inz/SUP/beagle/rel/beagle-raw").
+-define(SCRIPT_RIGHTS, "0775").
+
+main([ApplicationName]) ->
+    file:set_cwd(filename:dirname(escript:script_name())),
+    {ok, ApplicationDirs} = file:list_dir(?REL_DIR++"/lib"),
+    case lists:filter(fun(Dir) -> is_app_dir(ApplicationName, Dir) end, ApplicationDirs) of
+        [SingleAppDir] ->
+            [ApplicationName, Version] = string:tokens(SingleAppDir, "-"),
+            main([ApplicationName, Version]);
+        [_Dir1, _Dir2 | _Rest] ->
+            io:format("Multiple versions for this application were found. Specify version explicitly.~n");
+        [] ->
+            io:format("Application ~w not found.~n", [ApplicationName])
+    end;
+main([ApplicationName, Version]) ->
+    file:set_cwd(filename:dirname(escript:script_name())),
+    PackageName = package_name(ApplicationName),
+
+    Variables = get_variables(ApplicationName, Version),
+
+    execute_command("rm -rf "++PackageName),
+    initialize_pkg_dirs(ApplicationName),
+    file:set_cwd(PackageName),
+
+    save("DEBIAN/control", fill_template("../templates/control-app", Variables)),
+    save("DEBIAN/prerm", fill_template("../templates/prerm-app", Variables), ?SCRIPT_RIGHTS),
+    save("DEBIAN/postrm", fill_template("../templates/postrm-app", Variables), ?SCRIPT_RIGHTS),
+    save("DEBIAN/preinst", fill_template("../templates/preinst-app", Variables), ?SCRIPT_RIGHTS),
+    save("DEBIAN/postinst", fill_template("../templates/postinst-app", Variables), ?SCRIPT_RIGHTS),
+
+    ArchiveFile = string:sub_string(?TARGET_ROOT, 2)++"/debian/applications/"++ApplicationName,
+    Result = execute_commands(
+               [
+                "tar czf "++ArchiveFile++".tar.gz -C ../"++?REL_DIR++" lib/"++ApplicationName++"-"++Version,
+                "mv "++ArchiveFile++".tar.gz "++ArchiveFile,
+                "md5sum `find . -type f | awk '/."++escape_slashes(?TARGET_ROOT)++"/ { print substr($0, 3) }'` > DEBIAN/md5sums",
+                "dpkg -b . ../"++PackageName++".deb"
+               ]
+              ),
+
+    case Result of
+        0 ->
+            io:format("*** Package building successful ***~n"),
+            ok;
+        _ ->
+            io:format("*** Package building failed ***~n"),
+            failed
+    end;
+main(_) ->
+    io:format("Usage: ~s application [version]~n", [filename:basename(escript:script_name())]).
+
+get_variables(ApplicationName, Version) ->
+    Application = list_to_atom(ApplicationName),
+    AppDir = ?REL_DIR++"/lib/"++ApplicationName++"-"++Version,
+    {ok, [AppFileContents]} = file:consult(AppDir++"/ebin/"++ApplicationName++".app"),
+    {application, Application, AppConfig} = AppFileContents,
+
+    PackageName = package_name(ApplicationName),
+
+    {vsn, Version} = lists:keyfind(vsn, 1, AppConfig),
+    {description, Description} = lists:keyfind(description, 1, AppConfig),
+    {applications, Applications} = lists:keyfind(applications, 1, AppConfig),
+
+    Dependencies = lists:map(fun(App) -> package_name(atom_to_list(App)) end, Applications),
+
+    [
+     {target_root, ?TARGET_ROOT},
+     {application, ApplicationName},
+     {package, PackageName},
+     {vsn, Version},
+     {description, Description},
+     {dependencies, Dependencies}
+    ].
+
+initialize_pkg_dirs(ApplicationName) ->
+    PackageName = package_name(ApplicationName),
+
+    os:cmd("mkdir -p "++PackageName++"/DEBIAN"),
+    os:cmd("mkdir -p "++PackageName++?TARGET_ROOT++"/debian/applications").
+
+%% debian package name cannot contain underscores
+package_name(ApplicationName) ->
+    {ok, UnderscoreRegex} = re:compile("_"),
+    "sup-erlang-"++re:replace(ApplicationName, UnderscoreRegex, "-", [global, {return, list}]).
+
+escape_slashes(String) ->
+    {ok, SlashRegex} = re:compile("/"),
+    re:replace(String, SlashRegex, "\\\\/", [global, {return, list}]).
+
+is_app_dir(ApplicationName, Directory) ->
+    {ok, Regex} = re:compile("^"++ApplicationName++"-"++"\\d+[\.\\d+]*$"),
+    case re:run(Directory, Regex) of
+        {match, _} ->
+            true;
+        nomatch ->
+            false
+    end.
+
+save(File, Contents) ->
+    {ok, FileDevice} = file:open(File, [write]),
+    io:fwrite(FileDevice, "~s", [Contents]),
+    ok = file:close(FileDevice).
+save(File, Contents, Rights) ->
+    save(File, Contents),
+    os:cmd("chmod "++Rights++" "++File),
+    ok.
+
+fill_template(TemplateFile, Variables) ->
+    erlydtl:compile(TemplateFile, template),
+    {ok, Result} = template:render(Variables),
+    string:join(Result, "").
+
+execute_command(Command) ->
+    io:format("> ~s~n", [Command]),
+    Result = os:cmd(Command),
+    io:format("~s", [Result]),
+    list_to_integer(os:cmd("echo -n $?")).
+
+execute_commands([]) ->
+    0;
+execute_commands([Command|Rest]) ->
+    case execute_command(Command) of
+        0 ->
+            execute_commands(Rest);
+        NonzeroExitCode ->
+            NonzeroExitCode
+    end.

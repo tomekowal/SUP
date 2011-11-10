@@ -22,13 +22,15 @@
         <th>Description</th>
         <th>Version</th>
       </tr>
-      {% for name, description, version in device.running_applications %}
-        <tr>
-          <td> {{ name }} </td>
-          <td> {{ description }} </td>
-          <td> {{ version }} </td>
-        </tr>
-      {% endfor %}
+      {% if device.running_applications %}
+        {% for name, description, version in device.running_applications %}
+          <tr>
+            <td> {{ name }} </td>
+            <td> {{ description }} </td>
+            <td> {{ version }} </td>
+          </tr>
+        {% endfor %}
+      {% endif %}
     </table>
 
 		<h3>Pending jobs</h3>
@@ -40,15 +42,17 @@
 	      <th>Extra</th>
 	      <th>Status</th>
 	    </tr>
-			{% for job in device.jobs %}
-				<tr>		
-		    	<td> {{ job.message }}</td>
-		    	<td> {{ job.module }}</td>
-		    	<td> {{ job.function }}</td>
-		    	<td> {{ job.extra }}</td>
-		    	<td> {{ job.status }}</td>
-				<tr>      
-			{% endfor %}
+      {% if device.jobs %}
+        {% for job in device.jobs %}
+          <tr>
+            <td> {{ job.message }}</td>
+            <td> {{ job.module }}</td>
+            <td> {{ job.function }}</td>
+            <td> {{ job.extra }}</td>
+            <td> {{ job.status }}</td>
+          <tr>
+        {% endfor %}
+      {% endif %}
 			<tr>	
         <form action="/devices/{{ device.identity }}/jobs/new" method="post" onsubmit="return validate()">
 	      	<td><input type="text" name="message"/></td>
@@ -79,14 +83,16 @@
 	      <th>Extra</th>
 	      <th>Status</th>
 	    </tr>
-			{% for fjob in device.finished_jobs %}
-				<tr>
-		    	<td> {{ fjob.message }}</td>
-		    	<td> {{ fjob.module }}</td>
-		    	<td> {{ fjob.function }}</td>
-		    	<td> {{ fjob.extra }}</td>
-		    	<td> {{ fjob.status }}</td>
-				<tr>
-			{% endfor %}
+      {% if device.finished_jobs %}
+        {% for fjob in device.finished_jobs %}
+          <tr>
+            <td> {{ fjob.message }}</td>
+            <td> {{ fjob.module }}</td>
+            <td> {{ fjob.function }}</td>
+            <td> {{ fjob.extra }}</td>
+            <td> {{ fjob.status }}</td>
+          <tr>
+        {% endfor %}
+      {% endif %}
 	  </table>
 {% endblock %}

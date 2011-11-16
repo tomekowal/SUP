@@ -1,0 +1,19 @@
+#!/bin/bash
+echo "prerm $*"
+
+REL={{ release }}
+ERL_ROOT={{ target_root }}
+
+NODERUN=$ERL_ROOT/bin/$REL
+
+case "$1" in
+    remove|upgrade)
+
+    $NODERUN ping > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        echo "Stopping node $REL..."
+        $NODERUN stop
+    fi
+
+    ;;
+esac

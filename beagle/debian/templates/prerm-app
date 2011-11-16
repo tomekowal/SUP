@@ -1,2 +1,15 @@
 #!/bin/bash
 echo "prerm $*"
+
+APP={{ application }}
+VSN={{ vsn }}
+ERL_ROOT={{ target_root }}
+
+APP_DIR=$ERL_ROOT/lib/$APP-$VSN
+
+case "$1" in
+    remove)
+    rm -rf $APP_DIR
+
+    ;;
+esac

@@ -7,6 +7,7 @@ ERTS_VSN={{ erts_vsn }}
 ERL_ROOT={{ target_root }}
 
 NODERUN=$ERL_ROOT/bin/$REL
+ERL=$ERL_ROOT/erts-$ERTS_VSN/bin/erl
 ESCRIPT=$ERL_ROOT/erts-$ERTS_VSN/bin/escript
 NODETOOL=$ERL_ROOT/erts-$ERTS_VSN/bin/nodetool
 
@@ -14,49 +15,49 @@ NAME_ARG=`egrep '^-s?name' $ERL_ROOT/etc/vm.args`
 COOKIE_ARG=`grep '^-setcookie' $ERL_ROOT/etc/vm.args`
 
 NODETOOL_RPC="$ESCRIPT $NODETOOL $NAME_ARG $COOKIE_ARG rpc"
+ERL_NOSHELL="$ERL -noshell"
 
 case "$1" in
     configure)
 
-    # Unpack release files
-    tar xzvf $ERL_ROOT/debian/releases/$REL -C $ERL_ROOT
+    # unpack release
+    tar xzvf $ERL_ROOT/debian/releases/$REL -C $ERL_ROOT > /dev/null
     truncate -s 0 $ERL_ROOT/debian/releases/$REL
 
-    # Check if 'start_erl.data' exists. If not, this is initial release, and
-    # 'start_erl.data' and 'RELEASES' files must be created.
     if [ ! -f $ERL_ROOT/releases/start_erl.data ]; then
-        echo "No initial release found. Generating start_erl.data..."
-        echo "$ERTS_VSN $VSN" > $ERL_ROOT/releases/start_erl.data && \
+        echo "Initializing release..."
+        echo "$ERTS_VSN $VSN" > $ERL_ROOT/releases/start_erl.data
+        $ERL_NOSHELL -s sup_beagle_maintenance create_RELEASES $ERL_ROOT $REL $VSN halt
 
         echo "Starting node..."
-        $NODERUN start && sleep 1
-        echo "Generating RELEASES..."
-        $NODETOOL_RPC sup_beagle_maintenance create_RELEASES $ERL_ROOT $REL $VSN
+        $NODERUN start
+        exit $?
+    fi
 
-        if [ $? -eq 0 ]; then
-            exit 0
-        else
-            echo "Operation failed. Exiting."
-            exit 1
+    OLDVSN=$2
+    $NODERUN ping > /dev/null 2>&1
+    UP=$?
+
+    MANUAL=false
+    if [ "$OLDVSN" -a \( $UP -eq 0 \) ]; then
+        echo "Performing release upgrade..."
+        $NODETOOL_RPC sup_beagle_maintenance upgrade_release $ERL_ROOT $REL $VSN
+
+        if [ ! $? -eq 0 ]; then
+            echo "Release upgrade failed. Stopping node..."
+            $NODERUN stop
+            MANUAL=true
         fi
-    fi
-
-    echo "Checking if node is running..."
-    $ERL_ROOT/bin/$REL ping
-    if [ ! $? -eq 0 ]; then
-        echo "Starting node..."
-        $NODERUN start && sleep 1
-    fi
-
-    echo "Performing upgrade..."
-    $NODETOOL_RPC sup_beagle_maintenance upgrade_release $ERL_ROOT $REL $VSN
-
-    if [ $? -eq 0 ]; then
-        echo "Cleaning old releases..."
-        $NODETOOL_RPC sup_beagle_maintenance clean_old_releases
     else
-        echo "Upgrade failed. Exiting..."
-        exit 1
+        MANUAL=true
+    fi
+
+    if [ $MANUAL = "true" ]; then
+        echo "Performing manual upgrade..."
+        echo "$ERTS_VSN $VSN" > $ERL_ROOT/releases/start_erl.data
+        $ERL_NOSHELL -s sup_beagle_maintenance manual_upgrade $ERL_ROOT $REL $VSN $OLDVSN halt
+        echo "Starting node $REL..."
+        $NODERUN start
     fi
     ;;
 

@@ -5,26 +5,26 @@
 -define(TARGET_ROOT, "/home/ghik/Inz/SUP/beagle/rel/beagle-raw").
 -define(SCRIPT_RIGHTS, "0775").
 
-main([ApplicationName]) ->
+main([Release, ApplicationName]) ->
     file:set_cwd(filename:dirname(escript:script_name())),
     {ok, ApplicationDirs} = file:list_dir(?REL_DIR++"/lib"),
     case lists:filter(fun(Dir) -> is_app_dir(ApplicationName, Dir) end, ApplicationDirs) of
         [SingleAppDir] ->
             [ApplicationName, Version] = string:tokens(SingleAppDir, "-"),
-            main([ApplicationName, Version]);
+            main([Release, ApplicationName, Version]);
         [_Dir1, _Dir2 | _Rest] ->
             io:format("Multiple versions for this application were found. Specify version explicitly.~n");
         [] ->
-            io:format("Application ~w not found.~n", [ApplicationName])
+            io:format("Application ~s not found.~n", [ApplicationName])
     end;
-main([ApplicationName, Version]) ->
+main([Release, ApplicationName, Version]) ->
     file:set_cwd(filename:dirname(escript:script_name())),
-    PackageName = package_name(ApplicationName),
+    PackageName = application_package_name(Release, ApplicationName),
 
-    Variables = get_variables(ApplicationName, Version),
+    Variables = get_variables(Release, ApplicationName, Version),
 
     execute_command("rm -rf "++PackageName),
-    initialize_pkg_dirs(ApplicationName),
+    initialize_pkg_dirs(Release, ApplicationName),
     file:set_cwd(PackageName),
 
     save("DEBIAN/control", fill_template("../templates/control-app", Variables)),
@@ -39,7 +39,7 @@ main([ApplicationName, Version]) ->
                 "tar czf "++ArchiveFile++".tar.gz -C ../"++?REL_DIR++" lib/"++ApplicationName++"-"++Version,
                 "mv "++ArchiveFile++".tar.gz "++ArchiveFile,
                 "md5sum `find . -type f | awk '/."++escape_slashes(?TARGET_ROOT)++"/ { print substr($0, 3) }'` > DEBIAN/md5sums",
-                "dpkg -b . ../"++PackageName++".deb"
+                "dpkg -b . .."
                ]
               ),
 
@@ -54,19 +54,20 @@ main([ApplicationName, Version]) ->
 main(_) ->
     io:format("Usage: ~s application [version]~n", [filename:basename(escript:script_name())]).
 
-get_variables(ApplicationName, Version) ->
+get_variables(Release, ApplicationName, Version) ->
     Application = list_to_atom(ApplicationName),
     AppDir = ?REL_DIR++"/lib/"++ApplicationName++"-"++Version,
     {ok, [AppFileContents]} = file:consult(AppDir++"/ebin/"++ApplicationName++".app"),
     {application, Application, AppConfig} = AppFileContents,
 
-    PackageName = package_name(ApplicationName),
+    PackageName = application_package_name(Release, ApplicationName),
 
     {vsn, Version} = lists:keyfind(vsn, 1, AppConfig),
     {description, Description} = lists:keyfind(description, 1, AppConfig),
     {applications, Applications} = lists:keyfind(applications, 1, AppConfig),
 
-    Dependencies = lists:map(fun(App) -> package_name(atom_to_list(App)) end, Applications),
+    Dependencies = [base_package_name(Release)]
+        ++lists:map(fun(App) -> application_package_name(Release, atom_to_list(App)) end, Applications),
 
     [
      {target_root, ?TARGET_ROOT},
@@ -77,16 +78,19 @@ get_variables(ApplicationName, Version) ->
      {dependencies, Dependencies}
     ].
 
-initialize_pkg_dirs(ApplicationName) ->
-    PackageName = package_name(ApplicationName),
+initialize_pkg_dirs(Release, ApplicationName) ->
+    PackageName = application_package_name(Release, ApplicationName),
 
     os:cmd("mkdir -p "++PackageName++"/DEBIAN"),
     os:cmd("mkdir -p "++PackageName++?TARGET_ROOT++"/debian/applications").
 
 %% debian package name cannot contain underscores
-package_name(ApplicationName) ->
+application_package_name(Release, ApplicationName) ->
     {ok, UnderscoreRegex} = re:compile("_"),
-    "sup-erlang-"++re:replace(ApplicationName, UnderscoreRegex, "-", [global, {return, list}]).
+    Release++"-"++re:replace(ApplicationName, UnderscoreRegex, "-", [global, {return, list}]).
+
+base_package_name(Release) ->
+    Release++"-base".
 
 escape_slashes(String) ->
     {ok, SlashRegex} = re:compile("/"),

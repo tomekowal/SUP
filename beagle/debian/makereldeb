@@ -26,7 +26,7 @@ main([Release, Version]) ->
                 "tar czf "++ArchiveFile++".tar.gz -C ../"++?REL_DIR++" releases/"++Version,
                 "mv "++ArchiveFile++".tar.gz "++ArchiveFile,
                 "md5sum `find . -type f | awk '/."++escape_slashes(?TARGET_ROOT)++"/ { print substr($0, 3) }'` > DEBIAN/md5sums",
-                "dpkg -b . ../"++PackageName++".deb"
+                "dpkg -b . .."
                ]
               ),
 
@@ -47,12 +47,13 @@ get_variables(Release, Version) ->
     {release, {Release, Version}, {erts, ErtsVersion}, Applications} = RelFileContents,
 
     PackageName = release_package_name(Release),
-    Dependencies = lists:map(
-                     fun({App, AppVer}) ->
-                             application_package_name(atom_to_list(App))++" (= "++AppVer++")"
-                     end,
-                     Applications
-                    ),
+    Dependencies = [base_package_name(Release)++" (= "++ErtsVersion++")"]
+        ++lists:map(
+            fun({App, AppVer}) ->
+                    application_package_name(Release, atom_to_list(App))++" (= "++AppVer++")"
+            end,
+            Applications
+           ),
 
     [
      {target_root, ?TARGET_ROOT},
@@ -71,11 +72,14 @@ initialize_pkg_dirs(Release) ->
     os:cmd("mkdir -p "++PackageName++?TARGET_ROOT++"/debian/releases").
 
 release_package_name(Release) ->
-    "sup-erlang-rel-"++Release.
+    Release.
 
-application_package_name(ApplicationName) ->
+application_package_name(Release, ApplicationName) ->
     {ok, UnderscoreRegex} = re:compile("_"),
-    "sup-erlang-"++re:replace(ApplicationName, UnderscoreRegex, "-", [global, {return, list}]).
+    Release++"-"++re:replace(ApplicationName, UnderscoreRegex, "-", [global, {return, list}]).
+
+base_package_name(Release) ->
+    Release++"-base".
 
 escape_slashes(String) ->
     {ok, SlashRegex} = re:compile("/"),

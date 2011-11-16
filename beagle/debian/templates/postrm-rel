@@ -1,2 +1,26 @@
 #!/bin/bash
 echo "postrm $*"
+
+VSN={{ vsn }}
+REL={{ release }}
+ERTS_VSN={{ erts_vsn }}
+ERL_ROOT={{ target_root }}
+
+NODERUN=$ERL_ROOT/bin/$REL
+ERL=$ERL_ROOT/erts-$ERTS_VSN/bin/erl
+ESCRIPT=$ERL_ROOT/erts-$ERTS_VSN/bin/escript
+NODETOOL=$ERL_ROOT/erts-$ERTS_VSN/bin/nodetool
+
+NAME_ARG=`egrep '^-s?name' $ERL_ROOT/etc/vm.args`
+COOKIE_ARG=`grep '^-setcookie' $ERL_ROOT/etc/vm.args`
+
+NODETOOL_RPC="$ESCRIPT $NODETOOL $NAME_ARG $COOKIE_ARG rpc"
+ERL_NOSHELL="$ERL -noshell"
+
+case "$1" in
+    remove)
+
+    ;;
+esac
+
+exit 0

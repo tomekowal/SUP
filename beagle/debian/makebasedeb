@@ -1,0 +1,97 @@
+#!/usr/bin/env escript
+%% -*- erlang -*-
+
+-define(REL_DIR, "../rel/beagle-full").
+-define(TARGET_ROOT, "/home/ghik/Inz/SUP/beagle/rel/beagle-raw").
+-define(SCRIPT_RIGHTS, "0775").
+
+main([Release]) ->
+    file:set_cwd(filename:dirname(escript:script_name())),
+    PackageName = base_package_name(Release),
+
+    Variables = get_variables(Release),
+    execute_command("rm -rf "++PackageName),
+    initialize_pkg_dirs(Release),
+    file:set_cwd(PackageName),
+
+    save("DEBIAN/control", fill_template("../templates/control-base", Variables)),
+    save("DEBIAN/prerm", fill_template("../templates/prerm-base", Variables), ?SCRIPT_RIGHTS),
+
+    Result = execute_commands(
+               [
+                "cp -R ../"++?REL_DIR++"/* ."++?TARGET_ROOT,
+                "rm -rf ."++?TARGET_ROOT++"/lib/*",
+                "rm -rf ."++?TARGET_ROOT++"/releases/*",
+                "md5sum `find . -type f | awk '/."++escape_slashes(?TARGET_ROOT)++"/ { print substr($0, 3) }'` > DEBIAN/md5sums",
+                "dpkg -b . .."
+               ]
+              ),
+
+    case Result of
+        0 ->
+            io:format("*** Package building successful ***~n"),
+            ok;
+        _ ->
+            io:format("*** Package building failed ***~n"),
+            failed
+    end;
+main(_) ->
+    io:format("Usage: ~s release~n", [filename:basename(escript:script_name())]).
+
+get_variables(Release) ->
+    [ErtsDir] = filelib:wildcard(?REL_DIR++"/erts-*"),
+    ErtsVersion = string:substr(filename:basename(ErtsDir), length("erts-")+1),
+
+    PackageName = base_package_name(Release),
+    Architecture = os:cmd("dpkg-architecture -c 'echo -n $DEB_HOST_ARCH'"),
+
+    [
+     {target_root, ?TARGET_ROOT},
+     {package, PackageName},
+     {vsn, ErtsVersion},
+     {architecture, Architecture},
+     {description, "Base Erlang embedded node runtime for SUP-managed release "++Release}
+    ].
+
+initialize_pkg_dirs(Release) ->
+    PackageName = base_package_name(Release),
+
+    os:cmd("mkdir -p "++PackageName++"/DEBIAN"),
+    os:cmd("mkdir -p "++PackageName++?TARGET_ROOT).
+
+base_package_name(Release) ->
+    Release++"-base".
+
+escape_slashes(String) ->
+    {ok, SlashRegex} = re:compile("/"),
+    re:replace(String, SlashRegex, "\\\\/", [global, {return, list}]).
+
+save(File, Contents) ->
+    {ok, FileDevice} = file:open(File, [write]),
+    io:fwrite(FileDevice, "~s", [Contents]),
+    ok = file:close(FileDevice).
+save(File, Contents, Rights) ->
+    save(File, Contents),
+    os:cmd("chmod "++Rights++" "++File),
+    ok.
+
+fill_template(TemplateFile, Variables) ->
+    erlydtl:compile(TemplateFile, template),
+    {ok, Result} = template:render(Variables),
+    string:join(Result, "").
+
+execute_command(Command) ->
+    io:format("> ~s~n", [Command]),
+    Result = os:cmd(Command),
+    io:format("~s", [Result]),
+    list_to_integer(os:cmd("echo -n $?")).
+
+execute_commands([]) ->
+    0;
+execute_commands([Command|Rest]) ->
+    case execute_command(Command) of
+        0 ->
+            execute_commands(Rest);
+        NonzeroExitCode ->
+            NonzeroExitCode
+    end.

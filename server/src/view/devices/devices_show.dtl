@@ -2,15 +2,15 @@
 {% block yield %}
     <table class="devices">
       <tr>
-      	<th>Identity</th>
+        <th>Identity</th>
         <td>{{ device.identity }}</td>
       </tr>
       <tr>
-      	<th>Last contact</th>
+        <th>Last contact</th>
         <td>{{ device.last_contact }}</td>
       </tr>
       <tr>
-      	<th>Ip</th>
+        <th>Ip</th>
         <td>{{ device.ip }}</td>
       </tr>
     </table>
@@ -33,15 +33,15 @@
       {% endif %}
     </table>
 
-		<h3>Pending jobs</h3>
-	  <table class="devices">
-	    <tr>
-	      <th>Message</th>
-	      <th>Module</th>
-	      <th>Function</th>
-	      <th>Extra</th>
-	      <th>Status</th>
-	    </tr>
+    <h3>Pending jobs</h3>
+    <table class="devices">
+      <tr>
+        <th>Message</th>
+        <th>Module</th>
+        <th>Function</th>
+        <th>Extra</th>
+        <th>Status</th>
+      </tr>
       {% if device.jobs %}
         {% for job in device.jobs %}
           <tr>
@@ -53,36 +53,36 @@
           <tr>
         {% endfor %}
       {% endif %}
-			<tr>	
+      <tr>
         <form action="/devices/{{ device.identity }}/jobs/new" method="post" onsubmit="return validate()">
-	      	<td><input type="text" name="message"/></td>
-	      	<td><input type="text" name="module"/></td>
-	      	<td><input type="text" name="function"/></td>
-	      	<td><input type="text" name="extra"/></td>
+          <td><input type="text" name="message"/></td>
+          <td><input type="text" name="module"/></td>
+          <td><input type="text" name="function"/></td>
+          <td><input type="text" name="extra"/></td>
           <td><input type="submit"/></td>
         </form>
-			<tr>     
-	  </table>
-	  <h3>Upgrade to release</h3>
-	  <table class="devices">
-	    <tr><th>Release Name</th><th></th></tr>
-	    <tr>
-	      <form action="/devices/{{ device.identity }}/jobs/new/upgrade" method="post" onsubmit="return validate()">
-      	  <td><input type="text" name="file"/></td>
+      <tr>
+    </table>
+    <h3>Upgrade to release</h3>
+    <table class="devices">
+      <tr><th>Release Name</th><th></th></tr>
+      <tr>
+        <form action="/devices/{{ device.identity }}/jobs/new/upgrade" method="post" onsubmit="return validate()">
+          <td><input type="text" name="file"/></td>
           <td><input type="submit" text="Upgrade"/></td>
-        </form>  
-	    </tr>
-	  </table>
+        </form>
+      </tr>
+    </table>
 
-		<h3>Finished jobs</h3>
-	  <table class="devices">
-	    <tr>
-	      <th>Message</th>
-	      <th>Module</th>
-	      <th>Function</th>
-	      <th>Extra</th>
-	      <th>Status</th>
-	    </tr>
+    <h3>Finished jobs</h3>
+    <table class="devices">
+      <tr>
+        <th>Message</th>
+        <th>Module</th>
+        <th>Function</th>
+        <th>Extra</th>
+        <th>Status</th>
+      </tr>
       {% if device.finished_jobs %}
         {% for fjob in device.finished_jobs %}
           <tr>
@@ -94,5 +94,5 @@
           <tr>
         {% endfor %}
       {% endif %}
-	  </table>
+    </table>
 {% endblock %}

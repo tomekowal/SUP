@@ -1,0 +1,17 @@
+{% extends "main/main.dtl" %}
+{% block content %}
+<table>
+  <tr>
+    <th>Filename</th>
+    <th>Last modified</th>
+    <th>Filesize</th>
+  </tr>
+  {% for filename, mtime, filesize in files %}
+    <tr>
+      <td><a href="/{{ relpath }}/{{ filename }}">{{ filename }}</a></td>
+      <td>{{ mtime }}</td>
+      <td>{{ filesize }}</td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}

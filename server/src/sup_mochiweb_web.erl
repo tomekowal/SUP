@@ -23,25 +23,26 @@ stop() ->
 %%------------------------------------------------------------------------------
 %% @doc Dispatches web requests.
 %%
-%% Sends requests to defined controllers. Currently "main",
-%% "devices" and "programs".
+%% Sends requests to defined controllers. Currently "main" and "devices".
 %% @end
 %%------------------------------------------------------------------------------
 loop(Req, DocRoot) ->
     %% Path is everything after host name
     "/" ++ Path = Req:get(path),
     try
-      [Controller | Args] = lists:map(fun(X) -> binary_to_list(X) end, re:split(Path, "/")),
-      case Controller of
-        "" ->
-          main_controller:index(Req);
-        "devices" ->
-          devices_controller:dispatch(Req, Args);
-        "upload" ->
-          upload_controller:dispatch(Req, Args);
-        _ ->
-          Req:serve_file(Path, DocRoot)
-      end
+        [Controller | Args] = lists:map(fun(X) -> binary_to_list(X) end, re:split(Path, "/")),
+        case Controller of
+            "" ->
+                main_controller:index(Req);
+            "devices" ->
+                devices_controller:dispatch(Req, Args);
+            "upload" ->
+                upload_controller:dispatch(Req, Args);
+            "repository" ->
+                repository_controller:dispatch(Req);
+            _ ->
+                Req:serve_file(Path, DocRoot)
+        end
     catch
         Type:What ->
             Report = ["web request failed",

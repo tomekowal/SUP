@@ -1,28 +1,31 @@
 #!/usr/bin/env escript
 %% -*- erlang -*-
 
--define(REL_DIR, "../rel/beagle-full").
--define(TARGET_ROOT, "/home/ghik/Inz/SUP/beagle/rel/beagle-raw").
 -define(SCRIPT_RIGHTS, "0775").
 
-main([Release]) ->
+main(Arguments) ->
     file:set_cwd(filename:dirname(escript:script_name())),
-    PackageName = base_package_name(Release),
+    main(Arguments, load_config()).
 
-    Variables = get_variables(Release),
+main([], Config) ->
+    PackageName = base_package_name(Config),
+    Variables = get_variables(Config),
+
     execute_command("rm -rf "++PackageName),
-    initialize_pkg_dirs(Release),
+    initialize_pkg_dirs(Config),
     file:set_cwd(PackageName),
 
     save("DEBIAN/control", fill_template("../templates/control-base", Variables)),
     save("DEBIAN/prerm", fill_template("../templates/prerm-base", Variables), ?SCRIPT_RIGHTS),
 
+    TargetRoot = config_get(Config, target_root),
+    SourceDir = config_get(Config, source_dir),
     Result = execute_commands(
                [
-                "cp -R ../"++?REL_DIR++"/* ."++?TARGET_ROOT,
-                "rm -rf ."++?TARGET_ROOT++"/lib/*",
-                "rm -rf ."++?TARGET_ROOT++"/releases/*",
-                "md5sum `find . -type f | awk '/."++escape_slashes(?TARGET_ROOT)++"/ { print substr($0, 3) }'` > DEBIAN/md5sums",
+                "cp -R ../"++SourceDir++"/* ."++TargetRoot,
+                "rm -rf ."++TargetRoot++"/lib/*",
+                "rm -rf ."++TargetRoot++"/releases/*",
+                "md5sum `find . -type f | awk '/."++escape_slashes(TargetRoot)++"/ { print substr($0, 3) }'` > DEBIAN/md5sums",
                 "dpkg -b . .."
                ]
               ),
@@ -35,32 +38,41 @@ main([Release]) ->
             io:format("*** Package building failed ***~n"),
             failed
     end;
-main(_) ->
-    io:format("Usage: ~s release~n", [filename:basename(escript:script_name())]).
+main(_, _Config) ->
+    io:format("Usage: ~s~n", [filename:basename(escript:script_name())]).
 
-get_variables(Release) ->
-    [ErtsDir] = filelib:wildcard(?REL_DIR++"/erts-*"),
+load_config() ->
+    {ok, Config} = file:consult("debian.config"),
+    Config.
+
+config_get(Config, Key) ->
+    {Key, Value} = lists:keyfind(Key, 1, Config),
+    Value.
+
+get_variables(Config) ->
+    Nodename = config_get(Config, nodename),
+    [ErtsDir] = filelib:wildcard(config_get(Config, source_dir)++"/erts-*"),
     ErtsVersion = string:substr(filename:basename(ErtsDir), length("erts-")+1),
-
-    PackageName = base_package_name(Release),
+    PackageName = base_package_name(Config),
     Architecture = os:cmd("dpkg-architecture -c 'echo -n $DEB_HOST_ARCH'"),
 
     [
-     {target_root, ?TARGET_ROOT},
+     {target_root, config_get(Config, target_root)},
      {package, PackageName},
      {vsn, ErtsVersion},
      {architecture, Architecture},
-     {description, "Base Erlang embedded node runtime for SUP-managed release "++Release}
+     {maintainer, config_get(Config, maintainer)},
+     {description, "Base Erlang embedded node runtime for SUP-managed release "++Nodename}
     ].
 
-initialize_pkg_dirs(Release) ->
-    PackageName = base_package_name(Release),
+initialize_pkg_dirs(Config) ->
+    PackageName = base_package_name(Config),
 
     os:cmd("mkdir -p "++PackageName++"/DEBIAN"),
-    os:cmd("mkdir -p "++PackageName++?TARGET_ROOT).
+    os:cmd("mkdir -p "++PackageName++config_get(Config, target_root)).
 
-base_package_name(Release) ->
-    Release++"-base".
+base_package_name(Config) ->
+    config_get(Config, nodename)++"-base".
 
 escape_slashes(String) ->
     {ok, SlashRegex} = re:compile("/"),

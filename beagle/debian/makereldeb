@@ -1,17 +1,19 @@
 #!/usr/bin/env escript
 %% -*- erlang -*-
 
--define(REL_DIR, "../rel/beagle-full").
--define(TARGET_ROOT, "/home/ghik/Inz/SUP/beagle/rel/beagle-raw").
 -define(SCRIPT_RIGHTS, "0775").
 
-main([Release, Version]) ->
+main(Arguments) ->
     file:set_cwd(filename:dirname(escript:script_name())),
-    PackageName = release_package_name(Release),
+    Config = load_config(),
+    main(Arguments, Config).
 
-    Variables = get_variables(Release, Version),
+main([Version], Config) ->
+    PackageName = release_package_name(Config),
+
+    Variables = get_variables(Version, Config),
     execute_command("rm -rf "++PackageName),
-    initialize_pkg_dirs(Release),
+    initialize_pkg_dirs(Config),
     file:set_cwd(PackageName),
 
     save("DEBIAN/control", fill_template("../templates/control-rel", Variables)),
@@ -20,12 +22,14 @@ main([Release, Version]) ->
     save("DEBIAN/preinst", fill_template("../templates/preinst-rel", Variables), ?SCRIPT_RIGHTS),
     save("DEBIAN/postinst", fill_template("../templates/postinst-rel", Variables), ?SCRIPT_RIGHTS),
 
-    ArchiveFile = "."++filename:join([?TARGET_ROOT, "debian/releases", Release]),
+    TargetRoot = config_get(Config, target_root),
+    SourceDir = config_get(Config, source_dir),
+    ArchiveFile = "."++filename:join([TargetRoot, "debian/releases", config_get(Config, nodename)]),
     Result = execute_commands(
                [
-                "tar czf "++ArchiveFile++".tar.gz -C ../"++?REL_DIR++" releases/"++Version,
+                "tar czf "++ArchiveFile++".tar.gz -C ../"++SourceDir++" releases/"++Version,
                 "mv "++ArchiveFile++".tar.gz "++ArchiveFile,
-                "md5sum `find . -type f | awk '/."++escape_slashes(?TARGET_ROOT)++"/ { print substr($0, 3) }'` > DEBIAN/md5sums",
+                "md5sum `find . -type f | awk '/."++escape_slashes(TargetRoot)++"/ { print substr($0, 3) }'` > DEBIAN/md5sums",
                 "dpkg -b . .."
                ]
               ),
@@ -38,48 +42,58 @@ main([Release, Version]) ->
             io:format("*** Package building failed ***~n"),
             failed
     end;
-main(_) ->
-    io:format("Usage: ~s release version~n", [filename:basename(escript:script_name())]).
+main(_, _Config) ->
+    io:format("Usage: ~s version~n", [filename:basename(escript:script_name())]).
 
-get_variables(Release, Version) ->
-    RelDir = ?REL_DIR++"/releases/"++Version,
-    {ok, [RelFileContents]} = file:consult(RelDir++"/"++Release++".rel"),
-    {release, {Release, Version}, {erts, ErtsVersion}, Applications} = RelFileContents,
+load_config() ->
+    {ok, Config} = file:consult("debian.config"),
+    Config.
 
-    PackageName = release_package_name(Release),
-    Dependencies = [base_package_name(Release)++" (= "++ErtsVersion++")"]
+config_get(Config, Key) ->
+    {Key, Value} = lists:keyfind(Key, 1, Config),
+    Value.
+
+get_variables(Version, Config) ->
+    Nodename = config_get(Config, nodename),
+    RelDir = config_get(Config, source_dir)++"/releases/"++Version,
+    {ok, [RelFileContents]} = file:consult(RelDir++"/"++Nodename++".rel"),
+    {release, {Nodename, Version}, {erts, ErtsVersion}, Applications} = RelFileContents,
+
+    PackageName = release_package_name(Config),
+    Dependencies = [base_package_name(Config)++" (= "++ErtsVersion++")"]
         ++lists:map(
             fun({App, AppVer}) ->
-                    application_package_name(Release, atom_to_list(App))++" (= "++AppVer++")"
+                    application_package_name(atom_to_list(App), Config)++" (= "++AppVer++")"
             end,
             Applications
            ),
 
     [
-     {target_root, ?TARGET_ROOT},
+     {target_root, config_get(Config, target_root)},
      {erts_vsn, ErtsVersion},
-     {release, Release},
+     {release, config_get(Config, nodename)},
      {package, PackageName},
      {vsn, Version},
-     {description, "SoftwareUpdatePlatform-managed release: "++Release},
+     {maintainer, config_get(Config, maintainer)},
+     {description, config_get(Config, description)},
      {dependencies, Dependencies}
     ].
 
-initialize_pkg_dirs(Release) ->
-    PackageName = release_package_name(Release),
+initialize_pkg_dirs(Config) ->
+    PackageName = release_package_name(Config),
 
     os:cmd("mkdir -p "++PackageName++"/DEBIAN"),
-    os:cmd("mkdir -p "++PackageName++?TARGET_ROOT++"/debian/releases").
+    os:cmd("mkdir -p "++PackageName++config_get(Config, target_root)++"/debian/releases").
 
-release_package_name(Release) ->
-    Release.
+release_package_name(Config) ->
+    config_get(Config, nodename).
 
-application_package_name(Release, ApplicationName) ->
+application_package_name(ApplicationName, Config) ->
     {ok, UnderscoreRegex} = re:compile("_"),
-    Release++"-"++re:replace(ApplicationName, UnderscoreRegex, "-", [global, {return, list}]).
+    config_get(Config, nodename)++"-"++re:replace(ApplicationName, UnderscoreRegex, "-", [global, {return, list}]).
 
-base_package_name(Release) ->
-    Release++"-base".
+base_package_name(Config) ->
+    config_get(Config, nodename)++"-base".
 
 escape_slashes(String) ->
     {ok, SlashRegex} = re:compile("/"),

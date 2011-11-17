@@ -9,10 +9,11 @@
 %% @end
 %%------------------------------------------------------------------------------
 init() ->
-  mnesia:create_schema([node()]),
-  mnesia:start(),
-  mnesia:create_table(device, [{type, set}, {attributes, record_info(fields, device)}, {disc_copies, [node()]}]),
-  mnesia:create_table(release, [{type, set}, {attributes, record_info(fields, release)}, {disc_copies, [node()]}]).
+    mnesia:create_schema([node()]),
+    mnesia:start(),
+    mnesia:create_table(device, [{type, set}, {attributes, record_info(fields, device)}, {disc_copies, [node()]}]),
+    mnesia:create_table(release, [{type, set}, {attributes, record_info(fields, release)}, {disc_copies, [node()]}]),
+    mnesia:create_table(category, [{type, set}, {attributes, record_info(fields, category)}, {disc_copies, [node()]}]).
 
 %%------------------------------------------------------------------------------
 %% @doc Starts Mnesia database

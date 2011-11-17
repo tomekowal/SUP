@@ -30,7 +30,7 @@ loop(Req, DocRoot) ->
     %% Path is everything after host name
     "/" ++ Path = Req:get(path),
     try
-        [Controller | Args] = lists:map(fun(X) -> binary_to_list(X) end, re:split(Path, "/")),
+        [Controller | Args] = re:split(Path, "/", [{return, list}]),
         case Controller of
             "" ->
                 main_controller:index(Req);

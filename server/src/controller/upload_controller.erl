@@ -35,11 +35,11 @@ dispatch(Req, Args) ->
   end.
 
 index(Req) ->
-  {ok, HTMLOutput} = upload_index_dtl:render([]),
-  Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
+    {ok, HTMLOutput} = upload_index_dtl:render([]),
+    Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
 create(Req) ->
-  FileHandler = fun(Filename, ContentType) -> handle_file(Filename, ContentType) end,
-  Files = mochiweb_multipart:parse_form(Req, FileHandler),
-  Photo = proplists:get_value("file", Files),
-  Req:respond({302, [{"Location", "/upload" }], ""}).
+    FileHandler = fun(Filename, ContentType) -> handle_file(Filename, ContentType) end,
+    Files = mochiweb_multipart:parse_form(Req, FileHandler),
+    Photo = proplists:get_value("file", Files),
+    Req:respond({302, [{"Location", "/upload" }], ""}).

@@ -52,7 +52,7 @@ main([Release, ApplicationName, Version]) ->
             failed
     end;
 main(_) ->
-    io:format("Usage: ~s application [version]~n", [filename:basename(escript:script_name())]).
+    io:format("Usage: ~s release application [version]~n", [filename:basename(escript:script_name())]).
 
 get_variables(Release, ApplicationName, Version) ->
     Application = list_to_atom(ApplicationName),

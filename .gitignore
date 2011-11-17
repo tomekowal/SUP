@@ -8,7 +8,7 @@
 /beagle/rel/*
 !/beagle/rel/reltool.config
 !/beagle/rel/files
-/beagle/debian/sup-erlang-*
+/beagle/debian/beagle-*
 /beagle/NOTES
 .DS_Store
 .\#*

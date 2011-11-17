@@ -1,0 +1,45 @@
+#!/usr/bin/env escript
+%% -*- erlang -*-
+
+main([Release, TargetDirVsn, UpFromDirVsns, DownToDirVsns]) ->
+    application:start(sasl),
+    DirVsnToTuple = fun(DirVsn) ->
+                            [Dir, Vsn] = string:tokens(DirVsn, ":"),
+                            {Dir, Vsn}
+                    end,
+
+    TupleToRelFile = fun({Dir,Vsn}) ->
+                             filename:join([Dir, "releases", Vsn, Release])
+                     end,
+
+    Target = DirVsnToTuple(TargetDirVsn),
+    UpFrom = lists:map(DirVsnToTuple, string:tokens(UpFromDirVsns, ",")),
+    DownTo = lists:map(DirVsnToTuple, string:tokens(DownToDirVsns, ",")),
+
+    code:add_pathsa(
+      lists:append(
+        lists:map(
+          fun({Dir,Vsn}) ->
+                  [filename:join([Dir, "releases", Vsn])] ++
+                      filelib:wildcard(filename:join([Dir, "lib", "*", "ebin"]))
+          end,
+          [Target]++UpFrom++DownTo
+         )
+       )
+     ),
+
+    {TargetDir, TargetVsn} = Target,
+    OutDir = filename:join([TargetDir, "releases", TargetVsn]),
+
+    case systools:make_relup(TupleToRelFile(Target),
+                             lists:map(TupleToRelFile, UpFrom),
+                             lists:map(TupleToRelFile, DownTo),
+                             [{outdir, OutDir}]
+                            ) of
+        ok ->
+            ok;
+        {ok, _, _, _} ->
+            ok
+    end;
+main(_) ->
+    io:format("Usage: genrelup release target_rel_dir:vsn upfrom_rel_dir:vsn,... downto_rel_dir:vsn,...\n").

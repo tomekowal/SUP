@@ -18,20 +18,20 @@ start() ->
 %% @end
 %%------------------------------------------------------------------------------
 init(Mode) ->
-	case Mode of
-		quiet ->
-			Port = 6789,
-			case gen_tcp:listen(Port, [{active, false},{packet,2}]) of
-        		{ok, Socket} ->
-					quiet_loop(Socket);
-				{error, Reason} ->
-				    {error, Reason}
-			end;
-		loud ->
-			{ok, ServerHost} = application:get_env(sup_beagle, management_host),
+    case Mode of
+        quiet ->
+            Port = 6789,
+            case gen_tcp:listen(Port, [{active, false},{packet,2}]) of
+                {ok, Socket} ->
+                    quiet_loop(Socket);
+                {error, Reason} ->
+                    {error, Reason}
+            end;
+        loud ->
+            {ok, ServerHost} = application:get_env(sup_beagle, management_host),
             {ok, Port} = application:get_env(sup_beagle, management_port),
-			loop(ServerHost, Port)
-	end.
+            loop(ServerHost, Port)
+    end.
 
 %%------------------------------------------------------------------------------
 %% Main loop periodically sends connection request.
@@ -59,7 +59,7 @@ quiet_loop(ListenSocket)->
     case gen_tcp:accept(ListenSocket) of
         {ok, Socket} ->
             inet:setopts(Socket, [{active, once}]),
-			receive_reply(),
+            receive_reply(),
             quiet_loop(ListenSocket);
         Other ->
             io:format("accept returned ~w - goodbye!~n", [Other]),

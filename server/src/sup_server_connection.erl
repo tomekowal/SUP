@@ -63,7 +63,7 @@ loop(Socket) ->
     inet:setopts(Socket, [{active, once}]),
     receive
         {tcp, Socket, Data} ->
-			{ok, {Address, _Port}} = inet:peername(Socket),
+            {ok, {Address, _Port}} = inet:peername(Socket),
             Answer = process(binary_to_term(Data), Address),
             gen_tcp:send(Socket, term_to_binary(Answer)),
             loop(Socket);
@@ -83,12 +83,12 @@ process(Data, Address) ->
     %% here should go functions which output
     %% {Request, Body} for client
     %% Request = get_data,
-	%% case sup_db:get_message_by_device_ip(Ip) of
-	%% 	[] ->
-	%% 		Body = [body, with, list, inside];
-	%% 	[H | _T] ->
-	%% 		Body = [the, message, is, H]
-	%% end,
+    %% case sup_db:get_message_by_device_ip(Ip) of
+    %% [] ->
+    %%     Body = [body, with, list, inside];
+    %%     [H | _T] ->
+    %%     Body = [the, message, is, H]
+    %% end,
     {Request, Body}.
 
 %%------------------------------------------------------------------------------

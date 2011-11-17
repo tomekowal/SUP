@@ -160,7 +160,8 @@ init_device(Socket, Message) ->
              running_applications = Message#inform.running_applications,
              ip = sup_server_utils:ip4addr_to_list(Address),
              jobs = [],
-             finished_jobs = []
+             finished_jobs = [],
+             categories = ""
            }.
 
 update_device(Socket, Message, Device) ->

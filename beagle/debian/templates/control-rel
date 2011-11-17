@@ -2,5 +2,5 @@ Package: {{ package }}
 Version: {{ vsn }}
 Architecture: all
 Depends: {{ dependencies|join:", " }}
-Maintainer: Roman Janusz <roman@student.agh.edu.pl>
+Maintainer: {{ maintainer }}
 Description: {{ description }}

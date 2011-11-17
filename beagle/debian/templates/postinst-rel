@@ -1,5 +1,4 @@
 #!/bin/bash
-echo "postinst $*"
 
 VSN={{ vsn }}
 REL={{ release }}
@@ -29,6 +28,11 @@ case "$1" in
         echo "$ERTS_VSN $VSN" > $ERL_ROOT/releases/start_erl.data
         $ERL_NOSHELL -s sup_beagle_maintenance create_RELEASES $ERL_ROOT $REL $VSN halt
 
+        if [ ! $? -eq 0 ]; then
+            echo "Release initialization failed."
+            exit 1
+        fi
+
         echo "Starting node..."
         $NODERUN start
         exit $?
@@ -56,17 +60,16 @@ case "$1" in
         echo "Performing manual upgrade..."
         echo "$ERTS_VSN $VSN" > $ERL_ROOT/releases/start_erl.data
         $ERL_NOSHELL -s sup_beagle_maintenance manual_upgrade $ERL_ROOT $REL $VSN $OLDVSN halt
+
+        if [ ! $? -eq 0 ]; then
+            echo "Manual upgrade failed."
+            exit 1
+        fi
+
         echo "Starting node $REL..."
         $NODERUN start
     fi
-    ;;
 
-    abort-upgrade|abort-remove|abort-deconfigure)
-    ;;
-
-    *)
-        echo "postinst called with unknown argument \`$1'" >&2
-        exit 1
     ;;
 esac
 

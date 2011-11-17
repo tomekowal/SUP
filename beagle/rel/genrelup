@@ -2,7 +2,7 @@
 %% -*- erlang -*-
 
 main([Release, TargetDirVsn, UpFromDirVsns, DownToDirVsns]) ->
-    application:start(sasl),
+    application:load(sasl),
     DirVsnToTuple = fun(DirVsn) ->
                             [Dir, Vsn] = string:tokens(DirVsn, ":"),
                             {Dir, Vsn}

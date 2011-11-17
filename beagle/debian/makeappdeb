@@ -30,8 +30,6 @@ main([ApplicationName, Version], Config) ->
 
     save("DEBIAN/control", fill_template("../templates/control-app", Variables)),
     save("DEBIAN/prerm", fill_template("../templates/prerm-app", Variables), ?SCRIPT_RIGHTS),
-    save("DEBIAN/postrm", fill_template("../templates/postrm-app", Variables), ?SCRIPT_RIGHTS),
-    save("DEBIAN/preinst", fill_template("../templates/preinst-app", Variables), ?SCRIPT_RIGHTS),
     save("DEBIAN/postinst", fill_template("../templates/postinst-app", Variables), ?SCRIPT_RIGHTS),
 
     TargetRoot = config_get(Config, target_root),

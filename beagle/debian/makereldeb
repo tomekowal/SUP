@@ -18,8 +18,6 @@ main([Version], Config) ->
 
     save("DEBIAN/control", fill_template("../templates/control-rel", Variables)),
     save("DEBIAN/prerm", fill_template("../templates/prerm-rel", Variables), ?SCRIPT_RIGHTS),
-    save("DEBIAN/postrm", fill_template("../templates/postrm-rel", Variables), ?SCRIPT_RIGHTS),
-    save("DEBIAN/preinst", fill_template("../templates/preinst-rel", Variables), ?SCRIPT_RIGHTS),
     save("DEBIAN/postinst", fill_template("../templates/postinst-rel", Variables), ?SCRIPT_RIGHTS),
 
     TargetRoot = config_get(Config, target_root),

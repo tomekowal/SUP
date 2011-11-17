@@ -1,5 +1,4 @@
 #!/bin/bash
-echo "postinst $*"
 
 APP={{ application }}
 ERL_ROOT={{ target_root }}
@@ -9,14 +8,7 @@ case "$1" in
 
     tar xzvf $ERL_ROOT/debian/applications/$APP -C $ERL_ROOT > /dev/null
     truncate -s 0 $ERL_ROOT/debian/applications/$APP
-	;;
 
-	abort-upgrade|abort-remove|abort-deconfigure)
-    ;;
-
-    *)
-        echo "postinst called with unknown argument \`$1'" >&2
-        exit 1
     ;;
 esac
 

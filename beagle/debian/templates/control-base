@@ -1,5 +1,5 @@
 Package: {{ package }}
 Version: {{ vsn }}
 Architecture: {{ architecture }}
-Maintainer: Roman Janusz <roman@student.agh.edu.pl>
+Maintainer: {{ maintainer }}
 Description: {{ description }}

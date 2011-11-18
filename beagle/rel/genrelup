@@ -40,6 +40,11 @@ main([Release, TargetDirVsn, UpFromDirVsns, DownToDirVsns]) ->
             ok;
         {ok, _, _, _} ->
             ok
-    end;
+    end,
+
+    ok = file:make_symlink(
+        Release++".boot",
+        filename:join([TargetDir,"releases",TargetVsn,"start.boot"])
+    );
 main(_) ->
     io:format("Usage: genrelup release target_rel_dir:vsn upfrom_rel_dir:vsn,... downto_rel_dir:vsn,...\n").

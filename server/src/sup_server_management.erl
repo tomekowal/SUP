@@ -85,36 +85,58 @@ begin_session(Socket) ->
 session_loop(Socket, SessionData) ->
     Identity = SessionData#session_data.identity,
     FailedJobs = SessionData#session_data.failed_jobs,
+
     case sup_db:fetch_job(Identity, FailedJobs+1) of
+        %% we have a job for the device
         {ok, {job, Message, Module, Function, Extra, _Status}} ->
-            try
-                ok = gen_tcp:send(Socket, term_to_binary(Message)),
-                {ok, Packet} = gen_tcp:recv(Socket, 0, ?TCP_TIMEOUT),
+
+            {HandlerResult, NewSessionData} =
                 try
-                    Result = binary_to_term(Packet),
-                    HandlerArgs = [Message, Result, SessionData, Extra],
-                    case apply(Module, Function, HandlerArgs) of
-                        {next_job, NextJob} ->
-                            sup_db:replace_job(Identity, FailedJobs+1, NextJob);
-                        none ->
-                            sup_db:delete_job(Identity, FailedJobs+1)
-                    end,
-                    session_loop(Socket, SessionData)
+                    %% send the job to device and receive result
+                    ok = gen_tcp:send(Socket, term_to_binary(Message)),
+                    {ok, Packet} = gen_tcp:recv(Socket, 0, ?TCP_TIMEOUT),
+                    JobResult = binary_to_term(Packet),
+                    HandlerArgs = [Message, JobResult, SessionData, Extra],
+
+                    %% invoke server-side job result handler
+                    try
+                        ActualHandlerResult = apply(Module, Function, HandlerArgs),
+                        {ActualHandlerResult, SessionData}
+                    catch
+                        _:HandlerException ->
+                            %% job result handler failed, mark job as failed and continue session
+                            sup_db:fail_job(Identity, FailedJobs+1, HandlerException),
+                            ModifiedSessionData = SessionData#session_data{failed_jobs = FailedJobs+1},
+                            {{none, continue}, ModifiedSessionData}
+                    end
                 catch
-                    _:HandlerException ->
-                        sup_db:fail_job(Identity, FailedJobs+1, HandlerException),
-                        NewSessionData = SessionData#session_data{failed_jobs = FailedJobs+1},
-                        session_loop(Socket, NewSessionData)
-                end
-            catch
-                %% connection broken, fail entire session
-                _:NetException ->
-                    sup_db:fail_job(Identity, FailedJobs+1, NetException)
+                    %% tcp connection broken, mark job as failed and finish session
+                    _:NetException ->
+                        sup_db:fail_job(Identity, FailedJobs+1, NetException),
+                        {{none, finish}, SessionData}
+                end,
+
+            {NextJobSpec, Continue} = HandlerResult,
+
+            %% do we have next job to insert to database?
+            case NextJobSpec of
+                {next_job, NextJob} ->
+                    sup_db:replace_job(Identity, FailedJobs+1, NextJob);
+                none ->
+                    sup_db:delete_job(Identity, FailedJobs+1)
+            end,
+
+            %% should we continue the session?
+            case Continue of
+                continue ->
+                    session_loop(Socket, NewSessionData);
+                finish ->
+                    finish_session(Socket)
             end;
+
+        %% there are no more jobs for this device, finish session
         empty ->
-            ok = gen_tcp:send(Socket, term_to_binary(finished)),
-            ok = gen_tcp:close(Socket),
-            ok
+            finish_session(Socket)
     end.
 
 %% -----------------------------------------------------------------------------
@@ -147,6 +169,11 @@ init_session(Socket, Message) ->
             reason = Message#inform.reason,
             failed_jobs = 0
            }.
+
+finish_session(Socket) ->
+    gen_tcp:send(Socket, term_to_binary(finished)),
+    gen_tcp:close(Socket),
+    ok.
 
 init_device(Socket, Message) ->
     {ok, {Address, _Port}} = inet:peername(Socket),

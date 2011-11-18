@@ -22,6 +22,8 @@ dispatch(Req, Args) ->
                 devices_controller:create(Req);
             [Id, "destroy"] ->
                 devices_controller:destroy(Req, Id);
+            [Id, "update_category"] ->
+                devices_controller:update_category(Req, Id);
             [Id, "jobs", "new"] ->
                 devices_controller:append_job(Req, Id);
             [Id, "jobs", "new", Type] ->
@@ -47,12 +49,30 @@ create(Req) ->
 show(Req, Id) ->
     [Record] = sup_db:find(device, Id),
     Device = device_to_print(Record),
-    {ok, HTMLOutput} = devices_show_dtl:render([{device, Device}]),
+    CheckedCategories = re:split(Record#device.categories, ",", [{return, list}]),
+    Categories = lists:sort(lists:map(
+        fun({category, Name, _}) ->
+            case lists:member(Name, CheckedCategories) of
+                true -> {Name, "on"};
+                false -> {Name, "off"}
+            end
+        end,
+        sup_db:all(category)
+    )),
+    {ok, HTMLOutput} = devices_show_dtl:render([{device, Device}, {categories, Categories}]),
     Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
 destroy(Req, Id) ->
     sup_db:destroy(device, Id),
     Req:respond({302, [{"Location", "/devices"}], ""}).
+
+update_category(Req, Id) ->
+    PostData = Req:parse_post(),
+    Categories = string:join(lists:sort(lists:map(fun({X, "on"}) -> X end, PostData)), ","),
+    [Device] = sup_db:find(device, Id),
+    UpdatedDevice = Device#device{categories=Categories},
+    sup_db:create(UpdatedDevice),
+    Req:respond({302, [{"Location", "/devices/" ++ Id}], ""}).
 
 append_job(Req, Id) ->
     PostData = Req:parse_post(),

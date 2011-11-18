@@ -15,6 +15,25 @@
       </tr>
     </table>
 
+    {% if categories %}
+      <h3>Categories</h3>
+      <form action="/devices/{{ device.identity }}/update_category" method="post">
+        <p class="checkbox_list">
+          {% for name, checked in categories %}
+            <label>
+              {% if checked == "on" %}
+                <input type="checkbox" name="{{ name }}" checked="checked"> {{ name }}
+              {% else %}
+                <input type="checkbox" name="{{ name }}"> {{ name }}
+              {% endif %}
+            </label>
+            <br />
+          {% endfor %}
+        </p>
+        <input type="submit" value="Update">
+      </form>
+    {% endif %}
+
     <h3>Applications</h3>
     <table class="applications">
       <tr>

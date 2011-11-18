@@ -183,3 +183,14 @@ td {
   vertical-align: middle;
 }
 
+.checkbox_list {
+  height: 100px;
+  width: 300px;
+  overflow: auto;
+  border: 5px solid white;
+  outline: 1px solid #98BF21;
+  background: white;
+  color: black;
+  margin-bottom: 1.5em;
+}
+

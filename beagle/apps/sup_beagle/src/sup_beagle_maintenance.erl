@@ -1,14 +1,10 @@
 -module(sup_beagle_maintenance).
--export([test/0, create_RELEASES/1, manual_upgrade/1, upgrade_release/1, applications_from_rel/1, remove_recursively/1]).
+-export([create_RELEASES/1, manual_upgrade/1, upgrade_release/1]).
 
 %% this module is used by debian package maintainer scripts through nodetool rpc or directly as erl -s param
 
-test() ->
-    io:format("This is a test.\n"),
-    halt().
-
 create_RELEASES([TargetRoot, Release, Version, halt]) ->
-    application:start(sasl),
+    application:load(sasl),
     create_RELEASES(lists:map(fun atom_to_list/1, [TargetRoot, Release, Version])),
     halt();
 create_RELEASES([TargetRoot, Release, Version]) ->
@@ -21,7 +17,7 @@ create_RELEASES([TargetRoot, Release, Version]) ->
     ok.
 
 manual_upgrade([TargetRoot, Release, Version, OldVersion, halt]) ->
-    application:start(sasl),
+    application:load(sasl),
     manual_upgrade(lists:map(fun atom_to_list/1, [TargetRoot, Release, Version, OldVersion])),
     halt();
 manual_upgrade([TargetRoot, Release, Version, OldVersion]) ->

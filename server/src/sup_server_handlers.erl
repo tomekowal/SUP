@@ -60,4 +60,16 @@ upgrade_handler({update_to_release, _Vsn}, {ok, Releases}, _SessionData, _Extra)
     {none, continue};
 upgrade_handler({update_to_release, _Vsn}, Unexpected, _SessionData, _Extra) ->
     io:format("Failed to upgrade device: ~p~n", [Unexpected]),
+    {none, continue};
+upgrade_handler(upgrade, ok, _SessionData, RelVsn) ->
+    NextJob = #job{
+      message = check_release,
+      module = ?MODULE,
+      function = upgrade_handler,
+      extra = RelVsn,
+      status = new
+     },
+    {{next_job, NextJob}, finish};
+upgrade_handler(check_release, {ok, ActualRelVsn}, _SessionData, RelVsn) ->
+    RelVsn = ActualRelVsn,
     {none, continue}.

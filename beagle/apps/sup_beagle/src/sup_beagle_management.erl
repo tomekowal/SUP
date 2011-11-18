@@ -92,7 +92,7 @@ init_session_message(Reason) ->
     end,
     Releases = release_handler:which_releases(),
     RunningApplications = application:which_applications(),
-    #inform{identity = Identity, reason = Reason, releases = Releases, 
+    #inform{identity = Identity, reason = Reason, releases = Releases,
       running_applications = RunningApplications}.
 
 %%------------------------------------------------------------------------------
@@ -109,6 +109,17 @@ handle_job({update_to_release, Vsn}) ->
     {ok, _OtherVsn, _Descr} = release_handler:install_release(Vsn),
     ok = release_handler:make_permanent(Vsn),
     {ok, release_handler:which_releases()};
+handle_job(upgrade) ->
+    spawn(fun() ->
+                  {ok, Command} = sup_beagle_config:get(upgrade_command),
+                  io:format("~s~n", [os:cmd(Command)]),
+                  trigger_session(upgrade_finished)
+          end
+         ),
+    ok;
+handle_job(check_release) ->
+    {_, RelVsn, _, permanent} = lists:keyfind(permanent, 4, release_handler:which_releases()),
+    {ok, RelVsn};
 handle_job({print, Message}) ->
     io:format("~p~n", [Message]),
     ok;

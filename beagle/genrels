@@ -1,0 +1,14 @@
+#!/bin/bash
+cd `dirname $0`
+rm -rf rel/beagle{,-1,-full}
+./switch 1 1.0
+make
+cp -r rel/beagle rel/beagle-full
+mv rel/beagle rel/beagle-1
+./switch 2 2.0
+make
+./rebar generate-appups previous_release=beagle-1
+./rel/genrelup beagle rel/beagle:2 rel/beagle-1:1 rel/beagle-1:1
+cp -rf rel/beagle/releases/2 rel/beagle-full/releases
+cp -rf rel/beagle/lib/sampleapp-2.0 rel/beagle-full/lib
+

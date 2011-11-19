@@ -32,7 +32,11 @@ main([Version], Config) ->
                ]
               ),
 
-    case Result of
+
+    file:set_cwd(".."),
+    CleanupResult = execute_command("rm -rf "++PackageName),
+
+    case Result+CleanupResult of
         0 ->
             io:format("*** Package building successful ***~n"),
             ok;

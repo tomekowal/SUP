@@ -32,9 +32,26 @@ dispatch(Req, Args) ->
     end.
 
 index(Req) ->
-    Devices = lists:map(fun(Record) -> device_to_print(Record) end, sup_db:all(device)),
-    {ok, HTMLOutput} = devices_index_dtl:render([{devices, Devices}]),
-    Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
+    SelectedCategory = Req:parse_qs(),
+    Categories = lists:sort(sup_db:all(category)),
+    case SelectedCategory of
+        [] ->
+            Devices = lists:map(fun(Record) -> device_to_print(Record) end, sup_db:all(device)),
+            {ok, HTMLOutput} = devices_index_dtl:render([{devices, Devices}, {categories, Categories}]),
+            Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput});
+        [{"category", ""}] ->
+            Devices = lists:map(fun(Record) -> device_to_print(Record) end, sup_db:all(device)),
+            {ok, HTMLOutput} = devices_index_dtl:render([{devices, Devices}, {categories, Categories}]),
+            Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput});
+        [{"category", CategoryName}] ->
+            Devices = sup_db:all(device),
+            FilteredDevices = lists:map(fun(Record) -> device_to_print(Record) end, lists:filter(fun(Device) ->
+                lists:member(CategoryName, re:split(Device#device.categories, ",", [{return, list}]))
+            end, Devices)),
+            {ok, HTMLOutput} = devices_index_dtl:render([{devices, FilteredDevices}, {categories, Categories},
+                {selected_category, CategoryName}]),
+            Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput})
+    end.
 
 new(Req) ->
     {ok, HTMLOutput} = devices_new_dtl:render([]),

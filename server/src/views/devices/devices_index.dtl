@@ -1,9 +1,27 @@
 {% extends "devices/devices.dtl" %}
 
 {% block yield %}
+  {% if categories %}
+    <div class="selector">
+      Filter devices by category:
+      <form action="/devices" method="get">
+        <select name="category" onchange="this.form.submit();">
+          <option></option>
+          {% for category, name, count in categories %}
+            {% if name == selected_category %}
+              <option value="{{ name }}" selected="selected">{{ name }}</option>
+            {% else %}
+              <option value="{{ name }}">{{ name }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+  {% endif %}
   {% if devices %}
     <table class="devices">
       <tr>
+        <th></th>
         <th>Identity</th>
         <th>Last contact</th>
         <th>IP</th>
@@ -11,15 +29,14 @@
       </tr>
       {% for device in devices %}
       <tr>
+        <td><input type="checkbox" checked="checked"></td>
         <td>{{ device.identity }}</td>
         <td>{{ device.last_contact }}</td>
         <td>{{ device.ip }}</td>
         <td>
-          <a href="/devices/{{ device.identity }}"><button type="button" class="action-button view">View</button></a>
-          <form action="/devices/{{ device.identity }}/destroy" method="post" class="delete">
-            <input type="hidden" name="identity" value="{{ device.identity }}">
-            <input type="submit" value="Delete" class="action-button delete" onclick="return confirm('Are you sure?');">
-          </form>
+          <a href="/devices/{{ device.identity }}">
+            <button type="button" class="action-button view">View</button>
+          </a>
         </td>
       </tr>
       {% endfor %}

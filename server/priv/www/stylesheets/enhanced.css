@@ -194,3 +194,11 @@ td {
   margin-bottom: 1.5em;
 }
 
+.selector {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.selector > form {
+  display: inline;
+}

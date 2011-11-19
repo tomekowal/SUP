@@ -22,8 +22,8 @@ dispatch(Req, Args) ->
                 devices_controller:create(Req);
             [Id, "destroy"] ->
                 devices_controller:destroy(Req, Id);
-            [Id, "update_category"] ->
-                devices_controller:update_category(Req, Id);
+            [Id, "update_categories"] ->
+                devices_controller:update_categories(Req, Id);
             [Id, "jobs", "new"] ->
                 devices_controller:append_job(Req, Id);
             [Id, "jobs", "new", Type] ->
@@ -66,11 +66,31 @@ destroy(Req, Id) ->
     sup_db:destroy(device, Id),
     Req:respond({302, [{"Location", "/devices"}], ""}).
 
-update_category(Req, Id) ->
-    PostData = Req:parse_post(),
-    Categories = string:join(lists:sort(lists:map(fun({X, "on"}) -> X end, PostData)), ","),
+update_categories(Req, Id) ->
     [Device] = sup_db:find(device, Id),
-    UpdatedDevice = Device#device{categories=Categories},
+    PostData = Req:parse_post(),
+    Categories = lists:sort(lists:map(fun({X, "on"}) -> X end, PostData)),
+    OldCategories = lists:sort(re:split(Device#device.categories, ",", [{return, list}])),
+    
+    %% updating count (amount of devices) in particular categories
+    CategoriesSet = sets:from_list(Categories),
+    OldCategoriesSet = sets:from_list(OldCategories),
+    DeletedCategories = sets:to_list(sets:subtract(OldCategoriesSet, CategoriesSet)),
+    AddedCategories = sets:to_list(sets:subtract(CategoriesSet, OldCategoriesSet)),
+    UpdateCount = fun(CategoryName, Val) ->
+        mnesia:transaction(
+            fun() ->
+                [Category] = sup_db:find(category, CategoryName),
+                NewCount = Category#category.count + Val,
+                sup_db:create(Category#category{count=NewCount})
+            end
+        )
+    end,
+    lists:foreach(fun(Name) -> UpdateCount(Name, -1) end, DeletedCategories),
+    lists:foreach(fun(Name) -> UpdateCount(Name, 1) end, AddedCategories),
+    
+    JoinedCategories = string:join(Categories, ","),
+    UpdatedDevice = Device#device{categories=JoinedCategories},
     sup_db:create(UpdatedDevice),
     Req:respond({302, [{"Location", "/devices/" ++ Id}], ""}).
 

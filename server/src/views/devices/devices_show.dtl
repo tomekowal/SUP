@@ -17,7 +17,7 @@
 
     {% if categories %}
       <h3>Categories</h3>
-      <form action="/devices/{{ device.identity }}/update_category" method="post">
+      <form action="/devices/{{ device.identity }}/update_categories" method="post">
         <p class="checkbox_list">
           {% for name, checked in categories %}
             <label>

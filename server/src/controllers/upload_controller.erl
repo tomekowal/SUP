@@ -49,6 +49,20 @@ create(Req) ->
     FinalFilename = filename:join([PathToPriv, RelPath, Filename]),
     {ok, _} = file:copy(TmpFilename, FinalFilename),
     ok = file:delete(TmpFilename),
+    generate_packages_gz(),
     Req:respond({302, [{"Location", "/" ++ RelPath }], ""}).
+
+generate_packages_gz() ->
+    PathToRepository = sup_mochiweb_deps:local_path(["priv", "repository"]),
+    os:cmd("dpkg-scanpackages "
+            ++ PathToRepository
+            ++ "/binary | gzip -9c > "
+            ++ PathToRepository
+            ++ "/binary/Packages.gz"),
+    os:cmd("dpkg-scansources "
+            ++ PathToRepository
+            ++ "/source | gzip -9c > "
+            ++ PathToRepository
+            ++ "/source/Packages.gz").
 
 

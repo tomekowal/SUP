@@ -1,6 +1,6 @@
 -module(sup_beagle_management).
 -include("sup_beagle.hrl").
--export([start_link/0, loop/0, trigger_session/1]).
+-export([start_link/0, loop/0, trigger_session/1, suspend_sessions/0, resume_sessions/0]).
 
 %%------------------------------------------------------------------------------
 %% @doc Starts management client process.
@@ -23,6 +23,22 @@ trigger_session(Reason) ->
     management_client ! {perform_session, Reason}.
 
 %%------------------------------------------------------------------------------
+%% @doc Suspends session execution. While session execution is suspended, all
+%% incoming trigger_session requests are waiting in the process queue except for
+%% periodic_notify requests, which are dropped to prevent them from stacking.
+%% @end
+%% ------------------------------------------------------------------------------
+suspend_sessions() ->
+    management_client ! suspend.
+
+%%------------------------------------------------------------------------------
+%% @doc Resumes session execution.
+%% @end
+%%------------------------------------------------------------------------------
+resume_sessions() ->
+    management_client ! resume.
+
+%%------------------------------------------------------------------------------
 %% @doc Management client main loop. Message {perform_session, Reason}
 %% makes the management client process initiate the session. Example reasons
 %% include connection request, periodic notify, scheduled notify etc. These
@@ -39,7 +55,22 @@ loop() ->
                     io:format("Session failed: ~p~n", [Exception])
             end,
             ?MODULE:loop();
+        suspend ->
+            wait_for_resume(),
+            ?MODULE:loop();
+        resume ->
+            %% unexpected, ignore to prevent it from coming later
+            ?MODULE:loop();
         stop ->
+            ok
+    end.
+
+wait_for_resume() ->
+    receive
+        %% ignore those while suspended to prevent them from stacking
+        {perform_session, periodic_notify} ->
+            wait_for_resume();
+        resume ->
             ok
     end.
 
@@ -110,10 +141,15 @@ handle_job({update_to_release, Vsn}) ->
     ok = release_handler:make_permanent(Vsn),
     {ok, release_handler:which_releases()};
 handle_job(upgrade) ->
+    suspend_sessions(),
     spawn(fun() ->
-                  {ok, Command} = sup_beagle_config:get(upgrade_command),
-                  io:format("~s~n", [os:cmd(Command)]),
-                  trigger_session(upgrade_finished)
+                  try
+                      {ok, Command} = sup_beagle_config:get(upgrade_command),
+                      io:format("~s~n", [os:cmd(Command)]),
+                      trigger_session(upgrade_finished)
+                  after
+                      resume_sessions()
+                  end
           end
          ),
     ok;

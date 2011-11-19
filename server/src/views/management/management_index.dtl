@@ -1,0 +1,36 @@
+{% extends "main/main.dtl" %}
+{% block content %}
+
+<h3>Categories</h3>
+{% if categories %}
+  <table>
+    <tr>
+      <th>Name</th>
+      <th>Count</th>
+      <th></th>
+    </tr>
+    {% for category, name, count in categories %}
+      <tr>
+        <td>{{ name }}</td>
+        <td>{{ count }}</td>
+        <td>
+          <form action="/management/remove_category" method="post">
+            <input type="hidden" name="category" value="{{ name }}">
+            <input type="submit" value="Delete">
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+{% else %}
+  No categories
+{% endif %}
+
+
+<h3>Add new category</h3>
+<form action="/management/add_category" method="post">
+  <input type="text" name="category">
+  <input type="submit">
+</form>
+
+{% endblock %}

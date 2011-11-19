@@ -38,6 +38,8 @@ loop(Req, DocRoot) ->
                 devices_controller:dispatch(Req, Args);
             "upload" ->
                 upload_controller:dispatch(Req, Args);
+            "management" ->
+                management_controller:dispatch(Req, Args);
             "repository" ->
                 repository_controller:dispatch(Req);
             _ ->

@@ -14,7 +14,7 @@
         <td>{{ name }}</td>
         <td>{{ count }}</td>
         <td>
-          <form action="/management/remove_category" method="post">
+          <form action="/categories/remove" method="post">
             <input type="hidden" name="category" value="{{ name }}">
             <input type="submit" value="Delete">
           </form>
@@ -28,7 +28,7 @@
 
 
 <h3>Add new category</h3>
-<form action="/management/add_category" method="post">
+<form action="/categories/add" method="post">
   <input type="text" name="category">
   <input type="submit">
 </form>

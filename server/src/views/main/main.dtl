@@ -16,7 +16,7 @@
       <div id="nav">
         <ul>
           <li class="menu"><a href="/devices" class="menu-button">Devices</a></li>
-          <li class="menu"><a href="/management" class="menu-button">Management</a></li>
+          <li class="menu"><a href="/categories" class="menu-button">Categories</a></li>
           <li class="menu"><a href="/repository" class="menu-button">Repository</a></li>
         </ul>
       </div>

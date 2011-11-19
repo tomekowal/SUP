@@ -1,4 +1,4 @@
--module(management_controller).
+-module(categories_controller).
 -compile(export_all).
 
 -include("../db/sup_db.hrl").
@@ -8,32 +8,32 @@ dispatch(Req, Args) ->
         'GET' ->
             case Args of
                 [] ->
-                    management_controller:index(Req);
+                    categories_controller:index(Req);
                 [""] ->
-                    management_controller:index(Req)
+                    categories_controller:index(Req)
             end;
         'POST' ->
             case Args of
-                ["add_category"] ->
-                    management_controller:add_category(Req);
-                ["remove_category"] ->
-                    management_controller:remove_category(Req)
+                ["add"] ->
+                    categories_controller:add(Req);
+                ["remove"] ->
+                    categories_controller:remove(Req)
             end
     end.
 
 index(Req) ->
     Categories = lists:sort(sup_db:all(category)),
-    {ok, HTMLOutput} = management_index_dtl:render([{categories, Categories}]),
+    {ok, HTMLOutput} = categories_index_dtl:render([{categories, Categories}]),
     Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).
 
-add_category(Req) ->
+add(Req) ->
     PostData = Req:parse_post(),
     CategoryName = proplists:get_value("category", PostData),
     sup_db:create(#category{name=CategoryName, count=0}),
-    Req:respond({302, [{"Location", "/management"}], ""}).
+    Req:respond({302, [{"Location", "/categories"}], ""}).
 
-remove_category(Req) ->
+remove(Req) ->
     PostData = Req:parse_post(),
     CategoryName = proplists:get_value("category", PostData),
     sup_db:destroy(category, CategoryName),
-    Req:respond({302, [{"Location", "/management"}], ""}).
+    Req:respond({302, [{"Location", "/categories"}], ""}).

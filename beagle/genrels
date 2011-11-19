@@ -1,4 +1,15 @@
 #!/bin/bash
+#
+# This script prepares a set of nodes in 'rel' directory that is used as
+# a source of files to be put in debian packages.
+#
+# This script generates:
+# rel/beagle-1      a node with release version 1
+# rel/beagle        a node with release version 2
+# rel/beagle-full   a node with both releases unpacked (but version 2
+#                   not set up) + proper appups and relup in version 2
+#
+
 cd `dirname $0`
 rm -rf rel/beagle{,-1,-full}
 ./switch 1 1.0

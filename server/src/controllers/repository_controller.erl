@@ -14,12 +14,12 @@ dispatch(Req) ->
 
 listdir(Req, FullPath, RelPath) ->
     {ok, FileList} = file:list_dir(FullPath),
-    Files = lists:map(fun(FileName) ->
+    Files = lists:sort(lists:map(fun(FileName) ->
         FullPathToFile = filename:join([FullPath, FileName]),
         ModificationTime = helper:format_date(filelib:last_modified(FullPathToFile)),
         FileSize = filelib:file_size(FullPathToFile),
         {FileName, ModificationTime, FileSize} end,
         FileList
-    ),
+    )),
     {ok, HTMLOutput} = repository_listdir_dtl:render([{relpath, RelPath}, {files, Files}]),
     Req:respond({200, [{"Content-Type", "text/html"}], HTMLOutput}).

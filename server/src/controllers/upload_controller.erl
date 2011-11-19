@@ -14,7 +14,8 @@ chunk_handler(Filename, ContentType, TempFilename, File) ->
     end.
 
 handle_file(Filename, ContentType) ->
-    TempFilename = "/tmp/" ++ helper:timestamp() ++ "_" ++ integer_to_list(erlang:phash2(make_ref())),
+    PathToTmp = sup_mochiweb_deps:local_path(["priv", "tmp"]),
+    TempFilename = filename:join([PathToTmp, Filename]),
     {ok, File} = file:open(TempFilename, [raw, write]),
     chunk_handler(Filename, ContentType, TempFilename, File).
 
@@ -40,6 +41,14 @@ index(Req) ->
 
 create(Req) ->
     FileHandler = fun(Filename, ContentType) -> handle_file(Filename, ContentType) end,
-    Files = mochiweb_multipart:parse_form(Req, FileHandler),
-    Photo = proplists:get_value("file", Files),
-    Req:respond({302, [{"Location", "/upload" }], ""}).
+    FormData = mochiweb_multipart:parse_form(Req, FileHandler),
+    {Filename, _ContentType, _TempFilename} = proplists:get_value("file", FormData),
+    RelPath = proplists:get_value("relpath", FormData),
+    PathToPriv = sup_mochiweb_deps:local_path(["priv"]),
+    TmpFilename = filename:join([PathToPriv, "tmp", Filename]),
+    FinalFilename = filename:join([PathToPriv, RelPath, Filename]),
+    {ok, _} = file:copy(TmpFilename, FinalFilename),
+    ok = file:delete(TmpFilename),
+    Req:respond({302, [{"Location", "/" ++ RelPath }], ""}).
+
+

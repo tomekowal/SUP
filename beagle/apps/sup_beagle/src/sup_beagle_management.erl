@@ -116,7 +116,8 @@ session_loop(Socket) ->
 %% Creates initial session message sent to management server based on reason.
 %%------------------------------------------------------------------------------
 init_session_message(Reason) ->
-    Identity = sup_beagle_hwaddress:get_first_hwaddress(),
+    [Nodename | _] = string:tokens(atom_to_list(node()), "@"),
+    Identity = sup_beagle_hwaddress:get_first_hwaddress()++"-"++Nodename,
     Releases = release_handler:which_releases(),
     RunningApplications = application:which_applications(),
     #inform{identity = Identity, reason = Reason, releases = Releases,

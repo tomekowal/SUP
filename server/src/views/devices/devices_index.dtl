@@ -19,31 +19,50 @@
     </div>
   {% endif %}
   {% if devices %}
-    <table class="devices">
-      <tr>
-        <th></th>
-        <th>Identity</th>
-        <th>Last contact</th>
-        <th>IP</th>
-        <th></th>
-      </tr>
-      {% for device in devices %}
-      <tr>
-        <td><input type="checkbox" checked="checked"></td>
-        <td>{{ device.identity }}</td>
-        <td>{{ device.last_contact }}</td>
-        <td>{{ device.ip }}</td>
-        <td>
-          <a href="/devices/{{ device.identity }}">
-            <button type="button" class="action-button view">View</button>
-          </a>
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
+    <h3>Devices</h3>
+    <form action="/devices/append_job_for_all" method="post">
+      <table class="devices">
+        <tr>
+          <th></th>
+          <th>Identity</th>
+          <th>Last contact</th>
+          <th>IP</th>
+          <th></th>
+        </tr>
+        {% for device in devices %}
+        <tr>
+          <td><input type="checkbox" name="ids[]" checked="checked" value="{{ device.identity }}"></td>
+          <td>{{ device.identity }}</td>
+          <td>{{ device.last_contact }}</td>
+          <td>{{ device.ip }}</td>
+          <td>
+            <a href="/devices/{{ device.identity }}">
+              <button type="button" class="action-button view">View</button>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+      <a href="/devices/new"><button type="button" class="action-button new">New device</button></a>
+
+      <h3>Enqueue jobs</h3>
+      <table class="devices">
+        <tr>
+          <th>Message</th>
+          <th>Module</th>
+          <th>Function</th>
+          <th>Extra</th>
+        <tr>
+          <td><input type="text" name="message" value="upgrade"/></td>
+          <td><input type="text" name="module" value="sup_beagle_handlers" /></td>
+          <td><input type="text" name="function" value="upgrade_handlers" /></td>
+          <td><input type="text" name="extra" value='"2"' /></td>
+        <tr>
+      </table>
+
+      <input type="submit" value="Append job for all">
+    </form>
   {% else %}
     <p><strong>No devices found.</strong></p>
   {% endif %}
-
-  <a href="/devices/new"><button type="button" class="action-button new">New device</button></a>
 {% endblock %}

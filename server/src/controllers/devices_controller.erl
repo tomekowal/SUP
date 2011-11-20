@@ -20,6 +20,8 @@ dispatch(Req, Args) ->
         case Args of
             [] ->
                 devices_controller:create(Req);
+            ["append_job_for_all"] ->
+                devices_controller:append_job_for_all(Req);
             [Id, "destroy"] ->
                 devices_controller:destroy(Req, Id);
             [Id, "update_categories"] ->
@@ -90,6 +92,22 @@ update_categories(Req, Id) ->
     UpdatedDevice = Device#device{categories=Categories},
     sup_db:create(UpdatedDevice),
     Req:respond({302, [{"Location", "/devices/" ++ Id}], ""}).
+
+append_job_for_all(Req) ->
+    PostData = Req:parse_post(),
+    Devices = lists:filter(fun({Key, _Value}) ->
+        case Key of
+            "ids[]" -> true;
+            _ -> false
+        end
+    end, PostData),
+    Message = sup_server_utils:list_to_term(proplists:get_value("message", PostData)),
+    Module = sup_server_utils:list_to_term(proplists:get_value("module", PostData)),
+    Function = sup_server_utils:list_to_term(proplists:get_value("function", PostData)),
+    Extra = sup_server_utils:list_to_term(proplists:get_value("extra", PostData)),
+    Job = #job{message=Message, module=Module, function=Function, extra=Extra},
+    lists:foreach(fun({"ids[]", Id}) -> sup_db:append_job(Id, Job) end, Devices),
+    Req:respond({302, [{"Location", "/devices/"}], ""}).
 
 append_job(Req, Id) ->
     PostData = Req:parse_post(),

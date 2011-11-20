@@ -54,15 +54,7 @@ create(Req) ->
 
 generate_packages_gz() ->
     PathToRepository = sup_mochiweb_deps:local_path(["priv", "repository"]),
-    os:cmd("dpkg-scanpackages "
-            ++ PathToRepository
-            ++ "/binary | gzip -9c > "
-            ++ PathToRepository
-            ++ "/binary/Packages.gz"),
-    os:cmd("dpkg-scansources "
-            ++ PathToRepository
-            ++ "/source | gzip -9c > "
-            ++ PathToRepository
-            ++ "/source/Packages.gz").
-
-
+    Command = "cd " ++ PathToRepository ++ " && " ++
+        "dpkg-scanpackages binary | gzip -9c > binary/Packages.gz && " ++
+        "dpkg-scansources source | gzip -9c > source/Pacakges.gz",
+    os:cmd(Command).

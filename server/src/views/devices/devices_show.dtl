@@ -1,5 +1,6 @@
 {% extends "devices/devices.dtl" %}
 {% block yield %}
+  <h2>Device info</h2>
     <table class="devices">
       <tr>
         <th>Identity</th>
@@ -10,8 +11,16 @@
         <td>{{ device.last_contact }}</td>
       </tr>
       <tr>
-        <th>Ip</th>
+        <th>IP</th>
         <td>{{ device.ip }}</td>
+      </tr>
+      <tr>
+        <th>Releases</th>
+        <td>
+          {% for release, name, version in device.releases %}
+            {{ name }}, {{ version }} <br/>
+          {% endfor %}
+        </td>
       </tr>
     </table>
 

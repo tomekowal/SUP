@@ -116,11 +116,7 @@ session_loop(Socket) ->
 %% Creates initial session message sent to management server based on reason.
 %%------------------------------------------------------------------------------
 init_session_message(Reason) ->
-    Hwaddr = sup_beagle_hwaddress:get_first_hwaddress(),
-    case length(Hwaddr) of
-        17 -> Identity = Hwaddr; %% valid MAC has 17 characters
-        _ -> {ok, Identity} = sup_beagle_config:get(identity)
-    end,
+    Identity = sup_beagle_hwaddress:get_first_hwaddress(),
     Releases = release_handler:which_releases(),
     RunningApplications = application:which_applications(),
     #inform{identity = Identity, reason = Reason, releases = Releases,

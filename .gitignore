@@ -3,6 +3,7 @@
 /server/doc
 /server/log
 /server/Mnesia.*
+/server/.eunit
 /beagle/apps/*/ebin
 /beagle/versioned/*/ebin
 /beagle/rel/*

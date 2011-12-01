@@ -107,13 +107,13 @@ session_loop(Socket, SessionData) ->
                             %% job result handler failed, mark job as failed and continue session
                             sup_db:fail_job(Identity, FailedJobs+1, HandlerException),
                             ModifiedSessionData = SessionData#session_data{failed_jobs = FailedJobs+1},
-                            {{none, continue}, ModifiedSessionData}
+                            {{failed, continue}, ModifiedSessionData}
                     end
                 catch
                     %% tcp connection broken, mark job as failed and finish session
                     _:NetException ->
                         sup_db:fail_job(Identity, FailedJobs+1, NetException),
-                        {{none, finish}, SessionData}
+                        {{failed, finish}, SessionData}
                 end,
 
             {NextJobSpec, Continue} = HandlerResult,
@@ -123,7 +123,9 @@ session_loop(Socket, SessionData) ->
                 {next_job, NextJob} ->
                     sup_db:replace_job(Identity, FailedJobs+1, NextJob);
                 none ->
-                    sup_db:delete_job(Identity, FailedJobs+1)
+                    sup_db:delete_job(Identity, FailedJobs+1);
+                failed ->
+                    failed
             end,
 
             %% should we continue the session?

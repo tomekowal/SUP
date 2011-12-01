@@ -158,6 +158,4 @@ handle_job({print, Message}) ->
     ok;
 handle_job(wait) ->
     timer:sleep(10000),
-    ok;
-handle_job(_Job) ->
     ok.

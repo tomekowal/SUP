@@ -8,7 +8,9 @@ running_interfaces_hwaddress({_Name, [{flags, Flags} | [{hwaddr, Hwaddr} | _Opti
             Hwaddr;
         _ ->
             false
-    end.
+    end;
+running_interfaces_hwaddress(_) ->
+    false.
 
 filter_interfaces(false) ->
     false;

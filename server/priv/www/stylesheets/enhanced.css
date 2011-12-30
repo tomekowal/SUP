@@ -5,9 +5,7 @@
 /* menu */
 
 #nav {
-  width: 100%;
-  float: left;
-  margin: 0 0 0 0;
+  height: 40px;
 }
 
 #nav ul {
@@ -28,7 +26,6 @@
   display: inline;
   padding: 10px 20px;
   color: white;
-  text-transform:capitalize;
   font-family: Verdana, Geneva, sans-serif;
   text-transform: capitalize;
 }
@@ -57,21 +54,23 @@
 #container {
   width: 980px;
   margin: 0 auto;
-  display: block;
-  height: 100%;
 }
 
 
 #content {
-  float: left;
-  margin-top: 20px;
+  margin: 20px 0 20px 0;
 }
 
 #footer {
-  float: left;
+  margin-top: 50px;
+  border-top: 1px solid #607B4A;
+  font-size: 70%;
+  padding: 10px 30px;
+  text-align: center;
+  color: #3E5928;
 }
 
-/* przyciski */
+/* buttons */
 .action-button {
   display: inline-block;
   padding-left: 20px;
@@ -165,7 +164,7 @@ form.delete {
   display: inline-block;
 }
 
-/* tabele */
+/* tables */
 .devices, .programs {
   border: 1px solid #98BF21;
   border-collapse: collapse;

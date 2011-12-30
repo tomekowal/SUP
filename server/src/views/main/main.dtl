@@ -9,24 +9,24 @@
 </head>
 <body>
   <div id="container">
-    <div id="header">
-      <div id="logo">
-        <a href="/"><img src="/images/logo.png" class="logo" /></a>
-      </div>
-      <div id="nav">
-        <ul>
-          <li class="menu"><a href="/devices" class="menu-button">Devices</a></li>
-          <li class="menu"><a href="/categories" class="menu-button">Categories</a></li>
-          <li class="menu"><a href="/repository" class="menu-button">Repository</a></li>
-        </ul>
-      </div>
+    <div id="logo">
+      <a href="/"><img src="/images/logo.png" class="logo" /></a>
     </div>
-      
+    <div id="nav">
+      <ul>
+        <li class="menu"><a href="/devices" class="menu-button">Devices</a></li>
+        <li class="menu"><a href="/categories" class="menu-button">Categories</a></li>
+        <li class="menu"><a href="/repository" class="menu-button">Repository</a></li>
+      </ul>
+    </div>
+
     <div id="content">
       {% block content %}{% endblock %}
     </div>
-    
-    <div id="footer"></div>
+
+    <div id="footer">
+    Copyright © by Przemysław Dąbek, Roman Janusz, Tomasz Kowal, Małgorzata Wielgus 2011-2012
+    </div>
   </div>
 </body>
 </html>

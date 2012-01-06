@@ -1,7 +1,8 @@
 % By zmienic jezyk na angielski/polski, dodaj opcje do klasy english lub polish
 \documentclass[polish,12pt]{aghthesis}
 \usepackage[utf8]{inputenc}
-\usepackage{url}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
 \usepackage{listings}
 
 \author{Przemysław Dąbek, Roman Janusz\\ Tomasz Kowal, Małgorzata Wielgus}
@@ -66,9 +67,7 @@ Platforma:
 \item pozwala na definiowanie grup urządzeń \emph{4}
 \item umożliwia aktualizację i instalację aplikacji na pojedynczych urządzeniach \emph{8}
 \item umożliwia aktualizację i instalację aplikacji na grupach urządzeń \emph{5}
-\item umożliwia aktualizację i instalację za pomocą systemowych narzędzi takich jak apt, yum, port \emph{7}
-\item umożliwia Hot Code Update dla aplikacji Erlangowych \emph{2}
-\item umożliwia aktualizację aplikacji Erlangowej działającej na sieci połączonych węzłów \emph{1}
+\item umożliwia aktualizację i instalację za pomocą systemowych narzędzi takich jak apt \emph{7}
 \item webowy interfejs użytkownika \emph{3}
 \item umożliwia tworzenie paczek aplikacji dedykowanych dla platformy wraz ze skryptami instalacyjnymi \emph{6}
 \end{itemize}
@@ -204,20 +203,19 @@ Stanowi element łączący serwer zarządzający i serwer http.
 \subsection{Graficzny interferjs użytkownika (serwer http - Mochiweb)}
 Służy do wyświetlania stanu urządzeń zapisanego w bazie danych oraz zapisywania do bazy poleceń dla konkretnych urządzeń. Serwer nie komunikuje się bezpośrednio z serwerem zarządzającym. Robi to pośrednio przez zapisywanie żądań do bazy danych. W związku z tym wykonanie żądań nie jest natychmiastowe. Jeżeli zależy nam, aby zmiany odniosły skutek natychmiastowy, należy wykorzystać mechanizm żądania połączenia (connection request). Proces wygląda następująco:
 \begin{itemize}
-\item Użytkownik podłącza się do node'a Erlangowego i wywołuje funkcję sup\_server\_management:trigger\_session(Reason).
+\item Użytkownik podłącza się do node'a Erlangowego i wywołuje funkcję \verb|sup_server_management:trigger_session(Reason)|.
 \item Urządzenie rozpoczyna komunikację z serwerem zarządzającym
 \item Serwer zarządzający zleca mu zadania na podstawie danych w bazie
 \end{itemize}
 Wraz z żądaniem połączenia można przesłać token. Klient przesyła ten token do serwera zarządzającego. Jest to dodatkowa informacja, na podstawie której serwer zarządzający wybiera zadania. W ten sposób można połączyć konkretne zadania z danym żądaniem połączenia.
 
 \section{Szczegóły protokołu komunikacyjnego i sesji zarządzania}
-Połączenie nawiązywane jest za pomocą tcp (gen\_tcp). Przesyłane wiadomości są termami erlangowymi serializowanymi za pomocą funkcji term\_to\_binary/1. Komunikację obejmującą jedno połączenie nazywamy sesją zarządzania.
+Połączenie nawiązywane jest za pomocą tcp (gen\_tcp). Przesyłane wiadomości są termami erlangowymi serializowanymi za pomocą funkcji \verb|term_to_binary/1|. Komunikację obejmującą jedno połączenie nazywamy sesją zarządzania.
 
 \subsection{Szczegóły przebiegu sesji z punktu widzenia urządzenia}
 Sesja zawsze inicjowana jest przez urządzenie. Może to nastąpić z kilku powodów:
 \begin{itemize}
-\item klient zarządzający jest uruchamiany
-\item w wyniku zewnętrznego żądania połączenia
+\item klient zarządzający jest uruchamiany w wyniku zewnętrznego żądania połączenia
 \item periodyczne żądanie
 \end{itemize}
 W razie potrzeby możemy dodać dodatkowe zdarzenia prowadzące do rozpoczęcia sesji (na przykład notyfikowanie o zmianie stanu urządzenia).
@@ -231,7 +229,7 @@ Sesja rozpoczyna się wiadomością od urządzenia do serwera. Wiadomość ta za
 Serwer przesyła kolejne zadania dla urządzenia do wykonania. Przesyła je pojedynczo i za każdym razem czeka na rezultat. Sesja kończy się wysłaniem do urządzenia informajcą o zakończeniu sesji.
 
 \subsection{Szczegóły sesji z punktu widzenia serwera zarządzającego}
-W momencie otrzymania od urządzenia początkowej wiadomości, na podstawie tej wiadomości oraz informacji z bazy danych, serwer tworzy początkową listę czynności do wykonania na kliencie oraz inicjuje dane sesji (SessionData?) dostępne i niezmienne w czasie trwania całej sesji. Czynność z punktu widzenia serwera to krotka następującej postaci: Handler = {Job, Module, Function, Extra} Job = term() Module = atom() Function = fun(Job, Message, SessionData?, Extra) -> Handlers Extra = Message = term() Job jest to wiadomość, która zostanie przesłana do urządzenia. Module oraz Function definiują funkcję, która zostanie wywołana na serwerze po otrzymaniu rezultatu zadania od urządzenia. Extra jest dowolną dodatkową informacją, która zostanie przekazana do fukncji. Message jest to rezultat wykonania zadania otrzymany od urządzenia.
+W momencie otrzymania od urządzenia początkowej wiadomości, na podstawie tej wiadomości oraz informacji z bazy danych, serwer tworzy początkową listę czynności do wykonania na kliencie oraz inicjuje dane sesji (SessionData?) dostępne i niezmienne w czasie trwania całej sesji. Czynność z punktu widzenia serwera to krotka następującej postaci: \texttt{Handler = {Job, Module, Function, Extra} Job = term() Module = atom() Function = fun(Job, Message, SessionData?, Extra) -> Handlers Extra = Message = term()} Job jest to wiadomość, która zostanie przesłana do urządzenia. Module oraz Function definiują funkcję, która zostanie wywołana na serwerze po otrzymaniu rezultatu zadania od urządzenia. Extra jest dowolną dodatkową informacją, która zostanie przekazana do fukncji. Message jest to rezultat wykonania zadania otrzymany od urządzenia.
 
 Funkcja może zwracać kolejną listę Handlerów
 
@@ -247,9 +245,9 @@ Baza danych (Mnesia) przechowuje stan systemu oraz jest punktem łączącym graf
 
 W bazie zdefiniowano następujące rekordy:
 
-\begin{lstlisting}
+\begin{verbatim}
 -record(job, {message, module, function, extra, status}).
-\end{lstlisting}
+\end{verbatim}
 
 message :: wiadomość wysyłana do urządzenia opisująca czynność, którą ma wykonać
 
@@ -257,15 +255,15 @@ module, function :: funkcja na serwerze przyjmująca między innymi parametr ext
 
 status :: pending | in\_progress | failed, status wykonywanego zadania
 
-\begin{lstlisting}
+\begin{verbatim}
 -record(release, {name, version}).
-\end{lstlisting}
+\end{verbatim}
 
 name :: nazwa pliku ze spakowanym releasem
 
 version :: string opisujący wersję releasu
 
-\begin{lstlisting}
+\begin{verbatim}
 -record(device, {identity :: nonempty_string(),
                  last_contact :: nonempty_string(),
                  releases :: [#release{}],
@@ -276,7 +274,7 @@ version :: string opisujący wersję releasu
                  categories :: nonempty_string()
                 }
        ).
-\end{lstlisting}
+\end{verbatim}
 
 Kiedy urządzenie rozpocznie sesję, serwer pobiera pierwszy element z listy jobów i zmienia jego status z pending na in\_progress. Następnie job jest wykonywany. Jeśli job wykona się do końca zostaje usunięty z początku listy. W przeciwnym wypadku jego status zmienia się na failed.
 
@@ -292,7 +290,7 @@ W skrócie: każda aplikacja jest niezależnym fragmentem oprogramowania działa
 
 Przykładowa definicja release'u (plik \url{http://www.erlang.org/doc/man/rel.html} rel):
 
-\begin{lstlisting}
+\begin{verbatim}
 {release,{"beagle","2"},
          {erts,"5.8.5"},
          [{kernel,"2.14.5"},
@@ -301,11 +299,11 @@ Przykładowa definicja release'u (plik \url{http://www.erlang.org/doc/man/rel.ht
           {inets,"5.7.1"},
           {sasl,"2.1.10"},
           {sup_beagle,"1.0"}]}.
-\end{lstlisting}
+\end{verbatim}
 
 Struktura węzła erlangowego odpowiadającego powyższemu release'owi:
 
-\begin{lstlisting}
+\begin{verbatim}
 beagle/
     bin/                  #skrypty do zarzadzania wezlem
                           (uruchamianie, restart itp.)
@@ -327,15 +325,18 @@ beagle/
         RELEASES
         start_erl.data
         2/
-            beagle.rel    #definicja konkretnej wersji release'u
+            beagle.rel    #definicja konkretnej wersji
+                          #release'u
             beagle.script
             beagle.boot   #binarny skrypt bootujacy release
-            relup         #definicje czynnosci podczas aktualizacji
+            relup         #definicje czynnosci podczas
+                          #aktualizacji
             ...
-    debian/               #folder tymczasowy dla plikow z pakietow .deb
+    debian/               #folder tymczasowy dla plikow
+                          #z pakietow .deb
         applications/...
         releases/...
-\end{lstlisting}
+\end{verbatim}
 
 \subsubsection{Zarządzanie}
 
@@ -364,7 +365,7 @@ Pakiet binarny .deb jest archiwum zawierającym pełną strukturę katalogów i 
 
 Przykładowo, prosty pakiet instalujący w systemie plik wykonywalny /bin/cat mógłby mieć następującą zawartość:
 
-\begin{lstlisting}
+\begin{verbatim}
 DEBIAN/
     control
     md5sums
@@ -374,7 +375,7 @@ DEBIAN/
     postinst
 bin/
    cat
-\end{lstlisting}
+\end{verbatim}
 
 \subsubsection{Maintainer scripts}
 Skrypty \texttt{preinst, postinst, prerm} oraz \texttt{postrm} pozwalają twórcy pakietu na wykonywanie różnych czynności w określonych momentach instalacji, aktualizacji, usuwania pakietów itp. Dokładny algorytm wywoływania skryptów zarządzających opisany jest w dokumentacji: Package maintainer scripts and installation procedure \url{http://www.debian.org/doc/debian-policy/ch-maintainerscripts.html}. Bardziej przystępnie algorytmy te przedstawione są również na poniższej stronie \url{http://wiki.debian.org/MaintainerScripts}.
@@ -415,7 +416,7 @@ Spełnienie obu powyższych wymagań nie jest możliwe bez zastosowania pewnego 
 
 Przykładowo, pakiet enkapsulujący aplikację sup\_beagle w węźle umieszczonym w systemie docelowym w katalogu /opt/beagle wygląda następująco:
 
-\begin{lstlisting}
+\begin{verbatim}
 DEBIAN/
     ...
 opt/
@@ -423,44 +424,44 @@ opt/
         debian/
             applications/
                 sup_beagle
-\end{lstlisting}
+\end{verbatim}
 
 Plik sup\_beagle jest archiwum tgz zawierającym faktyczną zawartość pakietu:
 
-\begin{lstlisting}
+\begin{verbatim}
 lib/
     sup_beagle-1.0/
         ebin/...
         priv/...
         ...
-\end{lstlisting}
+\end{verbatim}
 
 Wewnętrzne archiwum jest rozpakowywane w odpowiednich momentach przez skrypty zarządzające.
 
 \subsection{Działanie skryptów zarządzających dla pakietów węzła erlangowego}
 
 \subsubsection{Pakiet bazowy}
-\begin{lstlisting}
+\begin{verbatim}
 prerm remove|upgrade
-\end{lstlisting}
+\end{verbatim}
 Jeśli węzeł działa, ten skrypt zatrzymuje go. Jest to konieczne podczas deinstalacji węzła lub aktualizacji z nową wersją ERTS (pakiet bazowy zawiera erlangowy runtime).
 
 \subsubsection{Pakiety aplikacji erlangowych}
-\begin{lstlisting}
+\begin{verbatim}
 postinst configure [stara_wersja]
-\end{lstlisting}
+\end{verbatim}
 
 W trakcie instalacji lub aktualizacji pakietu aplikacji erlangowej, skrypt ten rozpakowuje wewnętrzne archiwum umieszczone przez menedżera pakietów w katalogu debian/applications/ na węźle do właściwej lokalizacji plików aplikacji, tj. katalogu lib na węźle. Po rozpakowaniu, plik archiwum jest obcinany do rozmiaru 0 bajtów i od tej pory pełni rolę znacznika informującego, że pakiet z daną aplikacją jest zainstalowany.
 
-\begin{lstlisting}
+\begin{verbatim}
 prerm remove
-\end{lstlisting}
+\end{verbatim}
 
 \subsubsection{Pakiet główny}
 
-\begin{lstlisting}
+\begin{verbatim}
 postinst configure [stara_wersja]
-\end{lstlisting}
+\end{verbatim}
 
 Pierwszą czynnością wykonywaną przez ten skrypt jest rozpakowanie plików release'u z wewnętrznego archiwum pakietu (rozpakowanego przez menedżera pakietów do folderu \texttt{debian/releases/} na węźle) do ich właściwej lokalizacji, tj. katalogu releases na węźle. Po rozpakowaniu, plik archiwum jest obcinany do rozmiaru 0 bajtów i funkcjonuje jako znacznik informujący o zainstalowaniu pakietu.
 
@@ -472,9 +473,9 @@ Jeśli węzeł nie działa lub aktualizacja hot-upgrade nie powiodła się, zost
 
 Ten skrypt podczas swojego działania wykorzystuje wygenerowane przez rebara narzędzie \texttt{nodetool} do wykonywania operacji na działającym węźle. Implementacje tych operacji zawarte są w module \texttt{sup\_beagle\_maintenance} aplikacji \texttt{sup\_beagle}.
 
-\begin{lstlisting}
+\begin{verbatim}
 prerm remove
-\end{lstlisting}
+\end{verbatim}
 
 Skrypt ten zatrzymuje węzeł (jeśli działa) oraz usuwa zawartość katalogu \texttt{releases}.
 

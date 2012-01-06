@@ -1,70 +1,84 @@
 % By zmienic jezyk na angielski/polski, dodaj opcje do klasy english lub polish
 \documentclass[polish,12pt]{aghthesis}
-\usepackage[latin2]{inputenc}
+\usepackage[utf8]{inputenc}
 \usepackage{url}
+\usepackage{listings}
 
-\author{Jan Kowalski, Jan Malinowski\\ Wojciech Kowalski}
+\author{Przemysław Dąbek, Roman Janusz\\ Tomasz Kowal, Małgorzata Wielgus}
 
-\title{Zarys szczeg�lnych podstaw\\ og�lnej teorii wszystkiego}
+\title{Platforma do automatycznych aktualizacji oprogramowania na urządzeniach zdalnych - Przewodnik}
 
-\supervisor{dr hab.\ in�.\ Krzysztof Iksi�ski, prof.\ nadzw.\ AGH}
+\supervisor{dr inż. Wojciech Turek}
 
-\date{2011}
+\date{2012}
 
-% Szablon przystosowany jest do druku dwustronnego, 
+% Szablon przystosowany jest do druku dwustronnego,
 \begin{document}
 
 \maketitle
 
-
-
 \section{Cel prac i wizja produktu}
-%\section{Project goals and vision}
-\label{sec:cel-wizja}
-\emph{Charakterystyka problemu, motywacja projektu (w tym przegl�d
-  istniej�cych rozwi�za� prowadz�ca do uzasadnienia celu prac), og�lna
-  wizja produktu, kr�tkie studium wykonalno�ci i analiza zagro�e�.}
+\subsection{Opis problemu}
+Problem: Duża ilość zdalnych urządzeń rozmieszczonych w terenie. Urządzenia komunikują się przez zawodną sieć. Na różnych urządzeniach działają różne wersje aplikacji. Zachodzi potrzeba aktualizacji oprogramowania na grupie urządzeń. Rozwiązanie: Platforma umożliwi monitorowanie oraz aktualizację wersji aplikacji na grupach urządzeń.
 
-\section{Zakres funkcjonalno�ci}
-%\section{Functional scope}
-\label{sec:zakres-funkcjonalnosci}
+\subsection{Opis użytkownika i zewnętrznych podsystemów}
+Użytkownikiem systemu jest osoba odpowiedzialna za oprogramowanie w systemie składającym się z urządzeń zdalnych. System składa się z dużej liczby tych urządzeń, które mogą mieć mocno ograniczone zasoby sprzętowe (np. \emph{Beagleboard}). Urządzenia mogą mieć różne architektury. Urządzenia będą łączyć się z serwerem głównym, do którego przesyłają zebrane dane. Komunikacja odbywa się za pomocą zawodnego połączenia (np. \emph{GSM}).
 
-\emph{Kontekst u�ytkowania produktu (aktorzy, wsp�pracuj�ce systemy)
-  oraz najwa�niejsze wymagania funkcjonalne i niefunkcjonalne.}
+\subsection{Opis produktu}
+Produkt składa się z serwera zawierającego repozytorium oprogramowania. Serwer ma za zadanie monitorować jakie wersje aplikacji znajdują się na konkretnych urządzeniach i grupach urządzeń. Udostępniono interfejs webowy, dzięki któremu można wybrać urządzenia (lub ich grupy), na których chcemy przeprowadzić aktualizację i sprawdzić jakie aplikacje są zainstalowane. Ponieważ nie zawsze możliwe jest połączenie z wybranym urządzeniem, serwer przechowuje jego stan. W momencie uzyskania połączenia z urządzeniem serwer wykonuje zaplanowane aktualizacje.
+
+\section{Zakres funkcfonalności}
+\subsection{Wymagania funkcjonalne}
+Platforma:
+\begin{itemize}
+  \item monitoruje, czy dane urządzenie jest dostępne
+  \item monitoruje zainstalowane aplikacje oraz ich wersje na urządzeniach
+  \item rejestruje urządzenia
+  \item pozwala na definiowanie grup urządzeń
+  \item umożliwia aktualizację i instalację aplikacji na pojedynczych urządzeniach
+  \item umożliwia aktualizację i instalację aplikacji na grupach urządzeń
+  \item umożliwia aktualizację i instalację za pomocą systemowych narzędzi takich jak apt
+  \item webowy interfejs użytkownika
+  \item umożliwia tworzenie paczek aplikacji dedykowanych dla platformy wraz ze skryptami instalacyjnymi
+\end{itemize}
+\subsection{Wymagania niefunkcjonalne}
+\begin{itemize}
+  \item Obsługa między 1000 - 10000 urządzeń
+  \item Obsługa różnych architektur i systemów operacyjnych
+  \item Prawidłowe działanie w przypadku zrywających się połączeń
+  \item Wymagania stawiane dokumentacji:
+    \begin{itemize}
+      \item Podręcznik użytkownika
+      \item Podręcznik instalacji i konfiguracji.
+      \item Dokumentacja techniczna – dokumentacja kodu, opis testów.
+    \end{itemize}
+\end{itemize}
 
 \section{Wybrane aspekty realizacji}
-%\section{Selected realization aspects}
-\label{sec:wybrane-aspekty-realizacji}
+Właściwie wszystkie podsystemy zostały wykonane w Erlangu, aby zachować homogeniczne środowisko:
+\begin{itemize}
+  \item baza danych - \emph{mnesia}
+  \item serwer http - \emph{mochiweb}
+  \item backend
+  \item aplikacja kliencka
+\end{itemize}
+Jedynym elementem, który używa innych technologii (\emph{ErlyDTL}, \emph{JavaScript}, \emph{jQuery}, \emph{CSS}) jest webowy interfejs użytkownika.
 
-\emph{Przyj�te za�o�enia, struktura i zasada dzia�ania systemu,
-  wykorzystane rozwi�zania technologiczne wraz z kr�tkim uzasadnieniem
-  ich wyboru.}
+Komunikacja między urządzeniem klienckim i serwerem odbywa się przez własny protokół nad TCP. Jest on w łatwy sposób rozszerzalny, gdyby trzeba było dodać nowe funkcjonalności oraz zapewnia możliwość komunikacji z urządzeniami znajdującymi się za NATem.
 
 \section{Organizacja pracy}
-%\section{Work organization}
-\label{sec:organizacja-pracy}
 
-\emph{Struktura zespo�u (role poszczeg�lnych os�b), kr�tki opis i
-  uzasadnienie przyj�tej metodyki i/lub kolejno�ci prac, planowane i
-  zrealizowane etapy prac ze wskazaniem udzia�u poszczeg�lnych
-  cz�onk�w zespo�u, wykorzystane praktyki i narz�dzia w zarz�dzaniu
-  projektem.}
+W trakcie prac podzieliliśmy się na dwa zespoły:
+\begin{itemize}
+\item zespół zajmujący się backendem w składzie Roman Janusz oraz Tomasz Kowal
+\item zespół zajmujący się frontendem oraz bazą danych w składzie Przemysław Dąbek oraz Małgorzata Wielgus
+\end{itemize}
+
+Prace zostały podzielone na dwa etapy. W pierwszym dokonaliśmy przeglądu potrzebnych technologii oraz zbudowaliśmy prototypy. W drugim zaimplementowaliśmy właściwą funkcjonalność.
+Pierwszy etap zakończył się w czerwcu 2011 roku. Pracę nad drugim zaczęliśmy w trakcie wakacji 2011 roku.
 
 \section{Wyniki projektu}
-%\section{Project results}
 
-\label{sec:wyniki-projektu}
-
-\emph{Najwa�niejsze wyniki (co konkretnie uda�o si� uzyska�:
-  oprogramowanie, dokumentacja, raporty z test�w/wdro�enia, itd.)
-  i ocena ich u�yteczno�ci (jak zosta�o to zweryfikowane --- np.\ wnioski
-  klienta/u�ytkownika, zrealizowane testy wydajno�ciowe, itd.),
-  istniej�ce ograniczenia i propozycje dalszych prac.}
-
-% o ile to mozliwe prosze uzywac odwolan \cite w konkretnych miejscach a nie \nocite
-
-\nocite{artykul2011,ksiazka2011,narzedzie2011,projekt2011}
-
-\bibliography{bibliografia}
+Wynikiem projektu jest działające oprogramowanie wraz z dokumentacją. System został przetestowany na urządzeniu beagleboard. W dalszej kolejności należy przetestować działanie systemu na większej liczbie urządzeń. Można spróbować dodać obsługę innych menedżerów pakietów (\emph{yum}, \emph{port}). Należy również popracować nad bezpieczeństwem systemu. W tej chwili pozwala on podłączać się do systemu każdemu urządzeniu, które zostanie poprawnie skonfigurowane (brak autoryzacji). Pozwala również na aktualizację dowolnej aplikacji działającej na urządzeniu klienckim, a nie tylko tych zarządzanych za pomocą systemu.
 
 \end{document}

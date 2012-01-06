@@ -32,18 +32,18 @@ Przed zainstalowaniem węzła erlangowego na systemie docelowym, konieczna jest 
 
 Konfiguracja menedżera pakietów sprowadza się do dodania repozytorium platformy do automatycznych aktualizacji. W tym celu można skorzystać z dostępnych w systemie graficznych konfiguratorów lub wprowadzić nowe repozytorium bezpośrednio do pliku konfiguracyjnego /etc/apt/sources.list. W tym celu należy w nim dopisać linię:
 
-\begin{lstlisting}
+\begin{verbatim}
 deb http://adresplatformy/repository/binary /
-\end{lstlisting}
+\end{verbatim}
 
 \subsection{Instalacja węzła}
 
 Po skonfigurowaniu menedżera pakietów i umieszczeniu zestawu pakietów dla węzła erlangowego w repozytorium platformy, jest on już gotowy do instalacji. Za pomocą apt'a można zrobić to przy uzyciu komend (z prawami root'a):
 
-\begin{lstlisting}
+\begin{verbatim}
 apt-get update
 apt-get install nazwa_pakietu_glownego_wezla
-\end{lstlisting}
+\end{verbatim}
 Podczas instalacji węzeł powinien zostać automatycznie uruchomiony. Może jednak nie działać poprawnie, jeśli nie został uprzednio (tj. przed zbudowaniem paczek .deb) skonfigurowany.
 
 \subsection{Uruchamianie i zatrzymywanie węzła}
@@ -69,10 +69,10 @@ Konfiguracja aplikacji klienckiej zawarta jest w pliku \texttt{priv/sup\_beagle.
 \item \texttt{upgrade\_command} - komenda wywoływana podczas aktualizacji węzła. Przykładowo, dla apt'a komendą tą może być:
 \end{itemize}
 
-\begin{lstlisting}
+\begin{verbatim}
 apt-get update && apt-get -y --force-yes install \
 nazwa_pakietu_glownego_wezla
-\end{lstlisting}
+\end{verbatim}
 
 \section{Interfejs użytkownika}
 \subsection{Instalacja i uruchomienie}
@@ -92,6 +92,7 @@ Po poprawnym uruchomieniu, pod adresem \url{http://localhost:8080/} powinna poja
 \subsection{Zarządzanie urządzeniami i oprogramowaniem}
 \subsubsection{Urządzenia}
 Podstrona \emph{Devices} jest odpowiedzialna za zarządzanie urządzeniami zapisanymi w bazie danych. \emph{Filter devices by category} filtruje urządzenia wyłącznie wg danej kategorii; 'pusta' kategoria oznacza wszystkie urządzenia. Poniżej znajduje się lista wszystkich urządzeń zgodnie z ustawionym filtrem kategorii. Dla każdego urządzenia tabela zawiera informację o nazwie, czasie ostatniego połączenia serwera z nim i adresie IP. Po lewej stronie każdego urządzenia w liście jest widoczny checkbox, który jest wykorzystywany przez formularz w sekcji \emph{Enqueue jobs} służący do zlecania aktualizacji oprogramowania. Przycisk \emph{View} po prawej stronie przenosi do podstrony ze szczegółowymi informacjami o danym urządzeniu.
+\clearpage
 
 \centerline{
 	\scalebox{0.5}{
@@ -154,7 +155,7 @@ Platforma udostępnia jako plik archiwum przykładową strukturę katalogów wra
 
 Zawartość środowiska startowego:
 
-\begin{lstlisting}
+\begin{verbatim}
 devenv/
     rebar
     rebar.config
@@ -170,19 +171,19 @@ devenv/
         makebasedeb
         makeappdeb
         makereldeb
-\end{lstlisting}
+\end{verbatim}
 
 \subsubsection{rebar}
 Plik wykonywalny zawierający narzędzie rebar. W celu łatwiejszego jego użycia można umieścić katalog ze środowiskiem w zmiennej PATH lub stworzyć alias w shellu odwołujący się do tego skryptu.
 \subsubsection{rebar.config}
 Plik konfiguracyjny rebara. Początkowa zawartość tego pliku jest następująca:
-\begin{lstlisting}
+\begin{verbatim}
 {sub_dirs, [
             "rel",
             "apps/sup_beagle"
            ]
 }.
-\end{lstlisting}
+\end{verbatim}
 Jak widać, konfiguracja rebara sprowadza się do wylistowania podkatalogów, które mają być przez niego widoczne. Plik ten wymaga edycji podczas dodawania lub usuwania aplikacji \url{http://www.erlang.org/doc/design_principles/applications.html} do release'u erlangowego przez programistę. Przykładowo, dodanie erlangowej aplikacji o nazwie \texttt{sampleapp} wymaga dodania do listy \texttt{sub\_dirs} elementu \texttt{"apps/sampleapp"}.
 \subsubsection{apps}
 Katalog ten zawiera źródła wszystkich aplikacji erlangowych tworzonych przez programistę, które mają znaleźć się w wynikowym release. Domyślnie katalog ten zawiera źródła aplikacji \texttt{sup\_beagle} będącej klientem platformy automatycznych aktualizacji. Aplikacja ta musi znaleźć się w wynikowym release. Źródła wszystkich innych tworzonych aplikacji należy umieścić w katalogu \texttt{apps}, w podobny sposób jak aplikację \texttt{sup\_beagle} (tj. źródła w podkatalogu src, pliki nagłówkowe w katalogu \texttt{include}, itp.). Dla każdej aplikacji należy również dodać wpis w pliku konfiguracyjnym rebara (patrz wyżej).
@@ -195,9 +196,9 @@ Katalog ten zawiera zestaw skryptów oraz plik konfiguracyjny używane do genera
 
 \subsection{Inicjalizacja węzła erlangowego}
 Po stworzeniu bazowego środowiska należy zainicjalizować węzeł erlangowy za pomocą rebara. W tym celu należy wejść do katalogu \texttt{rel} i wykonać następującą komendę:
-\begin{lstlisting}
+\begin{verbatim}
 ../rebar create-node nodeid=id_wezla
-\end{lstlisting}
+\end{verbatim}
 
 \texttt{id\_węzła} jest dowolnym identyfikatorem docelowego węzła erlangowego. Służy on również m.in. jako nazwa release'u i (domyślnie) stanowi bazową nazwę dla paczek debiana.
 
@@ -217,7 +218,7 @@ Wymagana jest edycja tego pliku i dodanie do niego następujących wpisów:
 Uwaga: dla poprawnego działania skryptów zarządzających w paczkach \emph{.deb} wymagane jest pozostawienie pustego release'u \texttt{start\_clean} oraz opcji \texttt{\{excl\_archive\_filters, [".*"]\}}.
 
 Gotowy plik \texttt{reltool.config} dla release'u o nazwie \texttt{beagle} w wersji 2 zawierającego aplikację \texttt{sampleapp} może wyglądać następująco:
-\begin{lstlisting}
+\begin{verbatim}
 {sys, [
        {lib_dirs, ["../apps"]},
        {rel, "beagle", "2",
@@ -258,7 +259,7 @@ Gotowy plik \texttt{reltool.config} dla release'u o nazwie \texttt{beagle} w wer
            {copy, "files/app.config", "etc/app.config"},
            {copy, "files/vm.args", "etc/vm.args"}
           ]}.
-\end{lstlisting}
+\end{verbatim}
 \subsubsection{sys.config}
 Plik zawierający domyślną konfigurację release'u, tj. zbiorczą konfigurację aplikacji erlangowych wchodzących w jego skład.
 
@@ -284,13 +285,13 @@ Do tworzenia pakietów .deb służy zestaw skryptów w katalogu debian. Przed ic
 \item \texttt{description} - opis umieszczany w pliku \texttt{control} pakietu debiana generowanego przez skrypt \texttt{makereldeb} (opcja \texttt{Description})
 \end{itemize}
 Przykładowa zawartość pliku debian.config dla węzła o nazwie beagle może wyglądać następująco:
-\begin{lstlisting}
+\begin{verbatim}
 {nodename, "beagle"}.
 {source_dir, "../rel/beagle"}.
 {target_root, "/opt/beagle"}.
 {maintainer, "Jan Kowalski <jankowalski@gmail.com>"}.
 {description, "Sample SUP-managed node for Beagleboard"}.
-\end{lstlisting}
+\end{verbatim}
 
 \subsubsection{Zarys modelu generacji paczek debiana}
 Węzeł erlangowy wygenerowany za pomocą rebara dzielony jest na następujący zestaw pakietów debiana:
@@ -313,10 +314,10 @@ Budując pakiety dla kolejnych release'ów należy pamiętać o kilku czynności
 \subsubsection{genrelup}
 
 Generując zestaw pakietów dla nowej wersji release'u, w celu obsługi aktualizacji należy wygenerować plik \texttt{relup} definiujący sposób aktualizacji release'u na urządzeniu zdalnym, "na żywo" (hot upgrade). Służy do tego skrypt \texttt{genrelup} o następującej składni:
-\begin{lstlisting}
+\begin{verbatim}
 genrelup release target_rel_dir:vsn upfrom_rel_dir:vsn,... \
 downto_rel_dir:vsn,...
-\end{lstlisting}
+\end{verbatim}
 
 \begin{itemize}
 \item \texttt{release} jest nazwą release'u (identyczna z id węzła)
@@ -325,24 +326,24 @@ downto_rel_dir:vsn,...
 \item \texttt{downto\_rel\_dir:vsn,...} to oddzielana przecinkami lista katalogów z wygenerowanym węzłem oraz wersją releasu, do których może zostać wykonany downgrade (downgrade nie jest obsługiwany przez platformę, lecz potencjalnie może być wykonywany ręcznie)
 
 Przykładowe wywołanie skryptu generujące plik relup dla releasu o nazwie \texttt{beagle} w wersji 3 w węźle w katalogu \texttt{beagle-new} dla starych wersji release'u 1 i 2 zawartych w węźle wygenerowanym w katalogu \texttt{beagle-old}:
-\begin{lstlisting}
+\begin{verbatim}
 genrelup beagle beagle-new:3 beagle-old:1,beagle-old:2
-\end{lstlisting}
+\end{verbatim}
 \subsubsection{Tworzenie plików \emph{.deb}}
 Do generacji finalnych paczek służą skrypty \texttt{makebasedeb},\texttt{makeappdeb} oraz \texttt{makereldeb}. Skrypty te zapisują wygenerowane pakiety w katalogu \texttt{debian}.
 \subsubsection{makebasedeb}
 Skrypt tworzący pakiet bazowy. Nie wymaga żadnych parametrów.
 \subsubsection{makeappdeb}
 Skrypt tworzący pakiet dla danej aplikacji erlangowej. Składnia:
-\begin{lstlisting}
+\begin{verbatim}
 makeappdeb nazwa_aplikacji [wersja_aplikacji]
-\end{lstlisting}
+\end{verbatim}
 Jeśli węzeł zawiera tylko jedną wersję danej aplikacji, specyfikowanie wersji nie jest konieczne.
 \subsubsection{makereldeb}
 Skrypt służący do generacji pakietu głównego dla release'u. Składnia:
-\begin{lstlisting}
+\begin{verbatim}
 makereldeb wersja_releasu
-\end{lstlisting}
+\end{verbatim}
 
 \end{itemize}
 

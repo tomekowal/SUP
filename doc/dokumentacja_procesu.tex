@@ -110,4 +110,55 @@ Klient zgłosił następujące uwagi:
     \end{itemize}
 \end{itemize}
 
+\section{Przegląd technologii do zastosowania w platformie}
+\subsection{Technologia do stworzenia graficznego interfejsu użytkownika}
+Pod uwagę brano:
+\begin{itemize}
+\item Ruby on Rails z połączeniem Erlectricity
+\item Yaws
+\item Mochiweb
+\item Webmachine
+\item Nitrogen
+\item Zotonic – CMS i framework
+\end{itemize}
+
+RoR: Według przykładów najpierw uruchamiany był proces erlanga, który dopiero wywoływał program w Rubym i dopiero wtedy zachodziła komunikacja. Nie można jednym procesem erlangowym dopiąć się do jednej klasy aplikacji w Ruby on Rails.
+
+Yaws: Serwer napisany całkowicie w Erlangu. Tworzenie interfejsu odbywa się w specjalnym dialekcie eHTML. Wydaje się być najlepszym rozwiązaniem.
+
+Mochiweb: jest narzędziem do budowania własnych lekkich serwerów http. Zbudowanie własnego serwera od zera dodałoby niepotrzebny dodatkowy stopień do złożoności problemu.
+
+Webmachine: Zestaw narzędzi do tworzenia web serwisów opartych o technologię REST. Prawdopodobnie nie będzie nam potrzebny.
+
+Nitrogen: Jest to framework do tworzenia aplikacji webowych w erlangu. Do tego potrzebny byłby jeszcze serwer.
+
+Zotonic: Framework i CMS w erlangu. Aby dopisać obsługę serwera trzeba napisać dodatkowe moduły i poznać jego strukturę.
+
+\subsection{Komunikacja między urządzeniem zdalnym, a głównym serwerem platformy:}
+\begin{itemize}
+\item wywoływanie poleceń przez SSH
+\item komunikacja przez socket TCP
+\item komunikacja między węzłami sieci erlanga
+\item web service
+\end{itemize}
+
+SSH: Połączenie może być w każdej chwili zrywane, co może skutkować nieprzewidywalnym zachowaniem. Wymaga również zmian konfiguracji w systemie operacyjnym zdalnego urządzenia (użytkownik, klucz, plik sudoers).
+
+TCP: Rozwiązanie o najmniejszym narzucie komunikacyjnym. Łatwe do obsłużenia w erlangu za pomocą gen\_tcp. Wymagana samodzielna obsługa zrywanych połączeń, zaprojektowanie własnego formatu wiadomości. Wydaje się być najlepszym rozwiązaniem.
+
+Węzły sieci erlanga: Po połączeniu z danym urządzeniem połączenie jest stale utrzymywane, co nie jest pożądane (ani nawet możliwe) w naszym przypadku.
+
+Web Serwisy: Powodują duży narzut komunikacyjny, a ponieważ zakładamy dużą liczbę urządzeń, chcieliśmy tego uniknąć.
+
+\subsection{Język programowania do implementacji klienta oraz serwera}
+W związku z tym, że wybraliśmy komponenty, które są napisane w erlangu, to aby uniknąć problemów na styku różnych technologii, postanowiliśmy napisać zarówno klienta, jak i serwer w erlangu.
+
+\subsection {Wybór bazy danych}
+\begin{itemize}
+\item mnesia
+\item MySQL
+\item ewentualnie inne relacyjne bazy danych
+\end{itemize}
+
+
 \end{document}

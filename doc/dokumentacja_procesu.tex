@@ -1,0 +1,113 @@
+% By zmienic jezyk na angielski/polski, dodaj opcje do klasy english lub polish
+\documentclass[polish,12pt]{aghthesis} \usepackage[utf8]{inputenc}
+\usepackage{url} \usepackage{listings}
+
+\author{Przemysław Dąbek, Roman Janusz\\ Tomasz Kowal, Małgorzata Wielgus}
+
+\title{Platforma do automatycznych aktualizacji oprogramowania na urządzeniach
+  zdalnych. - dokumentacja procesu}
+
+\supervisor{dr inż. Wojciech Turek}
+
+\date{2012}
+
+% Szablon przystosowany jest do druku dwustronnego,
+\begin{document}
+
+\maketitle
+
+\section{Podział na milestony}
+Prace zostały podzielone na dwa milestony. Zakończenie pierwszego miało na celu zapoznanie z technologiami, które można wykorzystać do rozwiązania problemu automatycznej aktualizacji oprogramowania. Celem Milestone 1 jest stworzenie wizji oraz koncepcji architektury systemu, a także przetestowanie branych pod uwagę technologii. Produktem końcowym tego etapu były:
+\begin{itemize}
+\item Prototyp komunikacji serwera z klientem
+\item Zapoznanie z działaniem menedżerów pakietów \emph{apt} oraz \emph{opkg}
+\item Wybór technologii do stworzenia graficznego interfejsu użytkownika
+\item Wybór bazy danych
+\end{itemize}
+
+Drugi milestone zakończył się dostarczeniem działającego produktu.
+\clearpage
+
+\subsection{Milestone 1}
+\begin{tabular}{| p{1.3cm} | p{5cm} | p{2.5cm} | p{1.5cm} | p{1.5cm} | p{1.5cm} |}
+\hline
+Ticket & Summary & Type & Owner & Status & Created \\ \hline
+\#273 & Wizja - określenie wymagań & task & tkowal & closed & 06/05/11 \\ \hline
+\#274 & Wizja - wstępna analiza ryzyka & task & szemek & closed & 06/05/11 \\ \hline
+\#275 & Wizja - ogólny opis produktu & task & tkowal & closed & 06/05/11 \\ \hline
+\#276 & Przegląd technologii apt & task & szemek & closed & 06/05/11 \\ \hline
+\#277 & Przegląd technologii bazodanowych. & task & szemek & closed & 06/05/11 \\ \hline
+\#278 & Przegląd technologii do tworzenia GUI & task & szemek & closed & 06/05/11 \\ \hline
+\#279 & Przegląd technologii do komunikacji ze zdalnymi urządzeniami & task & tkowal & closed & 06/05/11 \\ \hline
+\#280 & Określenie architektury systemu. & task & malgorza & closed & 06/05/11 \\ \hline
+\#281 & Przetestowanie komunikacji z użyciem modułu gen\_tcp. & task & tkowal & closed & 06/05/11 \\ \hline
+\#282 & Przetestowanie możliwości stworzenia GUI przy pomocy eHTML. & task & szemek & closed & 06/05/11 \\ \hline
+\#283 & Połączenie erlanga z bazą danych - drivery MySQL i PostgreSQL & task & szemek & closed & 06/05/11 \\ \hline
+\#285 & Sprawdzenie możliwości wykorzystania menedżera pakietów OPKG & task & tkowal & closed & 06/20/11 \\ \hline
+\#327 & Rozważenie możliwości użycia i przetestowanie mochiweb & task & tkowal & closed & 07/22/11 \\ \hline
+\#284 & Instalacja Debiana na beagleboardzie & task & roman & closed & 06/20/11 \\ \hline
+\end{tabular}
+\clearpage
+
+\subsection{Milestone 2}
+\begin{tabular}{| p{1.3cm} | p{5cm} | p{2.5cm} | p{1.5cm} | p{1.5cm} | p{1.5cm} |}
+\hline
+Ticket & Summary & Type & Owner & Status & Created \\ \hline
+\#334 & GUI do przeglądania urządzeń i dodawania prostych zadań & enhancement & malgorza & closed & 10/19/11 \\ \hline
+\#333 & Integracja ERLRC & task & roman & closed & 10/19/11 \\ \hline
+\#331 & Zmniejszenie rozmiaru paczek z releasami generowanych przez rebara & enhancement & roman & closed & 09/27/11 \\ \hline
+\#328 & Problem z uruchomieniem releasu wygenerowanego rebarem & defect & tkowal & closed & 09/27/11 \\ \hline
+\#329 & Implementacja infrastruktury sesji zarządania urządzeniem na kliencie i serwerze & enhancement & roman & closed & 09/27/11 \\ \hline
+\#286 & Zapoznanie się z OTP Design Principles (application, release) oraz narzędziem rebar & task & roman & closed & 06/20/11 \\ \hline
+\#330 & Instalacja i integracja z systemem serwera FTP, implentacja prostego klienta FTP dla urządzenia. & enhancement & roman & closed & 09/27/11 \\ \hline
+\#332 & Mechanizm logowania & enhancement & szemek & closed & 10/18/11 \\ \hline
+\end{tabular}
+
+\section{Podział prac}
+W trakcie prac podzieliliśmy się na 2 podzespoły: Przemysław Dąbek i Małgorzata Wielgus zajmowali się front-endem, natomiast Roman Janusz i Tomasz Kowal zajmowali się backendem. Podział nie był sztywny i często pracowaliśmy wspólnie w czwórkę.
+
+\section{Spotkania z klientem}
+\subsection{Treść notatki z 2011-06-07}
+Zapoznać się:
+\begin{itemize}
+\item RPC w Erlangu \url{http://erldocs.com/R14B02/kernel/rpc.html}
+\item rebar \url{https://bitbucket.org/basho/rebar/wiki/Home}
+\item release, update aplikacji erlangowych
+\end{itemize}
+Do zrobienia:
+\begin{itemize}
+\item prototyp technologiczny (repozytorium, urządzenie mobilne, serwer http, komunikacja pomiędzy składowymi systemu)
+\item opracowanie harmonogramu
+\end{itemize}
+Pomysły rozbudowy funkcjonalności:
+\begin{itemize}
+\item GPS, Google Maps
+\item VM i aplikacja uruchamiane przy starcie systemu na urządzeniu mobilnym
+\end{itemize}
+\subsection{Treść notatki z 2011-09-29}
+W czasie spotkania klient ocenił nasze dotychczasowe postępy.
+
+Do zrobienia:
+\begin{itemize}
+\item integracja poszczególnych części projektu
+\item integracja systemu z menedżerami pakietów
+\end{itemize}
+
+\subsection{Treść notatki z 2011-10-28}
+W czasie spotkania odbyła się prezentacja prototypu
+
+Klient zgłosił następujące uwagi:
+\begin{itemize}
+  \item apt - dokończyć generator
+  \item apt - integracja z systemem aktualizacji
+  \item pobieranie pakietów z http - opcjonalnie
+  \item interfejs --- dokończenie
+    \begin{itemize}
+    \item edycja grupowa
+    \item zakończone zadania
+    \item stan - uruchomione aplikacje, wersje
+    \item MAC - identyfikacja
+    \end{itemize}
+\end{itemize}
+
+\end{document}

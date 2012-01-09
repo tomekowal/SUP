@@ -18,7 +18,8 @@
 
 \maketitle
 
-
+\tableofcontents
+\clearpage
 
 
 
@@ -95,13 +96,27 @@ Platforma:
 \end{itemize}
 
 \section{Koncepcja Architektury}
+\subsection{Kontekst działania systemu}
 
-\centerline{
-	% skalujemy 90%
+  \begin{figure}[htbp]
+    \centering
+	\scalebox{0.6}{
+		\includegraphics{context.png}
+	}
+        \caption{Diagram kontekstowy}
+  \end{figure}
+
+
+Deweloperzy dostarczają paczki menedżera pakietów \emph{apt} i umieszczają je na serwerze. Następnie administrator zleca aktualizację wielu urządzeń jednocześnie. Dalej system zleca menedżerowi pakietów aktualizację. Na podstawie zwróconego rezultatu, system prezentuje użytkownikowi stan poszczególnych urządzeń.
+
+\subsection{Wewnętrzna struktura systemu}
+  \begin{figure}
+    \centering
 	\scalebox{0.5}{
 		\includegraphics{scheme.png}
 	}
-}
+        \caption{Schemat architektury systemu}
+  \end{figure}
 
 Na diagramie prostokątem po lewej zaznaczono urządzenie mobilne. Działa na nim pewna dystrybucja linuxa. Uruchomiona jest maszyna wirtualna erlanga wraz z działającą aplikacją (aplikacjami). Dodatkowo powinien zostać uruchomiony klient naszej platformy.
 
@@ -162,6 +177,25 @@ Wraz z żądaniem połączenia można przesłać token. Klient przesyła ten tok
 \section{Szczegóły protokołu komunikacyjnego i sesji zarządzania}
 Połączenie nawiązywane jest za pomocą tcp (gen\_tcp). Przesyłane wiadomości są termami erlangowymi serializowanymi za pomocą funkcji \verb|term_to_binary/1|. Komunikację obejmującą jedno połączenie nazywamy sesją zarządzania.
 
+\subsection{Diagram komunikacji sesji zarzadzania}
+  \begin{figure}[htbp]
+    \centering
+	\scalebox{0.65}{
+		\includegraphics{session.png}
+	}
+        \caption{Diagram komunikacji sesji zarządzania}
+  \end{figure}
+
+Na diagramie przedstawiono komunikację pomiędzy trzema częściami systemu:
+\begin{itemize}
+\item Klientem zarządzającym na urządzeniu mobilnym
+\item Serwerem \emph{sup\_server\_management}
+\item Bazą danych na serwerze
+\end{itemize}
+
+Sesję zawsze rozpoczyna klient, który może znajdować się za NATem. W bazie przechowywana jest lista zadań, które użytkownik zaplanował dla danego urządzenia. Dzięki danym przesłanym przy inicjacji połączenia można zidentyfikować urządzenie. Jeżeli są jakieś zadania do wykonania, są one pobierane z bazy danych i przekazywane urządzeniu. Na podstawie zwróconego rezultatu podejmuje się decyzcję o zmianie statusu zadania.
+Jeżeli nie ma więcej zadań do wykonania, następuje zakończenie sesji.
+
 \subsection{Szczegóły przebiegu sesji z punktu widzenia urządzenia}
 Sesja zawsze inicjowana jest przez urządzenie. Może to nastąpić z kilku powodów:
 \begin{itemize}
@@ -189,14 +223,38 @@ W momencie, gdy lista zadań jest pusta, serwer wysyła informację o zakończen
 
 W przypadku zakończenia zadania niepowodzeniem, jest ono zostawiane na liście zadań do wykonania ze statusem "failed" i rozpoczynane jest wykonywanie kolejnego zadania na liście. Przy kolejnej sesji po raz kolejny serwer próbuje zlecić urządzeniu niewykonane zadania.
 
+\subsection{Cykl życia zadania \emph{job}}
+  \begin{figure}[htbp]
+    \centering
+	\scalebox{0.8}{
+		\includegraphics{job.png}
+	}
+        \caption{Cykl życia zadania}
+  \end{figure}
+
+Zadanie zostaje stworzone przez użytkownika systemu, który używa webowego interfejsu. Zadanie do wykonania zostaje zapisane w bazie ze statusem \emph{pending}. Kiedy urządzenie zgłasza się do serwera, serwer pobiera pierwsze zaplanowane zadanie i zmienia mu status na \emph{in\_progress}. Serwer wysyła zadanie do urządzenia i oczekuje na informację zwrotną. Jeżeli urządzenie odpowie, że zadanie powiodło się, jego status zmienia się na \emph{finished}. W przecwinym wypadku na \emph{failed}. Zadania, których wykonanie nie powiodło się pozostają w kolejce zadań do wykonania do czasu, kiedy użytkownik je usunie.
+
 \section{Baza danych}
+
+\subsection{Diagram bazy danych}
+  \begin{figure}[htbp]
+    \centering
+	\scalebox{0.35}{
+		\includegraphics{database.png}
+	}
+        \caption{Schemat bazy danych}
+  \end{figure}
 
 Baza danych (Mnesia) przechowuje stan systemu oraz jest punktem łączącym graficzny interfejs użytkownika z serwerem.
 
 W bazie zdefiniowano następujące rekordy:
 
 \begin{verbatim}
--record(job, {message, module, function, extra, status}).
+-record(job, {message,
+              module,
+              function,
+              extra,
+              status}).
 \end{verbatim}
 
 message :: wiadomość wysyłana do urządzenia opisująca czynność, którą ma wykonać
@@ -206,7 +264,8 @@ module, function :: funkcja na serwerze przyjmująca między innymi parametr ext
 status :: pending | in\_progress | failed, status wykonywanego zadania
 
 \begin{verbatim}
--record(release, {name, version}).
+-record(release, {name,
+                  version}).
 \end{verbatim}
 
 name :: nazwa pliku ze spakowanym releasem
@@ -214,17 +273,31 @@ name :: nazwa pliku ze spakowanym releasem
 version :: string opisujący wersję releasu
 
 \begin{verbatim}
--record(device, {identity :: nonempty_string(),
-                 last_contact :: nonempty_string(),
-                 releases :: [#release{}],
-                 running_applications :: [term()],
-                 ip :: nonempty_string(),
-                 jobs :: [#job{}],
-                 finished_jobs :: [#job{}],
-                 categories :: nonempty_string()
-                }
-       ).
+-record(device, {identity,
+                 last_contact,
+                 releases,
+                 running_applications,
+                 ip,
+                 jobs,
+                 finished_jobs,
+                 categories }).
 \end{verbatim}
+
+identity :: krotka zawierająca nazwę węzła oraz adres MAC urządzenia
+
+last\_contact :: data i godzina, kiedy ostatnio urządzenie łączyło się z serwerem
+
+releases :: lista zainstalowanych \emph{releasów}
+
+running\_applications :: lista działających na urządzeniu aplikacji Erlangowych
+
+ip :: adres ip urządzenia
+
+jobs :: lista zadań zaplanowanych dla urządzenia
+
+finished\_jobs :: lista ukończonych zadań trzymana jako historia
+
+categories\_ :: lista kategorii, do których należy urządzenie
 
 Kiedy urządzenie rozpocznie sesję, serwer pobiera pierwszy element z listy jobów i zmienia jego status z pending na in\_progress. Następnie job jest wykonywany. Jeśli job wykona się do końca zostaje usunięty z początku listy. W przeciwnym wypadku jego status zmienia się na failed.
 
@@ -428,5 +501,8 @@ prerm remove
 \end{verbatim}
 
 Skrypt ten zatrzymuje węzeł (jeśli działa) oraz usuwa zawartość katalogu \texttt{releases}.
+\clearpage
+\listoffigures
+
 
 \end{document}

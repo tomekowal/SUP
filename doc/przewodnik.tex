@@ -79,6 +79,18 @@ Pierwszy etap zakończył się w czerwcu 2011 roku. Pracę nad drugim zaczęliś
 
 \section{Wyniki projektu}
 
-Wynikiem projektu jest działające oprogramowanie wraz z dokumentacją. System został przetestowany na urządzeniu beagleboard. W dalszej kolejności należy przetestować działanie systemu na większej liczbie urządzeń. Można spróbować dodać obsługę innych menedżerów pakietów (\emph{yum}, \emph{port}). Należy również popracować nad bezpieczeństwem systemu. W tej chwili pozwala on podłączać się do systemu każdemu urządzeniu, które zostanie poprawnie skonfigurowane (brak autoryzacji). Pozwala również na aktualizację dowolnej aplikacji działającej na urządzeniu klienckim, a nie tylko tych zarządzanych za pomocą systemu.
+Wynikiem projektu jest działające oprogramowanie wraz z dokumentacją. Oprogramowanie składa się z dwóch podstawowych części:
+\begin{itemize}
+\item serwera zarządzającego oraz
+\item aplikacji klienckiej.
+\end{itemize}
+ Serwer zarządzający po zainstalowaniu i uruchomieniu udostępnia repozytorium pakietów i obsługuje zgłaszające się urządzenia. Dzięki użyciu lekkich wątków erlangowych jest w stanie obsłużyć wiele urządzeń jednocześnie. Serwer udostępnia również webowy interfejs użytkownika dla administratora systemu umożliwiający operacje niezbędne z punktu widzenia zarządzania oprogramowaniem na dużej liczbie urządzeń. Pozwala on na przeglądanie stanów urządzeń i zainstalowanych na nich wersji aplikacji, grupowanie urządzeń oraz zlecanie aktualizacji urządzeniom.
+
+Aplikację kliencką można zawrzeć w dowolnym \emph{releasie} erlangowym, co zapewnia możliwość prostego wykorzystania systemu do różnych zastosowań, w tym na urządzeniach mobilnych. System jest w pełni zintegrowany z menedżerem pakietów \emph{apt}. Można tworzyć paczki z programami erlangowymi w taki sposób, że poszczególne aplikacje znajdują się w osobnych pakietach, co jest dużą zaletą w stosunku do ręcznej aktualizacji, gdyż pobierane są jedynie paczki zawierające nowe wersje aplikacji. System został przetestowany na urządzeniu \emph{beagleboard} z systemem operacyjnym \emph{debian}.
+
+System został zaprojektowany z myślą o łatwości instalacji i użytkowania, a także rozwoju. Serwer zarządzający może zostać zainstalowany w dowolnym systemie operacyjnym z \emph{Erlangiem}. Instalacja odbywa się w jednym kroku, automatycznie zostają pobrane wszystkie zależności. Webowy interfejs użytkownika z natury może być obsługiwany z dowolnego urządzenia z przeglądarką internetową. Aktualnie system docelowy, na którym działa aplikacja kliencka musi być wyposażony w menedżer pakietów \emph{apt}. Aplikację w systemie klienta można również w prosty sposób zainstalować w postaci paczki.
+
+\section{Możliwości dalszego rozwoju}
+W dalszej kolejności można popracować nad integracją z pozostałymi menedżerami pakietów, takimi jak \emph{yum}, \emph{port}, \emph{opkg}. Protokół komunikacyjny jest na tyle elastyczny, że użytkownik w prosty sposób może definiować własne zadania, które z pomocą systemu zostaną przydzielone do wykonania na wielu urządzeniach. Kolejnym krokiem jest poprawa bezpieczeństwa przez zaimplementowanie autoryzacji zgłaszających się urządzeń oraz serwera, a także szyfrowania przesyłanych wiadomości. Aby umożliwić podgląd stanu systemu w dowolnej chwili warto dopisać aplikację na \emph{Androida} i \emph{iOSa}, które udostępniałyby te same funkcjonalności, co interfejs webowy. Dodatkowo wzbogaciłoby również dodanie dodatkowych informacji na temat urządzeń - na przykład położenia geograficznego.
 
 \end{document}

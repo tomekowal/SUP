@@ -18,7 +18,8 @@
 
 \maketitle
 
-
+\tableofcontents
+\clearpage
 
 
 
@@ -95,64 +96,28 @@ Platforma:
 \end{itemize}
 
 \section{Koncepcja Architektury}
-\subsection{Przegląd technologii do zastosowania w platformie}
-\subsubsection{Technologia do stworzenia graficznego interfejsu użytkownika}
-Pod uwagę brano:
-\begin{itemize}
-\item Ruby on Rails z połączeniem Erlectricity
-\item Yaws
-\item Mochiweb
-\item Webmachine
-\item Nitrogen
-\item Zotonic – CMS i framework
-\end{itemize}
+\subsection{Kontekst działania systemu}
 
-RoR: Według przykładów najpierw uruchamiany był proces erlanga, który dopiero wywoływał program w Rubym i dopiero wtedy zachodziła komunikacja. Nie można jednym procesem erlangowym dopiąć się do jednej klasy aplikacji w Ruby on Rails.
+  \begin{figure}[htbp]
+    \centering
+	\scalebox{0.6}{
+		\includegraphics{context.png}
+	}
+        \caption{Diagram kontekstowy}
+  \end{figure}
 
-Yaws: Serwer napisany całkowicie w Erlangu. Tworzenie interfejsu odbywa się w specjalnym dialekcie eHTML. Wydaje się być najlepszym rozwiązaniem.
 
-Mochiweb: jest narzędziem do budowania własnych lekkich serwerów http. Zbudowanie własnego serwera od zera dodałoby niepotrzebny dodatkowy stopień do złożoności problemu.
+Deweloperzy dostarczają paczki menedżera pakietów \emph{apt} i umieszczają je na serwerze. Następnie administrator zleca aktualizację wielu urządzeń jednocześnie. Dalej system zleca menedżerowi pakietów aktualizację. Na podstawie zwróconego rezultatu, system prezentuje użytkownikowi stan poszczególnych urządzeń.
 
-Webmachine: Zestaw narzędzi do tworzenia web serwisów opartych o technologię REST. Prawdopodobnie nie będzie nam potrzebny.
-
-Nitrogen: Jest to framework do tworzenia aplikacji webowych w erlangu. Do tego potrzebny byłby jeszcze serwer.
-
-Zotonic: Framework i CMS w erlangu. Aby dopisać obsługę serwera trzeba napisać dodatkowe moduły i poznać jego strukturę.
-
-\subsubsection{Komunikacja między urządzeniem zdalnym, a głównym serwerem platformy:}
-\begin{itemize}
-\item wywoływanie poleceń przez SSH
-\item komunikacja przez socket TCP
-\item komunikacja między węzłami sieci erlanga
-\item web service
-\end{itemize}
-
-SSH: Połączenie może być w każdej chwili zrywane, co może skutkować nieprzewidywalnym zachowaniem. Wymaga również zmian konfiguracji w systemie operacyjnym zdalnego urządzenia (użytkownik, klucz, plik sudoers).
-
-TCP: Rozwiązanie o najmniejszym narzucie komunikacyjnym. Łatwe do obsłużenia w erlangu za pomocą gen\_tcp. Wymagana samodzielna obsługa zrywanych połączeń, zaprojektowanie własnego formatu wiadomości. Wydaje się być najlepszym rozwiązaniem.
-
-Węzły sieci erlanga: Po połączeniu z danym urządzeniem połączenie jest stale utrzymywane, co nie jest pożądane (ani nawet możliwe) w naszym przypadku.
-
-Web Serwisy: Powodują duży narzut komunikacyjny, a ponieważ zakładamy dużą liczbę urządzeń, chcieliśmy tego uniknąć.
-
-\subsubsection{Język programowania do implementacji klienta oraz serwera}
-W związku z tym, że wybraliśmy komponenty, które są napisane w erlangu, to aby uniknąć problemów na styku różnych technologii, postanowiliśmy napisać zarówno klienta, jak i serwer w erlangu.
-
-\subsubsection {Wybór bazy danych}
-\begin{itemize}
-\item mnesia
-\item MySQL
-\item ewentualnie inne relacyjne bazy danych
-\end{itemize}
-
-\centerline{
-	% skalujemy 90%
+\subsection{Wewnętrzna struktura systemu}
+  \begin{figure}
+    \centering
 	\scalebox{0.5}{
 		\includegraphics{scheme.png}
 	}
-}
+        \caption{Schemat architektury systemu}
+  \end{figure}
 
-\subsection{Opis diagramu}
 Na diagramie prostokątem po lewej zaznaczono urządzenie mobilne. Działa na nim pewna dystrybucja linuxa. Uruchomiona jest maszyna wirtualna erlanga wraz z działającą aplikacją (aplikacjami). Dodatkowo powinien zostać uruchomiony klient naszej platformy.
 
 Po prawej stronie znajdują się (od góry) administrator korzystający z webowego interfejsu, serwer HTTP (mochiweb), backend platformy zaimplementowany w erlangu, baza danych i repozyterium pakietów.
@@ -212,6 +177,25 @@ Wraz z żądaniem połączenia można przesłać token. Klient przesyła ten tok
 \section{Szczegóły protokołu komunikacyjnego i sesji zarządzania}
 Połączenie nawiązywane jest za pomocą tcp (gen\_tcp). Przesyłane wiadomości są termami erlangowymi serializowanymi za pomocą funkcji \verb|term_to_binary/1|. Komunikację obejmującą jedno połączenie nazywamy sesją zarządzania.
 
+\subsection{Diagram komunikacji sesji zarzadzania}
+  \begin{figure}[htbp]
+    \centering
+	\scalebox{0.65}{
+		\includegraphics{session.png}
+	}
+        \caption{Diagram komunikacji sesji zarządzania}
+  \end{figure}
+
+Na diagramie przedstawiono komunikację pomiędzy trzema częściami systemu:
+\begin{itemize}
+\item Klientem zarządzającym na urządzeniu mobilnym
+\item Serwerem \emph{sup\_server\_management}
+\item Bazą danych na serwerze
+\end{itemize}
+
+Sesję zawsze rozpoczyna klient, który może znajdować się za NATem. W bazie przechowywana jest lista zadań, które użytkownik zaplanował dla danego urządzenia. Dzięki danym przesłanym przy inicjacji połączenia można zidentyfikować urządzenie. Jeżeli są jakieś zadania do wykonania, są one pobierane z bazy danych i przekazywane urządzeniu. Na podstawie zwróconego rezultatu podejmuje się decyzcję o zmianie statusu zadania.
+Jeżeli nie ma więcej zadań do wykonania, następuje zakończenie sesji.
+
 \subsection{Szczegóły przebiegu sesji z punktu widzenia urządzenia}
 Sesja zawsze inicjowana jest przez urządzenie. Może to nastąpić z kilku powodów:
 \begin{itemize}
@@ -239,14 +223,38 @@ W momencie, gdy lista zadań jest pusta, serwer wysyła informację o zakończen
 
 W przypadku zakończenia zadania niepowodzeniem, jest ono zostawiane na liście zadań do wykonania ze statusem "failed" i rozpoczynane jest wykonywanie kolejnego zadania na liście. Przy kolejnej sesji po raz kolejny serwer próbuje zlecić urządzeniu niewykonane zadania.
 
+\subsection{Cykl życia zadania \emph{job}}
+  \begin{figure}[htbp]
+    \centering
+	\scalebox{0.8}{
+		\includegraphics{job.png}
+	}
+        \caption{Cykl życia zadania}
+  \end{figure}
+
+Zadanie zostaje stworzone przez użytkownika systemu, który używa webowego interfejsu. Zadanie do wykonania zostaje zapisane w bazie ze statusem \emph{pending}. Kiedy urządzenie zgłasza się do serwera, serwer pobiera pierwsze zaplanowane zadanie i zmienia mu status na \emph{in\_progress}. Serwer wysyła zadanie do urządzenia i oczekuje na informację zwrotną. Jeżeli urządzenie odpowie, że zadanie powiodło się, jego status zmienia się na \emph{finished}. W przecwinym wypadku na \emph{failed}. Zadania, których wykonanie nie powiodło się pozostają w kolejce zadań do wykonania do czasu, kiedy użytkownik je usunie.
+
 \section{Baza danych}
+
+\subsection{Diagram bazy danych}
+  \begin{figure}[htbp]
+    \centering
+	\scalebox{0.35}{
+		\includegraphics{database.png}
+	}
+        \caption{Schemat bazy danych}
+  \end{figure}
 
 Baza danych (Mnesia) przechowuje stan systemu oraz jest punktem łączącym graficzny interfejs użytkownika z serwerem.
 
 W bazie zdefiniowano następujące rekordy:
 
 \begin{verbatim}
--record(job, {message, module, function, extra, status}).
+-record(job, {message,
+              module,
+              function,
+              extra,
+              status}).
 \end{verbatim}
 
 message :: wiadomość wysyłana do urządzenia opisująca czynność, którą ma wykonać
@@ -256,7 +264,8 @@ module, function :: funkcja na serwerze przyjmująca między innymi parametr ext
 status :: pending | in\_progress | failed, status wykonywanego zadania
 
 \begin{verbatim}
--record(release, {name, version}).
+-record(release, {name,
+                  version}).
 \end{verbatim}
 
 name :: nazwa pliku ze spakowanym releasem
@@ -264,17 +273,31 @@ name :: nazwa pliku ze spakowanym releasem
 version :: string opisujący wersję releasu
 
 \begin{verbatim}
--record(device, {identity :: nonempty_string(),
-                 last_contact :: nonempty_string(),
-                 releases :: [#release{}],
-                 running_applications :: [term()],
-                 ip :: nonempty_string(),
-                 jobs :: [#job{}],
-                 finished_jobs :: [#job{}],
-                 categories :: nonempty_string()
-                }
-       ).
+-record(device, {identity,
+                 last_contact,
+                 releases,
+                 running_applications,
+                 ip,
+                 jobs,
+                 finished_jobs,
+                 categories }).
 \end{verbatim}
+
+identity :: krotka zawierająca nazwę węzła oraz adres MAC urządzenia
+
+last\_contact :: data i godzina, kiedy ostatnio urządzenie łączyło się z serwerem
+
+releases :: lista zainstalowanych \emph{releasów}
+
+running\_applications :: lista działających na urządzeniu aplikacji Erlangowych
+
+ip :: adres ip urządzenia
+
+jobs :: lista zadań zaplanowanych dla urządzenia
+
+finished\_jobs :: lista ukończonych zadań trzymana jako historia
+
+categories\_ :: lista kategorii, do których należy urządzenie
 
 Kiedy urządzenie rozpocznie sesję, serwer pobiera pierwszy element z listy jobów i zmienia jego status z pending na in\_progress. Następnie job jest wykonywany. Jeśli job wykona się do końca zostaje usunięty z początku listy. W przeciwnym wypadku jego status zmienia się na failed.
 
@@ -478,5 +501,8 @@ prerm remove
 \end{verbatim}
 
 Skrypt ten zatrzymuje węzeł (jeśli działa) oraz usuwa zawartość katalogu \texttt{releases}.
+\clearpage
+\listoffigures
+
 
 \end{document}

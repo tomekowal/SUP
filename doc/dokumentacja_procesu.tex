@@ -69,20 +69,26 @@ W trakcie prac podzieliliśmy się na 2 podzespoły: Przemysław Dąbek i Małgo
 \subsection{Prace wykonane przez poszczególne osoby}
 
 \begin{itemize}
-\item Roman Janusz
-\begin{itemize}
-\item Dokładne zapoznanie się z wzorcami OTP tworzenia oprogramowania w Erlangu - w szczególności \emph{application} i \emph{release}
-\item Zaprojektowanie ogólnej struktury oprogramowania przeznaczonego na urządzenia zdalne. Opracowanie modelu rozwoju oprogramowania z użyciem narzęcia \emph{rebar} i dodatkowych skryptów.
-\item Dokładne zapoznanie się ze strukturą pakietów \emph{deb}, działaniem menedżera pakietów \emph{dpkg}/\emph{apt} oraz metodami tworzenia pakietów i instalacji repozytorium. Rozpoznanie możliwości paczkowania oprogramowania tworzonego w erlangu z zachowaniem możliwości wykonywania hot-upgrade podczas aktualizacji pakietu.
-\item Zaprojektowanie sposobu dekompozycji erlangowego release'u w zestaw pakietów \emph{deb}. Stworzenie ogólnych skryptów (debian maintainer scripts) używanych podczas instalacji, aktualizacji i usuwania pakietów. Obsługa mechanizmu hot-upgrade podczas aktualizacji.
-\item Implementacja skryptów użytkownika do tworzenia pakietów \emph{deb} na podstawie erlangowego release'u wraz z ich konfiguracją.
-\item Integracja mechanizmu menedżera pakietów z platformą do automatycznych aktualizacji.
-\item Dokumentacja użytkownika i techniczna dotycząca sposobu wykorzystania menedżera pakietów \emph{deb} w projekcie.
-\end{itemize}
+  \item Roman Janusz
+  \begin{itemize}
+    \item Dokładne zapoznanie się z wzorcami OTP tworzenia oprogramowania w Erlangu - w szczególności \emph{application} i \emph{release}
+    \item Zaprojektowanie ogólnej struktury oprogramowania przeznaczonego na urządzenia zdalne. Opracowanie modelu rozwoju oprogramowania z użyciem narzęcia \emph{rebar} i dodatkowych skryptów.
+    \item Dokładne zapoznanie się ze strukturą pakietów \emph{deb}, działaniem menedżera pakietów \emph{dpkg}/\emph{apt} oraz metodami tworzenia pakietów i instalacji repozytorium. Rozpoznanie możliwości paczkowania oprogramowania tworzonego w erlangu z zachowaniem możliwości wykonywania hot-upgrade podczas aktualizacji pakietu.
+    \item Zaprojektowanie sposobu dekompozycji erlangowego release'u w zestaw pakietów \emph{deb}. Stworzenie ogólnych skryptów (debian maintainer scripts) używanych podczas instalacji, aktualizacji i usuwania pakietów. Obsługa mechanizmu hot-upgrade podczas aktualizacji.
+    \item Implementacja skryptów użytkownika do tworzenia pakietów \emph{deb} na podstawie erlangowego release'u wraz z ich konfiguracją.
+    \item Integracja mechanizmu menedżera pakietów z platformą do automatycznych aktualizacji.
+    \item Dokumentacja użytkownika i techniczna dotycząca sposobu wykorzystania menedżera pakietów \emph{deb} w projekcie.
+  \end{itemize}
 
-\item Tomasz Kowal
-\item Przemysław Dąbek
-\item Małgorzata Wielgus
+  \item Tomasz Kowal
+  \begin{itemize}
+    \item Testowanie możliwości serwera Mochiweb (ostatecznie użytego jako serwer http).
+    \item Zbadanie różnych możliwości komunikacji klienta i backendu (\emph{gen\_tcp}, \emph{gen\_rcp}, użycie \emph{JSON}).
+    \item Implementacja serwera przyjmującego zgłaszające się urządzenia klienckie.
+    \item Szkielet niskopoziomowej komunikacji.
+  \end{itemize}
+  \item Przemysław Dąbek
+  \item Małgorzata Wielgus
 \end{itemize}
 
 \section{Spotkania z klientem}

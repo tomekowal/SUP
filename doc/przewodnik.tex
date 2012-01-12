@@ -77,7 +77,43 @@ W trakcie prac podzieliliśmy się na dwa zespoły:
 Prace zostały podzielone na dwa etapy. W pierwszym dokonaliśmy przeglądu potrzebnych technologii oraz zbudowaliśmy prototypy. W drugim zaimplementowaliśmy właściwą funkcjonalność.
 Pierwszy etap zakończył się w czerwcu 2011 roku. Pracę nad drugim zaczęliśmy w trakcie wakacji 2011 roku.
 
-\section{Wyniki projektu}
+\subsection*{Prace wykonane przez poszczególne osoby}
+
+\begin{itemize}
+  \item Roman Janusz
+  \begin{itemize}
+    \item Dokładne zapoznanie się z wzorcami OTP tworzenia oprogramowania w Erlangu - w szczególności \emph{application} i \emph{release}
+    \item Zaprojektowanie ogólnej struktury oprogramowania przeznaczonego na urządzenia zdalne. Opracowanie modelu rozwoju oprogramowania z użyciem narzęcia \emph{rebar} i dodatkowych skryptów.
+    \item Dokładne zapoznanie się ze strukturą pakietów \emph{deb}, działaniem menedżera pakietów \emph{dpkg}/\emph{apt} oraz metodami tworzenia pakietów i instalacji repozytorium. Rozpoznanie możliwości paczkowania oprogramowania tworzonego w erlangu z zachowaniem możliwości wykonywania hot-upgrade podczas aktualizacji pakietu.
+    \item Zaprojektowanie sposobu dekompozycji erlangowego release'u w zestaw pakietów \emph{deb}. Stworzenie ogólnych skryptów (debian maintainer scripts) używanych podczas instalacji, aktualizacji i usuwania pakietów. Obsługa mechanizmu hot-upgrade podczas aktualizacji.
+    \item Implementacja skryptów użytkownika do tworzenia pakietów \emph{deb} na podstawie erlangowego release'u wraz z ich konfiguracją.
+    \item Integracja mechanizmu menedżera pakietów z platformą do automatycznych aktualizacji.
+    \item Dokumentacja użytkownika i techniczna dotycząca sposobu wykorzystania menedżera pakietów \emph{deb} w projekcie.
+  \end{itemize}
+
+  \item Tomasz Kowal
+  \begin{itemize}
+    \item Testowanie możliwości serwera Mochiweb (ostatecznie użytego jako serwer http).
+    \item Zbadanie różnych możliwości komunikacji klienta i backendu (\emph{gen\_tcp}, \emph{gen\_rcp}, użycie \emph{JSON}).
+    \item Implementacja serwera przyjmującego zgłaszające się urządzenia klienckie.
+    \item Szkielet niskopoziomowej komunikacji.
+  \end{itemize}
+  \item Przemysław Dąbek
+    \begin{itemize}
+      \item Przygotowanie interfejsu do operacji na bazie danych (mnesia).
+      \item Zaprojektowanie webowego interfejsu użytkownika oraz logo.
+      \item Implementacja logiki odpowiedzialnej za przetwarzanie żądań HTTP.
+      \item Dodanie mechanizmu logowania (lager).
+    \end{itemize}
+  \item Małgorzata Wielgus
+    \begin{itemize}
+      \item Stworzenie prototypu interfejsu graficznego przy użyciu serwera \emph{Yaws}.
+      \item Integracja backendu i frontendu serwera zarządzającego.
+      \item Rozszerzenie interfejsu graficznego o funkcjonalność zlecania zadań urządzeniom.
+      \item Testowanie różnych scenariuszy zakończenia \emph{joba}.
+    \end{itemize}
+\end{itemize}
+
 
 \section{Wyniki projektu}
 
@@ -89,7 +125,7 @@ Aplikację kliencką można zawrzeć w dowolnym \emph{releasie} erlangowym, co z
 
 Platforma została zaprojektowana z myślą o łatwości instalacji i użytkowania, a także rozwoju. Serwer zarządzający może zostać zainstalowany w dowolnym systemie operacyjnym z \emph{Erlangiem}. Instalacja odbywa się w jednym kroku, automatycznie zostają pobrane wszystkie zależności. Webowy interfejs użytkownika z natury może być obsługiwany z dowolnego urządzenia z przeglądarką internetową. Aktualnie system docelowy, na którym działa aplikacja kliencka musi być wyposażony w menedżer pakietów \emph{apt} oraz naturalnie emph{Erlanga}. Aplikację w systemie klienta można również w prosty sposób zainstalować w postaci paczki. System został przetestowany na urządzeniu \emph{beagleboard} z systemem operacyjnym \emph{debian}.
 
-\section{Możliwości dalszego rozwoju}
+\subsection*{Możliwości dalszego rozwoju}
 W dalszej kolejności można popracować nad integracją z pozostałymi menedżerami pakietów, takimi jak \emph{yum}, \emph{port}, \emph{opkg}. Protokół komunikacyjny jest na tyle elastyczny, że użytkownik w prosty sposób może definiować własne zadania, które z pomocą systemu zostaną przydzielone do wykonania na wielu urządzeniach. Kolejnym krokiem jest poprawa bezpieczeństwa przez zaimplementowanie autoryzacji zgłaszających się urządzeń oraz serwera, a także szyfrowania przesyłanych wiadomości. Aby umożliwić podgląd stanu systemu w dowolnej chwili warto dopisać aplikację na \emph{Androida} i \emph{iOSa}, które udostępniałyby te same funkcjonalności, co interfejs webowy. Dodatkowo wzbogaciłoby również dodanie dodatkowych informacji na temat urządzeń - na przykład położenia geograficznego.
 
 \end{document}

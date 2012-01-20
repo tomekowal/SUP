@@ -1,0 +1,689 @@
+% ---------------------------------------------------------------------
+%
+% Plik:     csagh.sty          [LaTeX Document style: Computer Science]
+%
+% Użycie:   \documentclass[10pt]{article}
+%           \usepackage{csagh}    % włączenie niniejszego stylu
+%           \usepackage{...}      % ewentualnie inne, konieczne pakiety
+%            ...
+%
+% Założenia:
+%  * rozmiary kolumny strony: 130x190mm (kolumna strony zawiera
+%    tekst zasadniczy --- bez nagłówków żywej paginy oraz numeracji
+%    stron)
+%  * zakładamy, iż językiem publikacji może być zarówno język
+%    polski jak i angielski
+%  * użycie makra \author{...} dla złożenia nazwisk autorów artykułu
+%  * użycie makr \titlePL{...} i titleEN{...} --- dla złożenia
+%    tytułu głównego odpowiednio w języku polskim i angielskim
+%  * użycie makra \affiliation{...} dla złożenia adresów autorów
+%  * użycie środowisk \begin{streszczenie}...\end{streszczenie}
+%    oraz \begin{abstract}...\begin{abstract} do złożenia
+%    streszczeń odpowiednio w języku polskim i angielskim
+%  * użycie makr \slowakluczowe{...} i \keywords{...} dla podania
+%    słów kluczowych artykułu odpowiednio w obu językach
+%    [Uwaga --- założono że podanie słów kluczowych w obu językach
+%     jest obowiązkowe!]
+%  * formatowanie śródtytułów: numerowane lub nienumerowane,
+%    wyrównane do lewego brzegu kolumny, składane pogrubionym krojem
+%    pisma, o wielkości zależnej od poziomu zagnieżdżenia
+%  * autor powinie przygotować swój artykuł, na wzór wydawnict typu
+%    ,,camera ready'' --- należy zwrócić uwagę na zalecenia jakie
+%    nakłada Wydawnictwo Naukowo-Dydaktyczne AGH (czytelność i należyta
+%    estetyka ilustracji, właściwa kolejność opisów bibliograficznych,
+%    właściwy układ typograficzny)
+%
+% Pakiety jakie wykorzystuje niniejszy styl, tj.:
+%   ifthen.sty,
+%   exscale.sty,
+%   array.sty,
+%   theorem.sty
+% --- są pakietami rozpowszechnianymi w podstawowej dystrybucji LaTeX2e.
+% Pozostałe (np amsmath.sty, amsthm.sty, amssymb.sty graphicx.sty)
+% mogą być dołączone w zależności od potrzeb do pliku głównego.
+% Wszyskie pakiety dostępne są poprzez Internetowe zasoby serwerów FTP,
+% m.in.:
+%   ftp://ftp.tex.ac.uk/tex-archive/macros/latex/required/
+%   ftp://ftp.pg.gda.pl/pub/TeX/macros/latex/required/
+%   ftp://ftp.agh.edu.pl/pub/tex/macros/latex/required/
+%
+% Należy pobrać i zainstalować pakiety z katalogów graphics/ i amslatex/.
+%
+% W przypadku artykułów, zawierających fragmenty tekstu pisane
+% w języku polskim, zachodzi uzasadnione przypuszczenie ;-) iż wystąpią
+% tam polskie diakrytyki. Celem prawidłowego tworzenia dokumentów
+% LaTeX-owych z użyciem polskich znaków (m.in. prawidłowe typograficznie
+% litery narodowe, odpowiednie znaki zgodne z polską tradycją drukarskę),
+% konieczne jest włączenie pakietu polski.sty oraz ewentualne doinstalowanie
+%  polskich fontów TeX-owych Computer Modern. Dostępność pakietu i fontôw
+% --- w archiwach jak wyżej, lub w dystrybucjach TeXLive.
+% Stosowny opis instalacji i prawidłowego użycia, na stronach
+% internetowych WWW:
+%   http://www.gust.org.pl/DOC/platex.html
+%   http://www.mimuw.edu.pl/~wolinski/TeX.html
+%
+% ----------------------------------------------------------------------------
+%
+% Przykład użycia niniejszego pliku stylu:
+%
+%  \documentclass[10pt]{article}
+%  \usepackage{tabularx}
+%  \usepackage[pl|en]{csagh}
+%
+%   \begin{document}
+%   \begin{opening}
+%
+%  \title{Tytuł referatu}
+%  \author{Autor/Autorzy\affiliation{Instytucja, adres, e-mail autora/autorów)}}
+%
+%  \begin{streszczenie}
+%    Jak sama nazwa wskazuje... streszczenie polskie.
+%  \slowakluczowe{...}
+%  \end{streszczenie}
+%
+%  \begin{abstract}
+%    Jak sama nazwa wskazuje... streszczenie angielskie.
+%  \keywords{...}
+%  \end{abstract}
+%   \end{opening}
+%
+%    ...
+%    Zasadniczy tekst referatu.
+%    ...
+%  \end{document}
+%
+% Referat może mieć również kilku autorów, będących przedstawicielami
+% różnych instytucji:
+%
+%  \documentclass[10pt]{article}
+%  \usepackage{tabularx}
+%  \usepackage[pl|en]{csagh}
+%
+%   \begin{document}
+%   \begin{opening}
+%
+%  \author{Autor\affiliation{Instytucja, adres, e-mail pierwszego autora},
+%    Autor\affiliation{Instytucja, adres, e-mail drugiego autora},
+%    ...}
+%  \title{Tytul referatu}
+%
+%  \begin{streszczenie}
+%    Jak sama nazwa wskazuje... streszczenie polskie.
+%  \slowakluczowe{...}
+%  \end{streszczenie}
+%
+%  \begin{abstract}
+%    Jak sama nazwa wskazuje... streszczenie angielskie.
+%  \keywords{...}
+%  \end{abstract}
+%   \end{opening}
+%
+%    ...
+%    Zasadniczy tekst referatu.
+%    ...
+%  \end{document}
+%
+%
+% Autor:   Jacek Kmiecik     (jk@pretext.com.pl)
+% Copyr.:  preTeXt           http://www.pretext.com.pl,
+%                            http://www.kmiecik.com.pl
+%
+% Date:    v0.1  15.05 2004
+%          v0.2  30.06.2004
+%          v0.3   3.07.2004
+%          v0.4   5.06.2005
+%          v0.5  20.10.2005
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\NeedsTeXFormat{LaTeX2e}% LaTeX 2.09 can't be used (nor non-LaTeX)
+\ProvidesPackage {csagh}%
+    [2005/10/20 v0.5 LaTeX style: Computer Science; copyr. d(JK)]
+
+\RequirePackage{ifthen}
+\RequirePackage{exscale}
+\RequirePackage{array}
+\RequirePackage{theorem}
+
+\newboolean{pl@language}
+\DeclareOption{pl}{\setboolean{pl@language}{true}}
+\DeclareOption{en}{\setboolean{pl@language}{false}}
+\ExecuteOptions{pl}
+\ProcessOptions
+
+\AtBeginDocument{%
+  \ifthenelse{\boolean{pl@language}}
+    {\RequirePackage[plmath]{polski}}
+    {\RequirePackage[nomathsymbols]{polski}
+     \selecthyphenation{english}
+     }
+  \InputIfFileExists{cs_jk.cfg}%
+    {\typeout{^^J \space[Lokala konfiguracja... Computer Sciencie]^^J}}%
+    {\typeout{^^J \space[Publiczna konfiguracja... Computer Sciencie]^^J}%
+     \let\@head@fik\@empty}%
+  \ifthenelse{\boolean{pl@language}}%
+   {%
+    \def\nam@theorem     {Twierdzenie}
+    \def\nam@definition  {Definicja}
+    \def\nam@lemma       {Lemat}
+    \def\nam@corollary   {Wniosek}
+    \def\nam@proposition {Stwierdzenie}
+    \def\nam@remark      {Uwaga}
+    \def\nam@proof       {Dowód}
+    \def\nam@example     {Przykład}
+    \def\tablename       {Tabela}
+    \def\figurename      {Rys.}
+    \def\refname         {Literatura}
+    \def\ack@name        {Podziękowania}
+   }
+   {%
+    \def\nam@theorem     {Theorem}
+    \def\nam@definition  {Definition}
+    \def\nam@lemma       {Lemma}
+    \def\nam@corollary   {Corollary}
+    \def\nam@proposition {Proposition}
+    \def\nam@remark      {Remark}
+    \def\nam@proof       {Proof}
+    \def\nam@example     {Example}
+    \def\tablename       {Table}
+    \def\figurename      {Fig.}
+    \def\refname         {References}
+    \def\ack@name        {Acknowledgements}
+   }
+  }
+
+\setlength{\paperwidth}      {210mm}
+\setlength{\paperheight}     {297mm}
+\setlength{\textheight}      {190mm}
+\setlength{\textwidth}       {130mm}
+
+\setlength{\topmargin}       {-21mm}
+\setlength{\headheight}      {8.4mm}
+\setlength{\headsep}        {17.5mm}
+\setlength{\topskip}           {0mm}
+\setlength{\footskip}       {52.5mm} % {27.5mm}
+
+\setlength{\oddsidemargin}  {14.9mm}
+\setlength{\evensidemargin} {14.9mm}
+\setlength{\marginparwidth}    {0mm}
+\setlength{\marginparsep}      {0mm}
+\setlength{\leftskip}          {0mm}
+\setlength{\rightskip}         {0mm}
+\setlength{\parskip}         {1.5pt plus1pt minus.75pt}
+\setlength{\parindent}        {20pt}
+\setlength{\leftmargini}      {\parindent}
+
+\setlength{\columnseprule}     {0pt}
+
+\renewcommand{\baselinestretch}{1.05}
+\widowpenalty 10000
+\clubpenalty  10000
+\sloppy
+\flushbottom
+
+%
+% Względnie lepsze położenie ,,float-ów'' na stronach...
+%
+\setcounter     {topnumber}              {3}   %% {2} --- orginal
+\renewcommand   {\topfraction}           {.95} %% {.7}
+\setcounter     {bottomnumber}           {0}   %% {1}
+\renewcommand   {\bottomfraction}        {.3}  %% {.3}
+\setcounter     {totalnumber}            {3}   %% {3}
+\renewcommand   {\textfraction}          {.1}  %% {.2}
+\renewcommand   {\floatpagefraction}     {.75} %% {.5}
+\setcounter     {dbltopnumber}           {2}   %% {2}
+\renewcommand   {\dbltopfraction}        {.8}  %% {.7}
+\renewcommand   {\dblfloatpagefraction}  {.8}  %% {.5}
+
+\newcommand\paginefont{\normalfont\small\ttfamily}
+\newcommand{\h@rule}{\rule[11pt]{\textwidth}{.3pt}}
+
+\newcommand{\ps@CSdraft}{%
+  \renewcommand{\@oddhead} {\@head@fik}% \@empty}%
+  \renewcommand{\@evenhead}{\@head@fik}% \@empty}%
+  \renewcommand{\@oddfoot} {\rightline{\bottompage}\llap{\h@rule}}%
+  \renewcommand{\@evenfoot}{\rightline{\bottompage}\llap{\h@rule}}%
+  }
+
+\newcommand\bottompage{\paginefont
+    \today\qquad{str.\space\thepage/\pageref{LastPage}}}
+
+\pagestyle{CSdraft}
+          % {empty}
+          % {plain}
+
+% ---
+
+\def\titl@form@T{\fontsize{13pt}{15pt}\sffamily\bfseries}
+\def\titl@form@B{\fontsize{13pt}{15pt}\sffamily}
+\gdef\titleEN #1{\def\title@EN{\bgroup\titl@format\MakeUppercase{#1}\par\egroup}}
+\gdef\tytulPL #1{\def\title@PL{\bgroup\titl@format\MakeUppercase{#1}\par\egroup}}
+\gdef\author  #1{\def\author@{#1}}
+\gdef\date    #1{\def\date@{#1}}
+\let\affiliation\thanks
+\let\afiliacje\thanks
+\let\autor\author
+
+\skip\footins = 16pt plus 4pt minus 2pt
+\def\footnoterule{\kern-3\p@
+    \hrule \@width\textwidth \kern 2.6\p@} % kreseczka na całą szerokość
+\renewcommand\@fnsymbol[1]{\ensuremath     % więcej gwiazdeczek...
+  {\ifcase#1\or*\or **\or *{*}*\or *{*}*{*}\or *{*}*{*}*\or
+   (6)\or (7)\or (8)\or (9)\else
+   \@ctrerr\fi}}
+
+\newcommand{\PL@version}
+  {\let\titl@format\titl@form@T
+   \@ifundefined{title@PL}
+      {\no@xists@tytul}
+      {\title@PL}
+      \par
+      \vskip  .5em%
+   \@ifundefined{@streszczenie}
+      {\no@xists@streszczenie}
+      {\@streszczenie}
+      \vskip 1.5em%
+      \let\titl@format\titl@form@B
+   \@ifundefined{title@EN}
+      {\no@xists@title}
+      {\title@EN}
+      \par
+   \@ifundefined{@abstract}
+      {\no@xists@abstract}
+      {\@abstract}
+   }
+\newcommand{\EN@version}
+  {\let\titl@format\titl@form@T
+   \@ifundefined{title@EN}
+      {\no@xists@title}
+      {\title@EN}
+      \par
+      \vskip  .5em%
+   \@ifundefined{@abstract}
+      {\no@xists@abstract}
+      {\@abstract}
+      \vskip 1.5em%
+      \let\titl@format\titl@form@B
+   \@ifundefined{title@PL}
+      {\no@xists@tytul}
+      {\title@PL}
+      \par
+   \@ifundefined{@streszczenie}
+      {\no@xists@streszczenie}
+      {\@streszczenie}
+   }
+
+\def\no@xists@streszczenie{\textsl
+    {??? brak streszczenia w języku polskim ???}}
+\def\no@xists@abstract    {\textsl
+    {??? english version Abstract non exists ???}}
+\def\no@xists@tytul       {\textsl
+    {??? brak tytułu w języku polskim ???}}
+\def\no@xists@title       {\textsl
+    {??? english version Title non exists ???}}
+\def\no@xists@author      {\textsl
+    {??? brak Autora\dots $\slash$\,Author non exists\dots ???}}
+
+\newbox\@ENabstractbox
+\newbox\@PLabstractbox
+\def\abstractsize{\small\slshape}
+
+\def\keywords      #1{\def\@keywords{#1}}
+\def\slowakluczowe #1{\def\@slowakluczowe{#1}}
+\def\@setkeywords{%
+  \@ifstar{\@setkeywords@do[???]}{\@setkeywords@do}}
+\newcommand\@setkeywords@do[1][\dump@keywords\@addpunct]{%
+  \par\nobreak\medskip
+  \noindent{\normalfont\bfseries\sffamily\keywordsname:}\enspace#1}
+\def\@addpunct#1{\ifnum\spacefactor>\@m \else#1\fi}
+
+\let\@keywords=\@empty
+\let\@slowakluczowe=\@empty
+
+\newskip\preabstractskip   \preabstractskip   = 10pt plus 4pt minus 4pt
+\newskip\afterabstractskip \afterabstractskip = 10pt plus 4pt minus 4pt
+
+\renewenvironment{abstract}{%
+  % streszczenie artykułu w języku Shakespeare'a
+  % --------------------------------------------
+  \gdef\@abstract{\message{^^J[Abstract]}%
+     \vskip\preabstractskip
+%     \message{^^J\the\wd\@ENabstractbox}
+%     \message{^^J\the\ht\@ENabstractbox}
+%     \message{^^J\the\dp\@ENabstractbox}
+     \noindent
+     \unvbox\@ENabstractbox
+     \vskip\afterabstractskip
+    }%
+  \global\setbox\@ENabstractbox\vbox
+     \bgroup
+       \edef\keywordsname{Keywords}
+       \abstractsize
+       \noindent\unskip
+       \ignorespaces
+  }%
+  {\let\dump@keywords\@keywords
+   \ifx\@keywords\@empty\@setkeywords*\relax\else\@setkeywords\fi
+   \par
+   \egroup
+  }
+
+\newenvironment{streszczenie}{%
+  % abstract artykułu w języku Mićkiewicza ;-)
+  % --------------------------------------------
+  \gdef\@streszczenie{\message{^^J[Streszczenie]}%
+     \vskip\preabstractskip
+     \noindent
+     \unvbox\@PLabstractbox
+     \vskip\afterabstractskip
+    }%
+  \global\setbox\@PLabstractbox\vbox
+     \bgroup
+       \edef\keywordsname{Słowa kluczowe}%
+       \abstractsize
+       \noindent
+       \ignorespaces
+  }%
+  {\let\dump@keywords\@slowakluczowe
+   \ifx\@slowakluczowe\@empty\@setkeywords*\relax\else\@setkeywords\fi
+   \par
+   \egroup
+  }
+
+\newenvironment{opening}
+  {\global\@topnum\z@
+   \begingroup
+     \renewcommand\thefootnote{\@fnsymbol\c@footnote}%
+     \def\@makefnmark{\@textsuperscript{\normalfont\@thefnmark}}%
+     \long\def\@makefntext##1{\parindent 20pt\leftskip 20pt%
+          \noindent\hb@xt@0pt{%
+          \hss\@textsuperscript{\normalfont\@thefnmark}}##1}%
+  }
+  {%
+   \vspace*{5mm}%
+     \begin{flushleft}%
+       {\large
+        \lineskip .5em%
+        \begin{tabular}[t]{@{}>{\scshape}l}%
+          \@ifundefined{author@}
+             {\no@xists@author}
+             {\author@}
+        \end{tabular}\par}%
+     \vskip 1.5em%
+     \ifthenelse{\boolean{pl@language}}%
+        {\PL@version}%
+        {\EN@version}%
+     \vskip 1.0em
+     \end{flushleft}
+     \@thanks\par
+   \endgroup
+   \setcounter{footnote}\z@ % <-- add v.0.4
+   }
+
+% ---
+
+\renewcommand\section{\@startsection
+  {section}{1}%
+           {\z@}%
+           {-2.5ex \@plus -1ex \@minus -.2ex}%
+           {2ex \@plus.2ex}%
+           {\normalfont\sffamily\fontsize{13pt}{15pt}\selectfont
+            \bfseries\raggedright}}
+\renewcommand\subsection{\@startsection
+  {subsection}{2}%
+           {\z@}%
+           {-2.25ex\@plus -1ex \@minus -.2ex}%
+           {1ex \@plus .2ex}%
+           {\normalfont\sffamily\fontsize{11pt}{13pt}\selectfont
+            \bfseries\raggedright}}
+\renewcommand\subsubsection{\@startsection
+  {subsubsection}{3}%
+           {\z@}%
+           {-2.25ex\@plus -1ex \@minus -.2ex}%
+           {.75ex \@plus .2ex}%
+           {\normalfont\sffamily\bfseries\normalsize\raggedright}}
+\renewcommand\paragraph{\@startsection
+  {paragraph}{4}%
+           {\z@}%
+           {-1.75ex\@plus -1ex \@minus -.2ex}%
+           {-.333em \@plus .2ex}%
+           {\normalfont\sffamily\bfseries\normalsize}}
+\renewcommand\subparagraph{\@startsection
+  {subparagraph}{4}%
+           {\z@}%
+           {-1.25ex\@plus -1ex \@minus -.2ex}%
+           {-.333em \@plus .2ex}%
+           {\normalfont\sffamily\itshape\normalsize}}
+
+\setcounter{secnumdepth}{3}
+\def\@seccntformat#1%
+    {\csname the#1\endcsname.\hspace{.5em}}           % kropka po numerze
+
+% ---
+
+\setlength  \labelsep  {.333em}
+\setlength  \labelwidth{\leftmargini}
+\addtolength\labelwidth{-\labelsep}
+\setlength\partopsep{0\p@}
+\@beginparpenalty -\@lowpenalty
+\@endparpenalty   -\@lowpenalty
+\@itempenalty     -\@lowpenalty
+\def\@listi  {\leftmargin\leftmargini
+              \parsep  \z@
+              \topsep  \z@
+                 plus .15\baselineskip
+                 minus \z@
+              \itemsep \p@}
+\@listi
+\let\@listI\@listi
+\def\@listii {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep .20\baselineskip
+                plus  .15\baselineskip
+                minus \z@
+              \parsep  \z@
+              \itemsep \p@}
+\def\@listiii{\leftmargin\leftmarginiii
+              \labelwidth\leftmarginiii
+              \advance\labelwidth-\labelsep
+              \itemsep   \p@}
+
+\def\itemize{%
+ \ifnum \@itemdepth >\thr@@\@toodeep\else
+   \advance\@itemdepth\@ne
+   \edef\@itemitem{labelitem\romannumeral\the\@itemdepth}%
+   \expandafter\list
+     \csname\@itemitem\endcsname
+      {\def\makelabel##1{\hss\llap{\reset@font##1}}}%
+ \fi}
+
+\def\enumerate{%
+ \ifnum \@enumdepth >\thr@@\@toodeep\else
+   \advance\@enumdepth\@ne
+   \edef\@enumctr{enum\romannumeral\the\@enumdepth}%
+   \expandafter\list
+     \csname label\@enumctr\endcsname
+      {\usecounter\@enumctr%
+       \def\makelabel##1{\hss\llap{\reset@font##1}}}%
+ \fi}
+
+\newenvironment{wyliczanka}[1]
+ {\removelastskip\nopagebreak
+  \begin{list}{}{\renewcommand\makelabel\w@descriptionlabel%
+  \setlength    {\labelsep}     {.5em}%
+  \settowidth   {\labelwidth}   {#1\nobreakspace--}%
+  \setlength    {\leftmargin}   {\labelwidth}%
+  \setlength    {\topsep}       {1pt}%
+  \addtolength  {\leftmargin}   {\labelsep}%
+  \setlength    {\itemsep}      {4\p@ plus0\p@ minus2\p@}
+ }}
+ {\end{list}}
+\newcommand*\w@descriptionlabel[1]{\hfill\mbox{\normalfont#1~--}}
+
+% ---
+
+\def\th@CSitshape{\normalfont\itshape
+    \def\@begintheorem##1##2{%
+        \item[\hskip\labelsep
+        \theorem@headerfont ##1\ ##2\@thmpunct]}%
+    \def\@opargbegintheorem##1##2##3{%
+        \item[\hskip\labelsep
+        \theorem@headerfont ##1\ ##2\ (##3)\@thmpunct]}%
+}
+\def\th@CSplain{\normalfont\rmfamily
+    \def\@begintheorem##1##2{%
+        \item[\hskip\labelsep
+        \theorem@headerfont ##1\ ##2\@thmpunct]}%
+    \def\@opargbegintheorem##1##2##3{%
+        \item[\hskip\labelsep
+        \theorem@headerfont ##1\ ##2\ (##3)\@thmpunct]}%
+}
+\def\@thmpunct{.}
+\theoremheaderfont{\normalfont\bfseries\sffamily}
+
+\theoremstyle{CSitshape}
+\newtheorem {theorem}     {\nam@theorem}
+\newtheorem {definition}  {\nam@definition}
+\newtheorem {lemma}       {\nam@lemma}
+\newtheorem {corollary}   {\nam@corollary}
+\newtheorem {proposition} {\nam@proposition}
+\newtheorem {remark}      {\nam@remark}
+%\theoremstyle{CSplain}
+%\newtheorem {proof}       {\nam@proof}
+
+%\global\@namedef{endproof}{\QED\endtrivlist}
+
+\newenvironment{proof}{%
+    \trivlist\normalfont\rmfamily
+    \item[\hskip\labelsep\theorem@headerfont\nam@proof.\space]\space}
+    {\QED\endtrivlist}
+
+\newcounter{@xample}
+\def\the@xample{\arabic{@xample}}
+
+\newenvironment{example}{\refstepcounter{@xample}%
+  \begin{trivlist}\normalfont\rmfamily
+  \item[\hskip\labelsep%
+        \theorem@headerfont\nam@example\space\the@xample.\space]\space}
+ {\end{trivlist}}
+
+\newenvironment{example*}{% <-- nienumerowany
+  \begin{trivlist}\normalfont\rmfamily
+  \item[\hskip\labelsep%
+        \theorem@headerfont\nam@example.\space]\space}
+ {\end{trivlist}}
+
+\DeclareRobustCommand{\whiteqed}{%
+  \ifmmode \mathqed
+  \else
+    \leavevmode\unskip\penalty9999 \hbox{}\nobreak\hfill
+    \quad\hbox{\op@nbox}%
+  \fi}
+\newcommand{\op@nbox}{\leavevmode
+  \hbox to.77778em{\hfil
+  \vrule\vbox to.675em{\hrule width.6em\vfil\hrule}%
+  \vrule\hfil}}
+
+\@ifundefined{mathqed}
+    {\newcommand{\mathqed}{\quad\hbox{\op@nbox}}}
+    {}
+\let\QED\whiteqed
+
+\global\setlength\theorempreskipamount  {4pt plus 2pt minus 2pt}
+\global\setlength\theorempostskipamount {4pt plus 2pt minus 1.5pt}
+
+% ---
+
+\def\verbatim@font{\normalfont\small\ttfamily}
+
+% ---
+
+\newcommand\cap@lab@fnt{\normalfont\small\sffamily\bfseries}
+\newcommand\cap@txt@fnt{\normalfont\small\rmfamily}
+\long\def\fig@makecaption#1#2{%
+    \setbox0\hbox{#2}%
+    \ifdim\wd0=\z@%
+        \let\cap@labeldelim\relax\else
+        \def\cap@labeldelim{.}\fi
+  \vskip\abovecaptionskip
+  \sbox\@tempboxa{%
+    {\cap@lab@fnt#1\cap@labeldelim}\nobreakspace{\cap@txt@fnt#2}}%
+  \ifdim \wd\@tempboxa >\hsize
+    \centerlast
+    \unhbox\@tempboxa\par
+  \else
+    \global \@minipagefalse
+    \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}%
+  \fi
+  \vskip\belowcaptionskip}
+
+\long\def\tab@makecaption#1#2{%
+  \vskip\belowcaptionskip
+  \minipage{\linewidth}
+%    \centering
+    \centerlast
+    \centerline{\cap@lab@fnt#1}
+    {\cap@txt@fnt#2}\par
+  \endminipage
+  \vskip\abovecaptionskip}
+
+\renewenvironment{figure}
+   {\let\@makecaption\fig@makecaption%
+    \@float{figure}}
+   {\end@float}
+
+\renewenvironment{table}
+   {\let\@makecaption\tab@makecaption%
+    \@float{table}}
+   {\end@float}
+
+\def\@floatboxreset {%
+    \reset@font
+    \normalsize
+    \@setminipage
+    \small
+  }
+
+\newcommand*\centerlast{%
+  \addtolength{\leftskip}    {0pt plus  1fil}%
+  \addtolength{\rightskip}   {0pt plus -1fil}%
+  \setlength  {\parfillskip} {0pt plus  2fil}%
+  }
+
+% ---
+
+\newenvironment{acknowledgements}{%
+  \subsection*{\ack@name}
+   \begin{itshape}\ignorespaces
+  }
+  {\end{itshape}}
+
+% ---
+
+\let\todayPL\today
+\begingroup
+  \count@\time
+  \divide\count@ 60
+  \count2=-\count@
+  \multiply\count2 60
+  \advance\count2 \time
+  \global\edef\today{%
+    \the\year/\two@digits{\the\month}/\two@digits{\the\day};\space%
+      \two@digits{\the\count@}:\two@digits{\the\count2}}
+\endgroup
+
+\def\lastpage@makelabel{\addtocounter{page}{-1}%
+    \immediate\write\@auxout{\string
+        \newlabel{LastPage}{{}{\thepage}}}%
+    \addtocounter{page}{1}}
+\AtEndDocument{\clearpage\lastpage@makelabel}%
+
+\@ifundefined{eqref}{\let\eqref\EQref}{}
+\newcommand\EQref[1]{\bgroup\rmfamily\upshape(\ref{#1})\egroup}
+
+% ---
+
+\endinput
+
+% -*- TeX:PL -*-

@@ -119,16 +119,15 @@ append_job(Req, Id) ->
     sup_db:append_job(Id,Job),
     Req:respond({302, [{"Location", "/devices/" ++ Id}], ""}).
 
-create_job(Req, Id, Type) ->
+create_job(Req, Id, _Type) ->
     PostData = Req:parse_post(),
-    Message = {get_release, proplists:get_value("file", PostData)},
+    Message = upgrade,
     Module = sup_server_handlers,
     Function = upgrade_handler,
-    Extra = ignore,
+    Extra = proplists:get_value("file", PostData),
     Job = #job{message=Message, module=Module, function=Function, extra=Extra},
     sup_db:append_job(Id,Job),
     Req:respond({302, [{"Location", "/devices/" ++ Id}], ""}).
-
 
 device_to_print(Record) ->
     Jobs = lists:map(

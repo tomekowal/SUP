@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.1.23)  23 JAN 2012 20:36
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.1.23)  24 JAN 2012 23:03
 entering extended mode
  %&-line parsing enabled.
 **sup.tex
@@ -533,48 +533,49 @@ LaTeX Font Info:    Try loading font information for T1+lmtt on input line 62.
 File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 (./sections/01_introduction.tex
-LaTeX Font Info:    Try loading font information for OMS+lmr on input line 4.
+LaTeX Font Info:    Try loading font information for OMS+lmr on input line 7.
  (/usr/share/texmf/tex/latex/lm/omslmr.fd
 File: omslmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 4.
+LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 7.
 
 (/usr/share/texmf/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Font shape `OMS/lmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 4.
-)
-(./sections/02_requirements_and_assumptions.tex [1
+(Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 7.
+ [1
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]) (./sections/03_erlang_tec
-hnology_overview.tex)
-(./sections/04_apt_for_erlang.tex) (./sections/05_software_update_platform.tex)
-(./sections/06_conclusions_and_further_work.tex [2])
-(./sections/07_acknowledgements.tex) [3] (./sup.aux) ) 
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]) (./sections/02_requiremen
+ts_and_assumptions.tex)
+(./sections/03_erlang_technology_overview.tex [2])
+(./sections/04_apt_for_erlang.tex [3])
+(./sections/05_software_update_platform.tex)
+(./sections/06_conclusions_and_further_work.tex)
+(./sections/07_acknowledgements.tex) [4] [5] (./sup.aux) ) 
 Here is how much of TeX's memory you used:
- 2571 strings out of 495026
- 29670 string characters out of 1181802
+ 2574 strings out of 495026
+ 29708 string characters out of 1181802
  80152 words of memory out of 3000000
- 5663 multiletter control sequences out of 15000+50000
- 59507 words of font info for 55 fonts, out of 3000000 for 9000
+ 5665 multiletter control sequences out of 15000+50000
+ 62594 words of font info for 57 fonts, out of 3000000 for 9000
  48 hyphenation exceptions out of 8191
- 29i,13n,30p,258b,316s stack positions out of 5000i,500n,10000p,200000b,50000s
-{/usr/share/texmf/fonts/e
-nc/dvips/lm/lm-ec.enc}{/usr/share/texmf-texlive/fonts/enc/dvips/pl/plms.enc}{/u
-sr/share/texmf/fonts/enc/dvips/lm/lm-mathsy.enc}</usr/share/texmf/fonts/type1/p
-ublic/lm/lmbx10.pfb></usr/share/texmf/fonts/type1/public/lm/lmcsc10.pfb></usr/s
-hare/texmf/fonts/type1/public/lm/lmr10.pfb></usr/share/texmf/fonts/type1/public
-/lm/lmr8.pfb></usr/share/texmf/fonts/type1/public/lm/lmri10.pfb></usr/share/tex
-mf/fonts/type1/public/lm/lmro9.pfb></usr/share/texmf/fonts/type1/public/lm/lmss
-12.pfb></usr/share/texmf/fonts/type1/public/lm/lmssbx10.pfb></usr/share/texmf/f
-onts/type1/public/lm/lmsy10.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt8.p
-fb></usr/share/texmf/fonts/type1/public/lm/lmtt9.pfb></usr/share/texmf-texlive/
-fonts/type1/public/pl/plsy6.pfb></usr/share/texmf-texlive/fonts/type1/public/pl
-/plsy8.pfb>
-Output written on sup.pdf (3 pages, 245150 bytes).
+ 29i,13n,30p,347b,316s stack positions out of 5000i,500n,10000p,200000b,50000s
+{/usr/share/texmf/fon
+ts/enc/dvips/lm/lm-ec.enc}{/usr/share/texmf-texlive/fonts/enc/dvips/pl/plms.enc
+}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathsy.enc}</usr/share/texmf/fonts/typ
+e1/public/lm/lmbx10.pfb></usr/share/texmf/fonts/type1/public/lm/lmcsc10.pfb></u
+sr/share/texmf/fonts/type1/public/lm/lmr10.pfb></usr/share/texmf/fonts/type1/pu
+blic/lm/lmr8.pfb></usr/share/texmf/fonts/type1/public/lm/lmri10.pfb></usr/share
+/texmf/fonts/type1/public/lm/lmro9.pfb></usr/share/texmf/fonts/type1/public/lm/
+lmss12.pfb></usr/share/texmf/fonts/type1/public/lm/lmssbx10.pfb></usr/share/tex
+mf/fonts/type1/public/lm/lmsy10.pfb></usr/share/texmf/fonts/type1/public/lm/lmt
+t10.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt8.pfb></usr/share/texmf/fon
+ts/type1/public/lm/lmtt9.pfb></usr/share/texmf-texlive/fonts/type1/public/pl/pl
+sy6.pfb></usr/share/texmf-texlive/fonts/type1/public/pl/plsy8.pfb>
+Output written on sup.pdf (5 pages, 273406 bytes).
 PDF statistics:
- 67 PDF objects out of 1000 (max. 8388607)
+ 77 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

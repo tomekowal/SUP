@@ -1,9 +1,81 @@
 \section{Erlang Technology Overview}
 
+\subsection{Usability of Erlang Technology in distributed systems}
+
+Erlang is a technology and a programming language that mixes functional programming with
+an approach to easily build heavily parallel and distributed, highly available systems. It achieves
+these goals using a set of unique features, including:
+
 \begin{itemize}
-	\item Usability of Erlang Technology in distributed systems -- general features, advantages
-	\item General description of Erlang OTP
-	\item Application and releases in Erlang
-	\item Updating Erlang applications 
-	\item Problems with using the method: 1. system admins are used to apt; 2. management of many devices is hard
+
+\item Virtual machine implementing message-passing concurrency model with
+lightweight Erlang processes
+\item Built-in, language-integrated engine for communication in a distributed environment
+\item Hot code swapping with a fine control over the software upgrade process. The aim of these
+is to allow an upgrade to be performed automatically without stopping any services.
+\item Fault-tolerance features like supervisors.
+\item Takeover and failover mechanisms for cluster systems.
+
 \end{itemize}
+
+\subsection{General description of Erlang OTP}
+
+Erlang OTP (Open Telecom Platform) is an Erlang distribution released by Ericsson in 1998
+when the language became open source. OTP is a set of standard erlang libraries and
+corresponding, well-defined design principles for Erlang developers. OTP defines patterns
+for basic elements that make up the software as well as the general layout of completed,
+deployed environment.
+
+OTP principles include:
+\begin{itemize}
+\item Supervisors and supervision trees
+
+Erlang software can be thought of as a set of lightweight erlang processes communicating with
+each other. In supervision tree principle, these processes form a tree where the leaves are
+called workers and are doing the actual job, while other nodes are called supervisors.
+Each supervisor is responsible for monitoring its children and reacting accordingly when
+any of them crashes. Supervisors allow to design well-structured and fault-tolerant
+software.
+
+\item Behaviours
+
+Behaviours are a set of basic design patterns used to build common types of software
+pieces. Fundamental behaviours are:
+\begin{itemize}
+\item {\tt gen\_server} for implementing simple servers and client-server relation between erlang
+processes
+\item {\tt gen\_fsm} for implementing generic finite state machines
+\item {\tt gen\_event} for implementing event handling subsystems
+\end{itemize}
+\item Applications and releases
+
+These patterns define general layout of a self-contained, deployable piece of Erlang
+software. Applications and releases will be described in the next section as the
+Software Update Platform deals heavily with them.
+
+\end{itemize}
+
+\subsection{Applications and releases in Erlang}
+
+An example of deployable package of software written in Erlang is so-called embedded
+node. An embedded node is a self-contained, configured Erlang environment along with actual software
+written in Erlang that can be deployed and run using a simple command. An embedded node contains:
+\begin{itemize}
+\item Erlang Runtime System
+\item A set of Erlang applications, the actual code
+\item Configuration for ERTS and applications
+\item An Erlang release
+\end{itemize}
+
+\subsubsection{Erlang applications}
+
+An erlang application is an independent piece of software that serves some particular
+functionality. An application is defined by its name, version, code (set of modules),
+dependencies (other applications) and other more finegrained settings and attributes. These are all
+configured in an {\tt .app} file. Every application defines a way of starting it, stopping it and possibly
+upgrading or downgrading it to another version. It also has its own piece of configuration.
+A running application is often made up of a single supervision tree.
+
+\subsection{Upgrading Erlang software}
+
+Problems with using the method: 1. system admins are used to apt; 2. management of many devices is hard

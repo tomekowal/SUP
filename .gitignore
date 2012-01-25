@@ -19,3 +19,5 @@
 *.beam
 *~
 doc/Makefile
+**/*.log
+**/*.aux

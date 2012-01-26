@@ -73,9 +73,36 @@ An erlang application is an independent piece of software that serves some parti
 functionality. An application is defined by its name, version, code (set of modules),
 dependencies (other applications) and other more finegrained settings and attributes. These are all
 configured in an {\tt .app} file. Every application defines a way of starting it, stopping it and possibly
-upgrading or downgrading it to another version. It also has its own piece of configuration.
+upgrading or downgrading it to another version (optional {\tt appup} file). It also has its own piece of configuration.
 A running application is often made up of a single supervision tree.
+
+\subsubsection{Erlang release}
+
+An erlang release is a configuration of what an embedded node contains and how it is
+started, stopped and upgraded. Thus, an erlang release, defined by an {\tt .rel} file,
+states which version of ERTS should be used in the node, lists a set of applications in 
+particular versions that should be part of the release, and defines one or more way the
+Erlang node is started and stopped. Separate, optional {\tt relup} file defines how the
+release is upgraded or downgraded (without stopping the node).
+Erlang release has its own version number.
 
 \subsection{Upgrading Erlang software}
 
-Problems with using the method: 1. system admins are used to apt; 2. management of many devices is hard
+As a part of focus for high available systems, Erlang supports hot code swapping and
+very finegrained control over the upgrade process without stopping running node.
+Every application may define how its version should be changed to higher or lower in the
+{\tt appup} file. Based on a set of {\tt appup} files, a {\tt relup} file may be generated
+which merges all operations listed in {\tt appup} files into one big script that
+upgrades or downgrades the whole release. This script may be executed using standard erlang
+API for release handling (the {\tt release\_handler} module).
+
+Because each application is responsible
+for defining how its version should be changed, the upgrade process is very straightforward
+and requires only a few calls to the release handling functions. Thus, it can be easily
+performed without human interaction, by automatic tools.
+
+Still, there are some problems with that method. Mainly, it is low-level as it requires
+calling the erlang API on the target node. What is needed and what our platform aims to provide is
+a way of easy installation and deinstallation of the erlang node on the target system using
+simple tools like package managers and also a way of easy management of a large number of devices.
+

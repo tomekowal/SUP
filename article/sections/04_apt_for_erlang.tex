@@ -1,8 +1,67 @@
-\section{APT for Erlang}
+\section{Packaging of erlang software}
+
+\subsection{What it is about and motivation for it}
+
+By `packaging of erlang software`, we mean a way of putting the contents of erlang node
+into packages like {\tt .deb}. These would be easy to install, upgrade and remove with standard
+package manager commands. We also want to maintain ability to perform upgrades without
+stopping the node (hot code swapping).
+
+There are a few reasons why we decided to implement this:
 
 \begin{itemize}
-	\item Why do this
-	\item How was it done 
-	\item Results, effects 
-    \item Problems and limitations
+\item Easy installation and deinstallation of erlang node on the target system using a single command.
+\item Reduction of amount of data downloaded during the upgrade (only the actually changed packages
+are fetched by the package manager).
+\item Overall better integration with the target system.
 \end{itemize}
+
+\subsection{How it was implemented}
+
+We decided to create tools to build debian packages {\tt .deb} that would span the contents
+of the erlang node and create a set of packages ready to be pushed to a repository and easily installed
+on the target device. This also required general implementation of debian maintainer scripts
+included into these packages. These scripts are responsible for management of the node
+during installation. Most importantly, they contain the code that performs the upgrade process.
+
+\subsubsection{Decomposition of the erlang node into debian package set}
+
+The erlang node is decomposed into a set of debian packages in the following way:
+\begin{itemize}
+\item Base package contains ERTS and its version is equal to the ERTS version. This package is
+architecture-dependent. It has no dependencies.
+\item Each erlang application gets its own package. Its version is equal to the application version.
+Package dependencies reflect the list of dependent applications in the {\tt .app} file.
+\item Erlang release files are packaged into the final, main package. This package is dependent on the base
+package and packages for all applications contained in the release. These dependencies are strict in terms
+of version of dependent packages - the release requires a concrete version of every application as well as the ERTS.
+\end{itemize}
+
+The only package that should be explicitly maintained by system administrator is the main package containing the release files.
+This package, thanks to its well-defined dependencies, represents the whole erlang node and its installation will cause
+the whole node to be deployed on the device.
+
+The point of splitting up the node into several packages related through dependencies was to reduce the amount
+of data downloaded during the upgrade process. It is a very common situation when we want to upgrade e.g. only
+one erlang application. Standard erlang features do not allow us to independently upgrade each application - we must
+always create a new version of the whole release and upgrade the release itself. Without proper decomposition of the contents
+of the release, this would force us to download a big package containing every application, even though most of them did not change.
+
+Usage of package manager solves this problem. When the node is decomposed into several packages, upgrade of the main package
+forces the package manager to download only these application packages whose version changed. This is all thanks to automatic
+dependency resolution provided by the package manager.
+
+\subsubsection{Upgrade of the release - maintainer scripts' job}
+
+There are a few maintainer scripts in all the packages spanning the erlang node.
+They are responsible for starting the node when it gets installed, stopping it when it gets
+removed and, most importantly, performing the release upgrade process when the main package is being
+upgraded by the package manager.
+
+The script performing the release upgrade checks whether the node is running, using tools available in the node {\tt bin} directory.
+When the node is running, the script remotely calls appropriate erlang code on the running node, causing it to switch to the higher
+version of the release (standard erlang release upgrade using the {\tt release\_handler}, without stopping the node).
+Hot upgrade may fail or the node may have been down from the beginning. If so, a manual replacement of the old version of the release with the new version is performed (manual replacement of some files) and the node is started.
+
+\subsection{Results and effects} 
+\subsection{Problems and limitations}

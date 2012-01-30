@@ -1,14 +1,33 @@
 \section{Conclusions and Further Work}
 
+We managed to solve most of occuring problems. Our system is fully functional. Even though \emph{apt} does not provide simple solution to hot upgrades, we implemented it. This gave us some advantages over standard tools like \emph{rebar}. We optimized amount of data to download. Using package manager to install and upgrade Erlang applications is easier for people who had never used Erlang before.
+
 \begin{itemize}
 \item Support for other package managers
+
+One obvious improvement for our platform would be support for more package managers, as
+debian package format {\tt .deb} was chosen arbitrarily for experimental development.
+Since its integration was successful, support for {\tt rpm}-based package managers (like {\tt yum}),
+{\tt pacman} or {\tt port} is planned in the future.
+
 \item Communication security
+
+Right now, communication between devices and the server is not encrypted. Wrapping device-server
+sessions in TLS and adding some authentication is another important potential feature for our
+platform.
+
 \item Development towards more general management platform
+
+The protocol used in communication between devices and the server is very general
+and extensible. New types of jobs can be easily added. Thus, the platform can be turned into
+more general management platform, providing a lot more of different functionality:
+
 \begin{itemize}
-\item monitoring
-\item configuration
-\item maintenance
-\item diagnostics
+\item monitoring of the devices, their status, statistics, etc.
+\item configuration of software installed on the device
+\item maintenance features (viewing logs, etc.)
+\item peforming diagnostics, troubleshooting, tests etc.
 \end{itemize}
+
 \end{itemize}
 

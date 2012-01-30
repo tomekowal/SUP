@@ -13,7 +13,11 @@ lightweight Erlang processes
 \item Built-in, language-integrated engine for communication in a distributed environment
 \item Hot code swapping with a fine control over the software upgrade process. The aim of these
 is to allow an upgrade to be performed automatically without stopping any services.
-\item Fault-tolerance features like supervisors.
+\item Fault-tolerance features. The most important one is supervisor behaviour for writing
+special control processes responsible for monitoring other processes
+and reacting accordingly when they crash. This allows programmers to take an \emph{happy case programming}
+approach which means that they can ignore any exceptions as long as they don't have to be handled explicitly in
+some special way.
 \item Takeover and failover mechanisms for cluster systems.
 
 \end{itemize}
@@ -21,16 +25,25 @@ is to allow an upgrade to be performed automatically without stopping any servic
 \subsection{General description of Erlang OTP}
 
 Erlang OTP (Open Telecom Platform) is an Erlang distribution released by Ericsson in 1998
-when the language became open source. OTP is a set of standard erlang libraries and
+when the language became open source. OTP is a set of standard Erlang libraries and
 corresponding, well-defined design principles for Erlang developers. OTP defines patterns
 for basic elements that make up the software as well as the general layout of completed,
 deployed environment.
+
+Erlang is a technology that from the very beginning incorporates patterns,
+conceptions and approaches that are crucial for heavily parallel and distributed systems.
+Since such systems are becoming ubiquitous these days, Erlang definitely has the chance to
+become a technology of the future for large, distributed computer systems.
+
+In this article, we will briefly describle basic OTP principles with more attention on
+the ones important for the Software Update Platform. You can read more on OTP principles
+in the official documentation in \cite{otp}.
 
 OTP principles include:
 \begin{itemize}
 \item Supervisors and supervision trees
 
-Erlang software can be thought of as a set of lightweight erlang processes communicating with
+Erlang software can be thought of as a set of lightweight Erlang processes communicating with
 each other. In supervision tree principle, these processes form a tree where the leaves are
 called workers and are doing the actual job, while other nodes are called supervisors.
 Each supervisor is responsible for monitoring its children and reacting accordingly when
@@ -42,7 +55,7 @@ software.
 Behaviours are a set of basic design patterns used to build common types of software
 pieces. Fundamental behaviours are:
 \begin{itemize}
-\item {\tt gen\_server} for implementing simple servers and client-server relation between erlang
+\item {\tt gen\_server} for implementing simple servers and client-server relation between Erlang
 processes
 \item {\tt gen\_fsm} for implementing generic finite state machines
 \item {\tt gen\_event} for implementing event handling subsystems
@@ -69,7 +82,7 @@ written in Erlang that can be deployed and run using a simple command. An embedd
 
 \subsubsection{Erlang applications}
 
-An erlang application is an independent piece of software that serves some particular
+An Erlang application is an independent piece of software that serves some particular
 functionality. An application is defined by its name, version, code (set of modules),
 dependencies (other applications) and other more finegrained settings and attributes. These are all
 configured in an {\tt .app} file. Every application defines a way of starting it, stopping it and possibly
@@ -78,8 +91,8 @@ A running application is often made up of a single supervision tree.
 
 \subsubsection{Erlang release}
 
-An erlang release is a configuration of what an embedded node contains and how it is
-started, stopped and upgraded. Thus, an erlang release, defined by an {\tt .rel} file,
+An Erlang release is a configuration of what an embedded node contains and how it is
+started, stopped and upgraded. Thus, an Erlang release, defined by an {\tt .rel} file,
 states which version of ERTS should be used in the node, lists a set of applications in 
 particular versions that should be part of the release, and defines one or more way the
 Erlang node is started and stopped. Separate, optional {\tt relup} file defines how the
@@ -93,7 +106,7 @@ very finegrained control over the upgrade process without stopping running node.
 Every application may define how its version should be changed to higher or lower in the
 {\tt appup} file. Based on a set of {\tt appup} files, a {\tt relup} file may be generated
 which merges all operations listed in {\tt appup} files into one big script that
-upgrades or downgrades the whole release. This script may be executed using standard erlang
+upgrades or downgrades the whole release. This script may be executed using standard Erlang
 API for release handling (the {\tt release\_handler} module).
 
 Because each application is responsible
@@ -102,7 +115,7 @@ and requires only a few calls to the release handling functions. Thus, it can be
 performed without human interaction, by automatic tools.
 
 Still, there are some problems with that method. Mainly, it is low-level as it requires
-calling the erlang API on the target node. What is needed and what our platform aims to provide is
-a way of easy installation and deinstallation of the erlang node on the target system using
+calling the Erlang API on the target node. What is needed and what our platform aims to provide is
+a way of easy installation and deinstallation of the Erlang node on the target system using
 simple tools like package managers and also a way of easy management of a large number of devices.
 

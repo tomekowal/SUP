@@ -1,12 +1,10 @@
 \section{Requirements and assumptions}
 
+During system implementation we made following assumptions:
 \begin{itemize}
-\item Network infrastructure assumptions
-\begin{itemize}
-\item Possibility of NAT
-\item Slow and unreliable connections
-\end{itemize}
-\item Need for scalability (up to about 10000 devices)
-\item Simple, intuitive interface
-\item Managing groups of devices, batch updates
+  \item Possibility of NAT -- usually mobile devices we want to update are not in the local network. This implies that those devices are behind a NAT. It makes ssh connection difficult. Devices should connect to central server with public IP.
+  \item Slow and unreliable connections -- while developing we thought mainly about devices that are connected via GSM. This connection can be slow and may be interrupted easily.
+  \item Need for scalability -- distributed systems has to be prepared for heavy load because they consist of large amount of devices. Our system should be able to manage up to about 10000 devices.
+  \item Simple, intuitive interface -- we wanted our system to be user-friendly.
+  \item Managing groups of devices, batch updates -- user can create groups of devices so that our system can be used to manage more than one distributed system at once. User can send requests to those groups. He alse has fine-grained control over particular device.
 \end{itemize}

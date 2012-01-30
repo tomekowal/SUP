@@ -1,8 +1,8 @@
-\section{Packaging of erlang software}
+\section{Packaging of Erlang software}
 
-\subsection{What it is about and motivation for it}
+\subsection{The idea and motivation}
 
-By `packaging of erlang software`, we mean a way of putting the contents of erlang node
+By `packaging of Erlang software`, we mean a way of putting the contents of Erlang node
 into packages like {\tt .deb}. These would be easy to install, upgrade and remove with standard
 package manager commands. We also want to maintain ability to perform upgrades without
 stopping the node (hot code swapping).
@@ -10,27 +10,27 @@ stopping the node (hot code swapping).
 There are a few reasons why we decided to implement this:
 
 \begin{itemize}
-\item Easy installation and deinstallation of erlang node on the target system using a single command.
+\item Easy installation and deinstallation of Erlang node on the target system using a single command.
 \item Reduction of amount of data downloaded during the upgrade (only the actually changed packages
 are fetched by the package manager).
 \item Overall better integration with the target system.
 \end{itemize}
 
-\subsection{How it was implemented}
+\subsection{Implementation details}
 
 We decided to create tools to build debian packages {\tt .deb} that would span the contents
-of the erlang node and create a set of packages ready to be pushed to a repository and easily installed
+of the Erlang node and create a set of packages ready to be pushed to a repository and easily installed
 on the target device. This also required general implementation of debian maintainer scripts
 included into these packages. These scripts are responsible for management of the node
 during installation. Most importantly, they contain the code that performs the upgrade process.
 
-\subsubsection{Decomposition of the erlang node into debian package set}
+\subsubsection{Decomposition of the Erlang node into debian package set}
 
-The erlang node is decomposed into a set of debian packages in the following way:
+The Erlang node is decomposed into a set of debian packages in the following way:
 \begin{itemize}
 \item Base package contains ERTS and its version is equal to the ERTS version. This package is
 architecture-dependent. It has no dependencies.
-\item Each erlang application gets its own package. Its version is equal to the application version.
+\item Each Erlang application gets its own package. Its version is equal to the application version.
 Package dependencies reflect the list of dependent applications in the {\tt .app} file.
 \item Erlang release files are packaged into the final, main package. This package is dependent on the base
 package and packages for all applications contained in the release. These dependencies are strict in terms
@@ -38,12 +38,12 @@ of version of dependent packages - the release requires a concrete version of ev
 \end{itemize}
 
 The only package that should be explicitly maintained by system administrator is the main package containing the release files.
-This package, thanks to its well-defined dependencies, represents the whole erlang node and its installation will cause
+This package, thanks to its well-defined dependencies, represents the whole Erlang node and its installation will cause
 the whole node to be deployed on the device.
 
 The point of splitting up the node into several packages related through dependencies was to reduce the amount
 of data downloaded during the upgrade process. It is a very common situation when we want to upgrade e.g. only
-one erlang application. Standard erlang features do not allow us to independently upgrade each application - we must
+one Erlang application. Standard Erlang features do not allow us to independently upgrade each application - we must
 always create a new version of the whole release and upgrade the release itself. Without proper decomposition of the contents
 of the release, this would force us to download a big package containing every application, even though most of them did not change.
 
@@ -53,15 +53,58 @@ dependency resolution provided by the package manager.
 
 \subsubsection{Upgrade of the release - maintainer scripts' job}
 
-There are a few maintainer scripts in all the packages spanning the erlang node.
+There are a few maintainer scripts (see \cite{maintainerscripts}) in all the packages spanning the Erlang node.
 They are responsible for starting the node when it gets installed, stopping it when it gets
 removed and, most importantly, performing the release upgrade process when the main package is being
 upgraded by the package manager.
 
 The script performing the release upgrade checks whether the node is running, using tools available in the node {\tt bin} directory.
-When the node is running, the script remotely calls appropriate erlang code on the running node, causing it to switch to the higher
-version of the release (standard erlang release upgrade using the {\tt release\_handler}, without stopping the node).
+When the node is running, the script remotely calls appropriate Erlang code on the running node, causing it to switch to the higher
+version of the release (standard Erlang release upgrade using the {\tt release\_handler}, without stopping the node).
 Hot upgrade may fail or the node may have been down from the beginning. If so, a manual replacement of the old version of the release with the new version is performed (manual replacement of some files) and the node is started.
 
-\subsection{Results and effects} 
+\subsection{Results and effects}
+
+We were able to implement all crucial features regarding integration of package manager
+with Software Update Platform.
+
+From the point of view of an erlang developer maintaining the software being upgraded, the main
+feature implemented are a few helpful scripts. They allow easy generation of debian packages from
+an Erlang release generated with {\tt rebar} (you can read more about development model in \ref{devmodel}).
+There is also a script for easy generation of the {\tt relup} file.
+
+From the point of view of a target system administrator, the main advantage of package manager
+is mentioned earlier easy way to install, upgrade and remove the Erlang node. The only configuration
+needed at the target system is addition of debian repository in the {\tt apt} configuration file.
+
+From the point of view of an user of the Software Update Platform, main feature implemented is
+a built-in debian packages repository along with an UI to manage its contents.
+
+We were also successful in obtaining desired non-functional features of the system regarding its use
+of package manager. This includes smaller downloads from the server to the target devices and ability
+to use hot-code swapping by the package manager during upgrade process.
+
 \subsection{Problems and limitations}
+
+Although the integration of package was successful, due to a significant mismatch between
+how package manager works and how standard Erlang upgrade tools work, some workarounds
+were required.
+
+The main problem that we encountered was an issue that we had to resolve when trying
+to preserve ability to perform hot-upgrade without stopping the system. Erlang upgrade tools
+require that at the point of a release upgrade, the whole old version of the release and the whole new
+version of the release are present in the filesystem. When the release is split into several packages, 
+it is impossible to find a moment where this requirement is met. It is also impossible to
+influence the way package manager works to force it to behave as we wanted.
+
+Because of that, we had to introduce a workaround. Erlang application and Erlang release packages
+do not contain their contents directly. Instead, an intermediate {\tt tar.gz} archive is created that
+contains actual contents of the package. This archive is then put into the {\tt .deb} file directly.
+Like this, we have full control over when the files from the intermediate package are unpacked and
+removed. The intermendiate archive is unpacked from the {\tt .deb} file by the package manager directly, while
+the actual files are unpacked by the maintainer scripts.
+
+One downside of this approach is that we also had to manually remove application and release files using maintainer scripts.
+Another one is that when an application is removed from the release, we have to manually remove the package containing that
+application. This cannot be done from the maintainer scripts as it is probably a bad idea to invoke package manager from scripts
+invoked by the package manager.

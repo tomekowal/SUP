@@ -8,7 +8,7 @@ database, platform will perform software update on that device.
 
 \subsection{Architecture}
 
-Software Update Platform consists of two main parts:
+Software Update Platform consists of two main parts (see \textbf{fig.} \ref{fig:architecture}):
 \begin{itemize}
   \item client application installed on mobile device,
   \item server.
@@ -19,7 +19,8 @@ Software Update Platform consists of two main parts:
     \scalebox{0.9}{
       \includegraphics[width=\textwidth]{graphics/architecture.pdf}
     }
-    \caption{Architecture overview}
+    \caption{General architecture of the Software Update Platform}
+    \label{fig:architecture}
 \end{figure}
 
 \subsubsection*{Client application}
@@ -40,10 +41,8 @@ Server consists of 3 components:
 
 \subsubsection*{HTTP server}
 
-Mochiweb -- our web server of choice is responsible for following tasks. It manages user interaction
-through web interface (serves content, performs user requests) and it is repository for \emph{.deb}
-packages.
-
+Mochiweb -- HTTP server manages user interaction through web interface (serves content, performs user requests)
+and works as repository for \emph{.deb} packages.
 
 \subsubsection*{Database}
 
@@ -60,7 +59,7 @@ on device.
 \subsubsection*{Backend}
 
 Backend is the core of platform. It is Erlang application responsible for whole automatic device
-management. Every new device in platform connected with backend is stored in database.
+management. Every new device in platform connects with backend and information about this device is stored in database.
 From now on backend can monitor state of that device and performs operations on it.
 
 \subsubsection{Device-server session}
@@ -70,23 +69,27 @@ From now on backend can monitor state of that device and performs operations on 
     \scalebox{0.9}{
       \includegraphics[width=\textwidth]{graphics/session.pdf}
     }
-    \caption{Session communication diagram}
+    \caption{Device-server session communication diagram}
+    \label{fig:session}
 \end{figure}
 
-Firstly device initializes connection which carries following data:
-\begin{itemize}
-  \item device identity: nodename and MAC address,
-  \item session start reason,
-  \item device states.
-\end{itemize}
-These pieces of information are used to unambiguously identify the device.
-After connection is established, server checks device state in database.
-If there are any enqueued jobs, they are sent to device.
-The device returns result of performed job. This status is written to database.
+\noindent Session between device and server (see \textbf{fig.} \ref{fig:session} above) consists of following steps:
+
+\begin{enumerate}
+  \item Device initializes connection which carries following data:
+    \begin{itemize}
+      \item device identity: nodename and MAC address,
+      \item session start reason,
+      \item device states.
+  \end{itemize}
+  These pieces of information are used to unambiguously identify the device.
+  \item After connection is established, server checks device state in database.
+  If there are any enqueued jobs, they are sent to device.
+  \item The device returns result of performed job. This status is written to database.
+\end{enumerate}
 
 \subsubsection{On-device upgrade logic}
-
-Updating software consists of two jobs:
+After receiving a task a device starts the update process. Updating software consists of two jobs:
 \begin{itemize}
   \item upgrade
   \item check release
@@ -96,12 +99,13 @@ Upgrade immediately returns with status \verb|ok|. It stops periodic connection 
 
 Check release reads value returned from \emph{apt} and notifies server about changes in next session.
 
+Update process doesn't interrupt running processes and services on device. 
+
 \subsection{Functionality}
 
-\begin{itemize}
-  \item General description of the Web interface
+\subsubsection{General description of the Web interface}
 
-Web interface provides simple way to manage groups of devices. User can:
+Web interface provides simple way to manage groups of devices (see \textbf{fig.} \ref{fig:gui}). User can:
 \begin{itemize}
   \item check last known state of device: IP, version of release, installed application
   \item assign device to one or more categories
@@ -111,30 +115,15 @@ Web interface provides simple way to manage groups of devices. User can:
 \begin{figure}[htbp]
   \centering
     \scalebox{0.9}{
-      \includegraphics[width=\textwidth]{graphics/device.png}
-    }
-    \caption{Device view}
-\end{figure}
-
-\begin{figure}[htbp]
-  \centering
-    \scalebox{0.9}{
       \includegraphics[width=\textwidth]{graphics/devices.png}
     }
-    \caption{Device view}
+    \caption{Web interface -- managing devices by category}
+    \label{fig:gui}
 \end{figure}
 
 There is also special page for repository where user can upload previously prepared packages.
 
-\begin{figure}[htbp]
-  \centering
-    \scalebox{0.9}{
-      \includegraphics[width=\textwidth]{graphics/repository.png}
-    }
-    \caption{Repository view}
-\end{figure}
-
-    \item\label{devmodel} Development model for application, debian packaging utilities
+\subsubsection{Development model for application, debian packaging utilities}
 
 Software Update Platform proposes a model and provides some tools for development of Erlang software installed
 on the target systems. The main assumption is that the developer uses a tool called {\tt rebar} for managing Erlang software (see \cite{rebar} for more information).
@@ -143,6 +132,4 @@ This includes automatic generation of stubs for Erlang applications, build, {\tt
 generation, creation of complete, self-contained Erlang nodes (with a runtime), documentation etc.
 Generated Erlang nodes are used as a basis for {\tt .deb} packages generation. This is implemented by a set of
 scripts provided by the Software Update Platform itself.
-
-\end{itemize}
 

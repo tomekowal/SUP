@@ -7,19 +7,17 @@ an approach to easily build heavily parallel and distributed, highly available s
 these goals using a set of unique features, including:
 
 \begin{itemize}
-
-\item Virtual machine implementing message-passing concurrency model with
+  \item Virtual machine implementing message-passing concurrency model with
 lightweight Erlang processes
-\item Built-in, language-integrated engine for communication in a distributed environment
-\item Hot code swapping with a fine control over the software upgrade process. The aim of these
+  \item Built-in, language-integrated engine for communication in a distributed environment
+  \item Hot code swapping with a fine control over the software upgrade process. The aim of these
 is to allow an upgrade to be performed automatically without stopping any services.
-\item Fault-tolerance features. The most important one is supervisor behaviour for writing
+  \item Fault-tolerance features. The most important one is supervisor behaviour for writing
 special control processes responsible for monitoring other processes
 and reacting accordingly when they crash. This allows programmers to take an \emph{happy case programming}
 approach which means that they can ignore any exceptions as long as they don't have to be handled explicitly in
 some special way.
-\item Takeover and failover mechanisms for cluster systems.
-
+  \item Takeover and failover mechanisms for cluster systems.
 \end{itemize}
 
 \subsection{General description of Erlang OTP}
@@ -41,18 +39,14 @@ in the official documentation in \cite{otp}.
 
 OTP principles include:
 \begin{itemize}
-\item Supervisors and supervision trees
-
-Erlang software can be thought of as a set of lightweight Erlang processes communicating with
+\item Supervisors and supervision trees -- Erlang software can be thought of as a set of lightweight Erlang processes communicating with
 each other. In supervision tree principle, these processes form a tree where the leaves are
 called workers and are doing the actual job, while other nodes are called supervisors.
 Each supervisor is responsible for monitoring its children and reacting accordingly when
 any of them crashes. Supervisors allow to design well-structured and fault-tolerant
 software.
 
-\item Behaviours
-
-Behaviours are a set of basic design patterns used to build common types of software
+\item Behaviours are a set of basic design patterns used to build common types of software
 pieces. Fundamental behaviours are:
 \begin{itemize}
 \item {\tt gen\_server} for implementing simple servers and client-server relation between Erlang
@@ -60,9 +54,7 @@ processes
 \item {\tt gen\_fsm} for implementing generic finite state machines
 \item {\tt gen\_event} for implementing event handling subsystems
 \end{itemize}
-\item Applications and releases
-
-These patterns define general layout of a self-contained, deployable piece of Erlang
+\item Applications and releases -- these patterns define general layout of a self-contained, deployable piece of Erlang
 software. Applications and releases will be described in the next section as the
 Software Update Platform deals heavily with them.
 
@@ -74,7 +66,7 @@ An example of deployable package of software written in Erlang is so-called embe
 node. An embedded node is a self-contained, configured Erlang environment along with actual software
 written in Erlang that can be deployed and run using a simple command. An embedded node contains:
 \begin{itemize}
-\item Erlang Runtime System
+\item ERTS (Erlang Runtime System)
 \item A set of Erlang applications, the actual code
 \item Configuration for ERTS and applications
 \item An Erlang release

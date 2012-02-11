@@ -8,7 +8,7 @@ database, platform will perform software update on that device.
 
 \subsection{Architecture}
 
-Software Update Platform consists of two main parts (see \textbf{fig.} \ref{fig:architecture}):
+Software Update Platform consists of two main parts (see \textbf{fig.}~\ref{fig:architecture}):
 \begin{itemize}
   \item client application installed on mobile device,
   \item server.
@@ -16,7 +16,7 @@ Software Update Platform consists of two main parts (see \textbf{fig.} \ref{fig:
 
 \begin{figure}[htbp]
   \centering
-    \scalebox{0.9}{
+    \scalebox{0.9}{%
       \includegraphics[width=\textwidth]{graphics/architecture.pdf}
     }
     \caption{General architecture of the Software Update Platform}
@@ -66,14 +66,14 @@ From now on backend can monitor state of that device and performs operations on 
 
 \begin{figure}[htbp]
   \centering
-    \scalebox{0.9}{
+    \scalebox{0.9}{%
       \includegraphics[width=\textwidth]{graphics/session.pdf}
     }
     \caption{Device-server session communication diagram}
     \label{fig:session}
 \end{figure}
 
-\noindent Session between device and server (see \textbf{fig.} \ref{fig:session} above) consists of following steps:
+\noindent Session between device and server (see \textbf{fig.}~\ref{fig:session} above) consists of following steps:
 
 \begin{enumerate}
   \item Device initializes connection which carries following data:
@@ -105,7 +105,7 @@ Update process doesn't interrupt running processes and services on device.
 
 \subsubsection{General description of the Web interface}
 
-Web interface provides simple way to manage groups of devices (see \textbf{fig.} \ref{fig:gui}). User can:
+Web interface provides simple way to manage groups of devices (see \textbf{fig.}~\ref{fig:gui}). User can:
 \begin{itemize}
   \item check last known state of device: IP, version of release, installed application
   \item assign device to one or more categories
@@ -114,7 +114,7 @@ Web interface provides simple way to manage groups of devices (see \textbf{fig.}
 
 \begin{figure}[htbp]
   \centering
-    \scalebox{0.9}{
+    \scalebox{0.9}{%
       \includegraphics[width=\textwidth]{graphics/devices.png}
     }
     \caption{Web interface -- managing devices by category}
@@ -124,12 +124,13 @@ Web interface provides simple way to manage groups of devices (see \textbf{fig.}
 There is also special page for repository where user can upload previously prepared packages.
 
 \subsubsection{Development model for application, debian packaging utilities}
+\label{devmodel}
 
 Software Update Platform proposes a model and provides some tools for development of Erlang software installed
-on the target systems. The main assumption is that the developer uses a tool called {\tt rebar} for managing Erlang software (see \cite{rebar} for more information).
-{\tt rebar} is a script providing functionality for Erlang similar to what {\tt maven} provides for Java development.
-This includes automatic generation of stubs for Erlang applications, build, {\tt .appup} file
+on the target systems. The main assumption is that the developer uses a tool called \texttt{rebar} for managing Erlang software (see \cite{rebar} for more information).
+\texttt{rebar} is a script providing functionality for Erlang similar to what \texttt{maven} provides for Java development.
+This includes automatic generation of stubs for Erlang applications, build, \texttt{.appup} file
 generation, creation of complete, self-contained Erlang nodes (with a runtime), documentation etc.
-Generated Erlang nodes are used as a basis for {\tt .deb} packages generation. This is implemented by a set of
+Generated Erlang nodes are used as a basis for \texttt{.deb} packages generation. This is implemented by a set of
 scripts provided by the Software Update Platform itself.
 

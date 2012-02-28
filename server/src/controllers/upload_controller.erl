@@ -44,13 +44,13 @@ create(Req) ->
     FormData = mochiweb_multipart:parse_form(Req, FileHandler),
     {Filename, _ContentType, _TempFilename} = proplists:get_value("file", FormData),
     RelPath = proplists:get_value("relpath", FormData),
-    PathToPriv = sup_mochiweb_deps:local_path(["priv"]),
-    TmpFilename = filename:join([PathToPriv, "tmp", Filename]),
-    FinalFilename = filename:join([PathToPriv, RelPath, Filename]),
-    {ok, _} = file:copy(TmpFilename, FinalFilename),
-    ok = file:delete(TmpFilename),
+    PathToBinaryRepo = sup_mochiweb_deps:local_path(["priv", "repository", "binary"]),
+    PathToTmp = sup_mochiweb_deps:local_path(["priv", "tmp"]),
+    TmpFilename = filename:join([PathToTmp, Filename]),
+    FinalFilename = filename:join([PathToBinaryRepo, RelPath, Filename]),
+    ok = file:rename(TmpFilename, FinalFilename),
     generate_packages_gz(),
-    Req:respond({302, [{"Location", "/" ++ RelPath }], ""}).
+    Req:respond({302, [{"Location", "/repository/" ++ RelPath }], ""}).
 
 generate_packages_gz() ->
     PathToRepository = sup_mochiweb_deps:local_path(["priv", "repository"]),

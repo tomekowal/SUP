@@ -66,6 +66,17 @@
       {% endif %}
     </table>
 
+    <h3>Release upgrade</h3>
+    <table class="devices">
+      <tr><th>Release Version</th><th></th></tr>
+      <tr>
+        <form action="/devices/{{ device.identity }}/jobs/new/upgrade" method="post" onsubmit="return validate()">
+          <td><input type="text" name="file"/></td>
+          <td><input type="submit" value="Schedule upgrade"/></td>
+        </form>
+      </tr>
+    </table>
+
     <h3>Pending jobs</h3>
     <table class="devices">
       <tr>
@@ -92,19 +103,9 @@
           <td><input type="text" name="module"/></td>
           <td><input type="text" name="function"/></td>
           <td><input type="text" name="extra"/></td>
-          <td><input type="submit"/></td>
+          <td><input type="submit" value="Schedule job"/></td>
         </form>
       <tr>
-    </table>
-    <h3>Upgrade to release</h3>
-    <table class="devices">
-      <tr><th>Release Name</th><th></th></tr>
-      <tr>
-        <form action="/devices/{{ device.identity }}/jobs/new/upgrade" method="post" onsubmit="return validate()">
-          <td><input type="text" name="file"/></td>
-          <td><input type="submit" text="Upgrade"/></td>
-        </form>
-      </tr>
     </table>
 
     <h3>Finished jobs</h3>

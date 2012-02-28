@@ -1,20 +1,33 @@
 {% extends "main/main.dtl" %}
 {% block content %}
+<h3>Debian repository contents</h3>
 <table>
   <tr>
-    <th>Filename</th>
+    <th>Package</th>
+    <th>Version</th>
+    <th>Architecture</th>
     <th>Last modified</th>
-    <th>Filesize</th>
+    <th>Size</th>
   </tr>
-  {% for filename, mtime, filesize in files %}
+  {% for filename, package, version, architecture, mtime, filesize in files %}
     <tr>
-      <td><a href="/{{ relpath }}/{{ filename }}">{{ filename }}</a></td>
+      <td><a href="/{{ relpath }}/{{ filename }}">{{ package }}</a></td>
+      <td>{{ version }}</td>
+      <td>{{ architecture }}</td>
       <td>{{ mtime }}</td>
       <td>{{ filesize }}</td>
+      <td>
+        <form action="/delete" method="post" enctype="multipart/form-data">
+          <input type="hidden" name="filename" value="{{ filename }}">
+          <input type="hidden" name="relpath" value="{{ relpath }}">
+          <input type="submit" value="Delete" onclick="return confirm('Are you sure to delete {{ filename }}?')">
+        </form>
+      </td>
     </tr>
   {% endfor %}
 </table>
 
+<h3>Upload package</h3>
 <form action="/upload" method="post" enctype="multipart/form-data">
   <p>
     <input type="file" name="file">

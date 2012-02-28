@@ -3,7 +3,13 @@
 
 dispatch(Req) ->
     PathToRepository = sup_mochiweb_deps:local_path(["priv", "repository", "binary"]),
-    "/repository/" ++ RelPath = Req:get(path),
+    RelPath = case Req:get(path) of
+        "/repository" ->
+            "";
+        Path ->
+            "/repository/" ++ RPath = Path,
+            RPath
+    end,
     FullPath = filename:join([PathToRepository, RelPath]),
     case filelib:is_dir(FullPath) of
         true ->

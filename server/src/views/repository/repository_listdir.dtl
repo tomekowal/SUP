@@ -11,7 +11,7 @@
   </tr>
   {% for filename, package, version, architecture, mtime, filesize in files %}
     <tr>
-      <td><a href="/{{ relpath }}/{{ filename }}">{{ package }}</a></td>
+      <td><a href="/repository/{{ filename }}">{{ package }}</a></td>
       <td>{{ version }}</td>
       <td>{{ architecture }}</td>
       <td>{{ mtime }}</td>
